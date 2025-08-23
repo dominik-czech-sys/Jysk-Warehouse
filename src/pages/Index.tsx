@@ -8,12 +8,14 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { LogOut, Scan, Users } from "lucide-react";
+import { IframeViewer } from "@/components/IframeViewer"; // Import IframeViewer
 
 const Index = () => {
   const { getArticleById, articles } = useArticles();
   const [foundArticle, setFoundArticle] = useState<Article | null>(null);
   const { logout, isAdmin, user, userWarehouseId } = useAuth();
   const [searchParams] = useSearchParams();
+  const [iframeSrc, setIframeSrc] = useState<string | null>(null); // Stav pro iframe
 
   useEffect(() => {
     const articleIdFromUrl = searchParams.get("articleId");
@@ -31,6 +33,14 @@ const Index = () => {
       setFoundArticle(null);
       toast.error(`Článek ${articleId} nebyl nalezen.`);
     }
+  };
+
+  const handleOpenIframe = (url: string) => {
+    setIframeSrc(url);
+  };
+
+  const handleCloseIframe = () => {
+    setIframeSrc(null);
   };
 
   return (
@@ -52,16 +62,20 @@ const Index = () => {
               </Button>
             </Link>
           )}
-          <a href="https://myjysk.thinktime.com/ui/dashboards/177" target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light">
-              MyJysk
-            </Button>
-          </a>
-          <a href="http://storefront.jysk.com/" target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light">
-              StoreFront
-            </Button>
-          </a>
+          <Button
+            variant="outline"
+            className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light"
+            onClick={() => handleOpenIframe("https://myjysk.thinktime.com/ui/dashboards/177")}
+          >
+            MyJysk
+          </Button>
+          <Button
+            variant="outline"
+            className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light"
+            onClick={() => handleOpenIframe("http://storefront.jysk.com/")}
+          >
+            StoreFront
+          </Button>
           <Button onClick={logout} variant="outline" className="flex items-center">
             <LogOut className="h-4 w-4 mr-2" /> Odhlásit se
           </Button>
@@ -88,6 +102,7 @@ const Index = () => {
         </Link>
       </div>
       <MadeWithDyad />
+      <IframeViewer src={iframeSrc} onClose={handleCloseIframe} />
     </div>
   );
 };

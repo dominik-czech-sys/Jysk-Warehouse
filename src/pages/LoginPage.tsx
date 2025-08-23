@@ -5,13 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { IframeViewer } from "@/components/IframeViewer"; // Import IframeViewer
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [iframeSrc, setIframeSrc] = useState<string | null>(null); // Stav pro iframe
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +21,14 @@ const LoginPage: React.FC = () => {
     } else {
       // toast.error is already called in AuthContext
     }
+  };
+
+  const handleOpenIframe = (url: string) => {
+    setIframeSrc(url);
+  };
+
+  const handleCloseIframe = () => {
+    setIframeSrc(null);
   };
 
   return (
@@ -57,19 +66,26 @@ const LoginPage: React.FC = () => {
             <Button type="submit" className="w-full bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
               Přihlásit se
             </Button>
-            <a href="https://myjysk.thinktime.com/ui/dashboards/177" target="_blank" rel="noopener noreferrer" className="block w-full">
-              <Button type="button" variant="outline" className="w-full mt-4 border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light">
-                Přejít na MyJysk
-              </Button>
-            </a>
-            <a href="http://storefront.jysk.com/" target="_blank" rel="noopener noreferrer" className="block w-full">
-              <Button type="button" variant="outline" className="w-full mt-4 border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light">
-                Přejít na StoreFront
-              </Button>
-            </a>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full mt-4 border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light"
+              onClick={() => handleOpenIframe("https://myjysk.thinktime.com/ui/dashboards/177")}
+            >
+              Přejít na MyJysk
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full mt-4 border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light"
+              onClick={() => handleOpenIframe("http://storefront.jysk.com/")}
+            >
+              Přejít na StoreFront
+            </Button>
           </form>
         </CardContent>
       </Card>
+      <IframeViewer src={iframeSrc} onClose={handleCloseIframe} />
     </div>
   );
 };
