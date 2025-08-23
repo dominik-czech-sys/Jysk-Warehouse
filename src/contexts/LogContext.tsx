@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
-// REMOVED: import { useAuth } from "@/hooks/useAuth"; // Import useAuth pro získání aktuálního uživatele
 
 export interface LogEntry {
   id: string;
@@ -24,9 +23,16 @@ interface LogProviderProps {
 export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
   const [logEntries, setLogEntries] = useState<LogEntry[]>(() => {
     const storedLog = localStorage.getItem("appLog");
-    return storedLog ? JSON.parse(storedLog) : [];
+    if (storedLog) {
+      const parsedLog: LogEntry[] = JSON.parse(storedLog);
+      // Ensure timestamps are numbers when loading from storage
+      return parsedLog.map(entry => ({
+        ...entry,
+        timestamp: typeof entry.timestamp === 'string' ? new Date(entry.timestamp).getTime() : entry.timestamp
+      }));
+    }
+    return [];
   });
-  // REMOVED: const { user } = useAuth(); // No longer directly getting user from AuthContext here
 
   useEffect(() => {
     localStorage.setItem("appLog", JSON.stringify(logEntries));
