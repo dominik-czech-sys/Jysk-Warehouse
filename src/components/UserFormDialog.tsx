@@ -29,9 +29,29 @@ const allPermissions: Permission[] = [
   "article:copy_from_store",
 ];
 
-// Helper to format permission names for display
-const formatPermissionName = (permission: Permission) => {
-  return permission.replace(/([A-Z])/g, ' $1').replace(':', ': ').toUpperCase();
+// Map permissions to their translation keys for descriptions
+const permissionDescriptions: Record<Permission, string> = {
+  "user:view": "permission.user.view",
+  "user:create": "permission.user.create",
+  "user:update": "permission.user.update",
+  "user:delete": "permission.user.delete",
+  "store:view": "permission.store.view",
+  "store:create": "permission.store.create",
+  "store:update": "permission.store.update",
+  "store:delete": "permission.store.delete",
+  "rack:view": "permission.rack.view",
+  "rack:create": "permission.rack.create",
+  "rack:update": "permission.rack.update",
+  "rack:delete": "permission.rack.delete",
+  "article:view": "permission.article.view",
+  "article:create": "permission.article.create",
+  "article:update": "permission.article.update",
+  "article:delete": "permission.article.delete",
+  "article:scan": "permission.article.scan",
+  "article:mass_add": "permission.article.massAdd",
+  "log:view": "permission.log.view",
+  "default_articles:manage": "permission.defaultArticles.manage",
+  "article:copy_from_store": "permission.article.copyFromStore",
 };
 
 interface UserFormDialogProps {
@@ -202,7 +222,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
                     disabled={!isAdmin && formData.role === "admin"} // Only admin can change admin permissions
                   />
                   <Label htmlFor={permission} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                    {formatPermissionName(permission)}
+                    {t(permissionDescriptions[permission])} {/* Zobrazujeme popis oprávnění */}
                   </Label>
                 </div>
               ))}

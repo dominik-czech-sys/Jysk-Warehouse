@@ -39,6 +39,28 @@ const logCategories = {
   "Article Copy": ["Artikly zkopírovány"],
 };
 
+// Map internal category keys to translation keys
+const logCategoryTranslationKeys: Record<keyof typeof logCategories, string> = {
+  "Full Log": "logCategory.fullLog",
+  "Login": "logCategory.login",
+  "LogOff": "logCategory.logOff",
+  "User Add": "logCategory.userAdd",
+  "User Edit": "logCategory.userEdit",
+  "User Delete": "logCategory.userDelete",
+  "Article Add": "logCategory.articleAdd",
+  "Article Edit": "logCategory.articleEdit",
+  "Article Delete": "logCategory.articleDelete",
+  "Article Search": "logCategory.articleSearch",
+  "Rack Add": "logCategory.rackAdd",
+  "Rack Edit": "logCategory.rackEdit",
+  "Rack Delete": "logCategory.rackDelete",
+  "Store Add": "logCategory.storeAdd",
+  "Store Edit": "logCategory.storeEdit",
+  "Store Delete": "logCategory.storeDelete",
+  "Default Articles Add": "logCategory.defaultArticlesAdd",
+  "Article Copy": "logCategory.articleCopy",
+};
+
 export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
   const { logEntries, clearLog } = useLog();
   const { t, i18n } = useTranslation(); // Initialize useTranslation
@@ -103,7 +125,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
               <SelectContent>
                 {Object.keys(logCategories).map(category => (
                   <SelectItem key={category} value={category}>
-                    {t(`common.${category.replace(/\s/g, "")}Log`)}
+                    {t(logCategoryTranslationKeys[category])} {/* Používáme nové klíče pro překlad */}
                   </SelectItem>
                 ))}
               </SelectContent>
