@@ -2,15 +2,15 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Boxes, LayoutDashboard, Warehouse, ScrollText } from "lucide-react"; // Import ScrollText for Log
+import { Boxes, LayoutDashboard, Warehouse } from "lucide-react"; // Odstraněn ScrollText
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next"; // Import useTranslation
 
 interface ManagementMenuProps {
-  onViewLog: () => void; // Add prop to open LogViewer
+  // onViewLog: () => void; // Odstraněn prop
 }
 
-export const ManagementMenu: React.FC<ManagementMenuProps> = ({ onViewLog }) => {
+export const ManagementMenu: React.FC<ManagementMenuProps> = (/* { onViewLog } */) => {
   const { hasPermission } = useAuth();
   const { t } = useTranslation(); // Initialize useTranslation
 
@@ -36,11 +36,7 @@ export const ManagementMenu: React.FC<ManagementMenuProps> = ({ onViewLog }) => 
             </Link>
           </DropdownMenuItem>
         )}
-        {hasPermission("log:view") && (
-          <DropdownMenuItem onClick={onViewLog} className="flex items-center">
-            <ScrollText className="h-4 w-4 mr-2" /> {t("common.viewLog")}
-          </DropdownMenuItem>
-        )}
+        {/* Odkaz na LogViewer byl přesunut do SiteDashboard */}
       </DropdownMenuContent>
     </DropdownMenu>
   );

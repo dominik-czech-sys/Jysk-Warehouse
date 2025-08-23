@@ -124,7 +124,7 @@ const SiteDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-6xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-8">
+      <div className="w-full max-w-6xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-8 animate-fade-in">
         <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-6 space-y-4 sm:space-y-0">
           <Link to="/" className="w-full sm:w-auto">
             <Button variant="outline" className="flex items-center w-full">
@@ -136,7 +136,7 @@ const SiteDashboard: React.FC = () => {
         </div>
 
         {/* Overview Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-slide-in-up">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t("common.totalStores")}</CardTitle>
@@ -178,7 +178,7 @@ const SiteDashboard: React.FC = () => {
         <Separator className="my-8" />
 
         {/* Store Management Section */}
-        <div className="mb-8">
+        <div className="mb-8 w-full animate-fade-in">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.storeManagement")}</h2>
             <div className="flex space-x-2">
@@ -194,7 +194,7 @@ const SiteDashboard: React.FC = () => {
               )}
             </div>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -245,7 +245,7 @@ const SiteDashboard: React.FC = () => {
         <Separator className="my-8" />
 
         {/* User Management Section */}
-        <div className="mb-8">
+        <div className="mb-8 w-full animate-fade-in">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.userManagement")}</h2>
             <div className="flex space-x-2">
@@ -256,7 +256,7 @@ const SiteDashboard: React.FC = () => {
               )}
             </div>
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -310,8 +310,22 @@ const SiteDashboard: React.FC = () => {
 
         {/* Default Article Management Section */}
         {hasPermission("default_articles:manage") && (
-          <div className="mb-8">
+          <div className="mb-8 w-full animate-fade-in">
             <DefaultArticleManager />
+          </div>
+        )}
+
+        <Separator className="my-8" />
+
+        {/* Log Viewer Section */}
+        {hasPermission("log:view") && (
+          <div className="mb-8 w-full animate-fade-in">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.logActivity")}</h2>
+              <Button onClick={() => setIsLogViewerOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+                <ScrollText className="h-4 w-4 mr-2" /> {t("common.viewLog")}
+              </Button>
+            </div>
           </div>
         )}
 
