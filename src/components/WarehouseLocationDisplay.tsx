@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Layers } from "lucide-react";
+import { MapPin, Layers, Info } from "lucide-react"; // Přidáno Info ikona
 import { Article } from "@/data/articles";
 
 interface WarehouseLocationDisplayProps {
@@ -38,6 +38,11 @@ export const WarehouseLocationDisplay: React.FC<WarehouseLocationDisplayProps> =
           <Layers className="h-6 w-6 text-purple-500" />
           <span className="font-semibold">Sklad:</span>
           <span className="text-gray-700 dark:text-gray-300">{article.warehouseId}</span>
+        </div>
+        <div className="flex items-center justify-center space-x-3 text-lg">
+          <Info className="h-6 w-6 text-blue-500" /> {/* Nová ikona pro status */}
+          <span className="font-semibold">Status:</span>
+          <span className="text-gray-700 dark:text-gray-300">{article.status}</span>
         </div>
       </CardContent>
     </Card>

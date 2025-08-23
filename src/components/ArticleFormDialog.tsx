@@ -12,13 +12,13 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Article } from "@/data/articles";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/useAuth"; // Import useAuth
+import { useAuth } from "@/hooks/useAuth";
 
 interface ArticleFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (article: Article) => void;
-  article?: Article | null; // Optional: if provided, it's for editing
+  article?: Article | null;
 }
 
 export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
@@ -27,7 +27,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
   onSubmit,
   article,
 }) => {
-  const { userWarehouseId } = useAuth(); // Get user's warehouse ID
+  const { userWarehouseId } = useAuth();
 
   const [formData, setFormData] = useState<Article>({
     id: "",
@@ -36,7 +36,8 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
     shelfNumber: "",
     location: "",
     floor: "",
-    warehouseId: userWarehouseId || "", // Initialize with user's warehouseId
+    warehouseId: userWarehouseId || "",
+    status: "", // Nové pole pro status
   });
 
   useEffect(() => {
@@ -50,10 +51,11 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
         shelfNumber: "",
         location: "",
         floor: "",
-        warehouseId: userWarehouseId || "", // Reset with user's warehouseId
+        warehouseId: userWarehouseId || "",
+        status: "", // Reset s prázdným statusem
       });
     }
-  }, [article, isOpen, userWarehouseId]); // Add userWarehouseId to dependencies
+  }, [article, isOpen, userWarehouseId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -62,7 +64,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.id || !formData.name || !formData.shelf || !formData.shelfNumber || !formData.location || !formData.floor || !formData.warehouseId) {
+    if (!formData.id || !formData.name || !formData.shelf || !formData.shelfNumber || !formData.location || !formData.floor || !formData.warehouseId || !formData.status) {
       toast.error("Prosím, vyplňte všechna pole.");
       return;
     }
@@ -89,7 +91,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               value={formData.id}
               onChange={handleChange}
               className="col-span-3"
-              readOnly={!!article} // Make ID read-only when editing
+              readOnly={!!article}
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -156,7 +158,19 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               value={formData.warehouseId}
               onChange={handleChange}
               className="col-span-3"
-              readOnly={!userWarehouseId} // Make warehouseId read-only if user has one
+              readOnly={!userWarehouseId}
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="status" className="text-right">
+              Status zboží
+            </Label>
+            <Input
+              id="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="col-span-3"
+              placeholder="Např. 21"
             />
           </div>
           <DialogFooter>

@@ -94,7 +94,8 @@ const ManageArticles = () => {
               <TableHead>Číslo regálu</TableHead>
               <TableHead>Umístění</TableHead>
               <TableHead>Patro</TableHead>
-              {isAdmin && <TableHead>ID Skladu</TableHead>} {/* Only show warehouse ID for admin */}
+              <TableHead>Status</TableHead> {/* Nový sloupec pro status */}
+              {isAdmin && <TableHead>ID Skladu</TableHead>}
               <TableHead className="text-right">Akce</TableHead>
             </TableRow>
           </TableHeader>
@@ -107,6 +108,7 @@ const ManageArticles = () => {
                 <TableCell>{article.shelfNumber}</TableCell>
                 <TableCell>{article.location}</TableCell>
                 <TableCell>{article.floor}</TableCell>
+                <TableCell>{article.status}</TableCell> {/* Zobrazení statusu */}
                 {isAdmin && <TableCell>{article.warehouseId}</TableCell>}
                 <TableCell className="text-right">
                   <Button
@@ -142,7 +144,7 @@ const ManageArticles = () => {
         isOpen={isAddDialogOpen}
         onClose={() => setIsAddDialogOpen(false)}
         onSubmit={handleAddArticle}
-        article={null} // No article for adding
+        article={null}
       />
 
       <ArticleFormDialog
