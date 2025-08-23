@@ -66,74 +66,76 @@ const ManageArticles = () => {
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
       <div className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-8">
-        <div className="flex justify-between items-center mb-6">
-          <Link to="/">
-            <Button variant="outline" className="flex items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-6 space-y-4 sm:space-y-0">
+          <Link to="/" className="w-full sm:w-auto">
+            <Button variant="outline" className="flex items-center w-full">
               <ArrowLeft className="h-4 w-4 mr-2" /> Zpět na hlavní stránku
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Správa článků</h1>
-          <div className="flex space-x-2">
-            <Link to="/skenovat-carkod">
-              <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Správa článků</h1>
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+            <Link to="/skenovat-carkod" className="w-full sm:w-auto">
+              <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
                 <Scan className="h-4 w-4 mr-2" /> Skenovat
               </Button>
             </Link>
-            <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+            <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">
               <PlusCircle className="h-4 w-4 mr-2" /> Přidat článek
             </Button>
           </div>
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">ID</TableHead>
-              <TableHead>Název</TableHead>
-              <TableHead>Regál</TableHead>
-              <TableHead>Číslo regálu</TableHead>
-              <TableHead>Umístění</TableHead>
-              <TableHead>Patro</TableHead>
-              <TableHead>Status</TableHead> {/* Nový sloupec pro status */}
-              {isAdmin && <TableHead>ID Skladu</TableHead>}
-              <TableHead className="text-right">Akce</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {articles.map((article) => (
-              <TableRow key={article.id}>
-                <TableCell className="font-medium">{article.id}</TableCell>
-                <TableCell>{article.name}</TableCell>
-                <TableCell>{article.shelf}</TableCell>
-                <TableCell>{article.shelfNumber}</TableCell>
-                <TableCell>{article.location}</TableCell>
-                <TableCell>{article.floor}</TableCell>
-                <TableCell>{article.status}</TableCell> {/* Zobrazení statusu */}
-                {isAdmin && <TableCell>{article.warehouseId}</TableCell>}
-                <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="mr-2"
-                    onClick={() => {
-                      setEditingArticle(article);
-                      setIsEditDialogOpen(true);
-                    }}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteArticle(article.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
+        <div className="overflow-x-auto"> {/* Obalení tabulky pro horizontální posouvání */}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="min-w-[80px]">ID</TableHead>
+                <TableHead className="min-w-[150px]">Název</TableHead>
+                <TableHead className="min-w-[80px]">Regál</TableHead>
+                <TableHead className="min-w-[100px]">Číslo regálu</TableHead>
+                <TableHead className="min-w-[120px]">Umístění</TableHead>
+                <TableHead className="min-w-[80px]">Patro</TableHead>
+                <TableHead className="min-w-[100px]">Status</TableHead>
+                {isAdmin && <TableHead className="min-w-[100px]">ID Skladu</TableHead>}
+                <TableHead className="text-right min-w-[100px]">Akce</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {articles.map((article) => (
+                <TableRow key={article.id}>
+                  <TableCell className="font-medium">{article.id}</TableCell>
+                  <TableCell>{article.name}</TableCell>
+                  <TableCell>{article.shelf}</TableCell>
+                  <TableCell>{article.shelfNumber}</TableCell>
+                  <TableCell>{article.location}</TableCell>
+                  <TableCell>{article.floor}</TableCell>
+                  <TableCell>{article.status}</TableCell>
+                  {isAdmin && <TableCell>{article.warehouseId}</TableCell>}
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mr-2"
+                      onClick={() => {
+                        setEditingArticle(article);
+                        setIsEditDialogOpen(true);
+                      }}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteArticle(article.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
 
         {articles.length === 0 && (
           <p className="text-center text-muted-foreground mt-4">Žádné články nebyly nalezeny. Přidejte nový!</p>

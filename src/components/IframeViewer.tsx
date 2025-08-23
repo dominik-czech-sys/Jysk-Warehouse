@@ -24,6 +24,9 @@ export const IframeViewer: React.FC<IframeViewerProps> = ({ src, onClose }) => {
         title="External Content"
         className="flex-grow w-full border-none rounded-lg shadow-lg"
         allowFullScreen
+        // Přidání atributu sandbox pro lepší kontrolu nad obsahem iframe
+        // Umožňuje navigaci, skripty, formuláře atd. uvnitř iframe
+        sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-downloads allow-pointer-lock allow-orientation-lock allow-presentation allow-top-navigation-by-user-activation"
       ></iframe>
     </div>
   );

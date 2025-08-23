@@ -37,7 +37,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
     location: "",
     floor: "",
     warehouseId: userWarehouseId || "",
-    status: "", // Nové pole pro status
+    status: "",
   });
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
         location: "",
         floor: "",
         warehouseId: userWarehouseId || "",
-        status: "", // Reset s prázdným statusem
+        status: "",
       });
     }
   }, [article, isOpen, userWarehouseId]);
@@ -82,8 +82,8 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="id" className="text-right">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="id" className="sm:text-right">
               ID článku
             </Label>
             <Input
@@ -94,8 +94,8 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               readOnly={!!article}
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="name" className="sm:text-right">
               Název
             </Label>
             <Input
@@ -105,8 +105,8 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               className="col-span-3"
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="shelf" className="text-right">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="shelf" className="sm:text-right">
               Regál
             </Label>
             <Input
@@ -116,8 +116,8 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               className="col-span-3"
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="shelfNumber" className="text-right">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="shelfNumber" className="sm:text-right">
               Číslo regálu
             </Label>
             <Input
@@ -127,8 +127,8 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               className="col-span-3"
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="location" className="text-right">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="location" className="sm:text-right">
               Umístění
             </Label>
             <Input
@@ -138,8 +138,8 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               className="col-span-3"
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="floor" className="text-right">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="floor" className="sm:text-right">
               Patro
             </Label>
             <Input
@@ -149,8 +149,8 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               className="col-span-3"
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="warehouseId" className="text-right">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="warehouseId" className="sm:text-right">
               ID Skladu
             </Label>
             <Input
@@ -161,8 +161,8 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               readOnly={!userWarehouseId}
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="status" className="text-right">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="status" className="sm:text-right">
               Status zboží
             </Label>
             <Input

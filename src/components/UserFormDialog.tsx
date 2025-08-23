@@ -76,8 +76,8 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="username" className="text-right">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="username" className="sm:text-right">
               Uživatelské jméno
             </Label>
             <Input
@@ -85,11 +85,11 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
               value={formData.username}
               onChange={handleChange}
               className="col-span-3"
-              readOnly={!!user} // Make username read-only when editing
+              readOnly={!!user}
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="password" className="text-right">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="password" className="sm:text-right">
               Heslo
             </Label>
             <Input
@@ -100,8 +100,8 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
               className="col-span-3"
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="role" className="text-right">
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="role" className="sm:text-right">
               Role
             </Label>
             <Select onValueChange={handleRoleChange} value={formData.role}>
@@ -115,8 +115,8 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
             </Select>
           </div>
           {formData.role === "skladnik" && (
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="warehouseId" className="text-right">
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+              <Label htmlFor="warehouseId" className="sm:text-right">
                 ID Skladu
               </Label>
               <Input

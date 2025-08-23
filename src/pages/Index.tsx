@@ -8,21 +8,21 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { LogOut, Scan, Users } from "lucide-react";
-import { IframeViewer } from "@/components/IframeViewer"; // Import IframeViewer
+import { IframeViewer } from "@/components/IframeViewer";
 
 const Index = () => {
   const { getArticleById, articles } = useArticles();
   const [foundArticle, setFoundArticle] = useState<Article | null>(null);
   const { logout, isAdmin, user, userWarehouseId } = useAuth();
   const [searchParams] = useSearchParams();
-  const [iframeSrc, setIframeSrc] = useState<string | null>(null); // Stav pro iframe
+  const [iframeSrc, setIframeSrc] = useState<string | null>(null);
 
   useEffect(() => {
     const articleIdFromUrl = searchParams.get("articleId");
     if (articleIdFromUrl) {
       handleSearch(articleIdFromUrl);
     }
-  }, [searchParams, articles]); // Re-run effect if articles change
+  }, [searchParams, articles]);
 
   const handleSearch = (articleId: string) => {
     const article = getArticleById(articleId);
@@ -45,58 +45,58 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-4xl flex justify-between items-center mb-8">
-        <div className="flex items-center space-x-4">
-          <h1 className="text-4xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">JYSK Sklad</h1>
+      <div className="w-full max-w-4xl flex flex-col md:flex-row justify-between items-center md:items-start mb-8 space-y-4 md:space-y-0">
+        <div className="flex flex-col items-center md:items-start space-y-2 md:space-x-4 md:flex-row">
+          <h1 className="text-4xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light text-center md:text-left">JYSK Sklad</h1>
           {user && (
-            <span className="text-lg text-gray-700 dark:text-gray-300">
+            <span className="text-lg text-gray-700 dark:text-gray-300 text-center md:text-left">
               Přihlášen jako: <span className="font-semibold">{user.username}</span> ({user.role === "admin" ? "Admin" : `Skladník - ${userWarehouseId}`})
             </span>
           )}
         </div>
-        <div className="flex space-x-2">
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full md:w-auto justify-center md:justify-end">
           {isAdmin && (
-            <Link to="/admin/uzivatele">
-              <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+            <Link to="/admin/uzivatele" className="w-full sm:w-auto">
+              <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
                 <Users className="h-4 w-4 mr-2" /> Správa uživatelů
               </Button>
             </Link>
           )}
           <Button
             variant="outline"
-            className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light"
+            className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light w-full sm:w-auto"
             onClick={() => handleOpenIframe("https://myjysk.thinktime.com/ui/dashboards/177")}
           >
             MyJysk
           </Button>
           <Button
             variant="outline"
-            className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light"
+            className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light w-full sm:w-auto"
             onClick={() => handleOpenIframe("http://storefront.jysk.com/")}
           >
             StoreFront
           </Button>
-          <Button onClick={logout} variant="outline" className="flex items-center">
+          <Button onClick={logout} variant="outline" className="flex items-center w-full sm:w-auto">
             <LogOut className="h-4 w-4 mr-2" /> Odhlásit se
           </Button>
         </div>
       </div>
 
-      <div className="text-center mb-8">
+      <div className="text-center mb-8 w-full">
         <p className="text-xl text-gray-600 dark:text-gray-400">
           Zadejte ID článku pro zjištění jeho umístění a patra.
         </p>
       </div>
       <WarehouseSearch onSearch={handleSearch} />
-      <div className="mt-8">
+      <div className="mt-8 w-full max-w-sm">
         <WarehouseLocationDisplay article={foundArticle} />
       </div>
-      <div className="mt-8 flex space-x-4">
-        <Link to="/spravovat-clanky">
-          <Button variant="outline" className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">Spravovat články</Button>
+      <div className="mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full max-w-sm">
+        <Link to="/spravovat-clanky" className="w-full">
+          <Button variant="outline" className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">Spravovat články</Button>
         </Link>
-        <Link to="/skenovat-carkod">
-          <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+        <Link to="/skenovat-carkod" className="w-full">
+          <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
             <Scan className="h-4 w-4 mr-2" /> Skenovat čárový kód
           </Button>
         </Link>

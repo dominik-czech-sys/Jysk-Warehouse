@@ -21,7 +21,7 @@ const CteckaCarkoduPage: React.FC = () => {
       html5QrcodeScanner.clear();
       setScanResult(decodedText);
       toast.success(`Čárový kód naskenován: ${decodedText}`);
-      navigate(`/?articleId=${decodedText}`); // Redirect to home with article ID
+      navigate(`/?articleId=${decodedText}`);
     };
 
     const onScanError = (errorMessage: string) => {
@@ -40,13 +40,13 @@ const CteckaCarkoduPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
       <div className="w-full max-w-md bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-8">
-        <div className="flex justify-between items-center mb-6">
-          <Link to="/">
-            <Button variant="outline" className="flex items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-6 space-y-4 sm:space-y-0">
+          <Link to="/" className="w-full sm:w-auto">
+            <Button variant="outline" className="flex items-center w-full">
               <ArrowLeft className="h-4 w-4 mr-2" /> Zpět na hlavní stránku
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Skenování čárového kódu</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Skenování čárového kódu</h1>
         </div>
 
         <Card className="w-full text-center p-6">
