@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
-import { User, users } from "@/data/users";
+import { User, users as initialUsers } from "@/data/users"; // Rename initialUsers to avoid conflict
 import { toast } from "sonner";
 
 interface AuthContextType {
@@ -23,7 +23,10 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [allUsers, setAllUsers] = useState<User[]>(users);
+  const [allUsers, setAllUsers] = useState<User[]>(() => {
+    const storedUsers = localStorage.getItem("allUsers");
+    return storedUsers ? JSON.parse(storedUsers) : initialUsers;
+  });
 
   useEffect(() => {
     const storedUser = localStorage.getItem("currentUser");
@@ -31,6 +34,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setCurrentUser(JSON.parse(storedUser));
     }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("allUsers", JSON.stringify(allUsers));
+  }, [allUsers]);
 
   const login = (username: string, password: string): boolean => {
     const foundUser = allUsers.find(

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth"; // Import useAuth
 
 export interface Article {
@@ -31,7 +31,14 @@ const initialArticles: Article[] = [
 
 export const useArticles = () => {
   const { userWarehouseId, isAdmin } = useAuth(); // Get user's warehouse ID and admin status
-  const [articles, setArticles] = useState<Article[]>(initialArticles);
+  const [articles, setArticles] = useState<Article[]>(() => {
+    const storedArticles = localStorage.getItem("articles");
+    return storedArticles ? JSON.parse(storedArticles) : initialArticles;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("articles", JSON.stringify(articles));
+  }, [articles]);
 
   // Filter articles based on user's warehouseId if not an admin
   const filteredArticles = isAdmin
