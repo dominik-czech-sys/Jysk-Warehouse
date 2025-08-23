@@ -13,6 +13,7 @@ import { ManagementMenu } from "@/components/ManagementMenu"; // Import new Mana
 import { ThemeToggle } from "@/components/ThemeToggle"; // Import ThemeToggle
 import { LanguageSwitcher } from "@/components/LanguageSwitcher"; // Import LanguageSwitcher
 import { useTranslation } from "react-i18next"; // Import useTranslation
+import { LogViewer } from "@/components/LogViewer"; // Import LogViewer
 
 const Index = () => {
   const { getArticleById, articles } = useArticles();
