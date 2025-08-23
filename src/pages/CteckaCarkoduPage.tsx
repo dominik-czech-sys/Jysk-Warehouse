@@ -6,11 +6,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Scan } from "lucide-react";
 import { toast } from "sonner";
 import { useLog } from "@/contexts/LogContext"; // Import useLog
+import { useAuth } from "@/hooks/useAuth"; // Import useAuth to get current user
 
 const CteckaCarkoduPage: React.FC = () => {
   const [scanResult, setScanResult] = useState<string | null>(null);
   const navigate = useNavigate();
   const { addLogEntry } = useLog(); // Použití useLog
+  const { user } = useAuth(); // Get current user
 
   useEffect(() => {
     const html5QrcodeScanner = new Html5QrcodeScanner(
@@ -23,7 +25,7 @@ const CteckaCarkoduPage: React.FC = () => {
       html5QrcodeScanner.clear();
       setScanResult(decodedText);
       toast.success(`Čárový kód naskenován: ${decodedText}`);
-      addLogEntry("Čárový kód naskenován", { scannedCode: decodedText });
+      addLogEntry("Čárový kód naskenován", { scannedCode: decodedText }, user?.username); // Pass username
       navigate(`/?articleId=${decodedText}`);
     };
 
@@ -38,7 +40,7 @@ const CteckaCarkoduPage: React.FC = () => {
         console.error("Failed to clear html5QrcodeScanner", error);
       });
     };
-  }, [navigate, addLogEntry]);
+  }, [navigate, addLogEntry, user?.username]); // Add user.username to dependencies
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">

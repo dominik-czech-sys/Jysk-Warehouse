@@ -1,17 +1,17 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import { useAuth } from "@/hooks/useAuth"; // Import useAuth pro získání aktuálního uživatele
+// REMOVED: import { useAuth } from "@/hooks/useAuth"; // Import useAuth pro získání aktuálního uživatele
 
 export interface LogEntry {
   id: string;
   timestamp: string;
-  user: string;
+  user: string; // User's username
   action: string;
   details?: Record<string, any>;
 }
 
 interface LogContextType {
   logEntries: LogEntry[];
-  addLogEntry: (action: string, details?: Record<string, any>) => void;
+  addLogEntry: (action: string, details?: Record<string, any>, username?: string) => void; // Added username parameter
   clearLog: () => void;
 }
 
@@ -26,17 +26,17 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
     const storedLog = localStorage.getItem("appLog");
     return storedLog ? JSON.parse(storedLog) : [];
   });
-  const { user } = useAuth(); // Získání aktuálního uživatele z AuthContextu
+  // REMOVED: const { user } = useAuth(); // No longer directly getting user from AuthContext here
 
   useEffect(() => {
     localStorage.setItem("appLog", JSON.stringify(logEntries));
   }, [logEntries]);
 
-  const addLogEntry = (action: string, details?: Record<string, any>) => {
+  const addLogEntry = (action: string, details?: Record<string, any>, username?: string) => {
     const newEntry: LogEntry = {
       id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
       timestamp: new Date().toLocaleString(),
-      user: user ? user.username : "Neznámý",
+      user: username || "Neznámý", // Use provided username or "Neznámý"
       action,
       details,
     };

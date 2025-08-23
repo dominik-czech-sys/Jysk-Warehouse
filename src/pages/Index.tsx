@@ -23,18 +23,18 @@ const Index = () => {
     if (articleIdFromUrl) {
       handleSearch(articleIdFromUrl);
     }
-  }, [searchParams, articles]);
+  }, [searchParams, articles, user?.username]); // Add user.username to dependencies
 
   const handleSearch = (articleId: string) => {
     const article = getArticleById(articleId);
     if (article) {
       setFoundArticle(article);
       toast.success(`Článek ${articleId} nalezen!`);
-      addLogEntry("Článek vyhledán", { articleId, found: true });
+      addLogEntry("Článek vyhledán", { articleId, found: true }, user?.username); // Pass username
     } else {
       setFoundArticle(null);
       toast.error(`Článek ${articleId} nebyl nalezen.`);
-      addLogEntry("Článek vyhledán", { articleId, found: false });
+      addLogEntry("Článek vyhledán", { articleId, found: false }, user?.username); // Pass username
     }
   };
 
