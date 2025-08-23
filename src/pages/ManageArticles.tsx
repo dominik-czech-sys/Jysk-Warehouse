@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useArticles, Article } from "@/data/articles";
 import { Link } from "react-router-dom";
-import { ArrowLeft, PlusCircle, Edit, Trash2, Scan } from "lucide-react";
+import { ArrowLeft, PlusCircle, Edit, Trash2, Scan, Boxes } from "lucide-react"; // Added Boxes icon
 import { ArticleFormDialog } from "@/components/ArticleFormDialog";
 import { toast } from "sonner";
 import {
@@ -77,6 +77,11 @@ const ManageArticles = () => {
             <Link to="/skenovat-carkod" className="w-full sm:w-auto">
               <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
                 <Scan className="h-4 w-4 mr-2" /> Skenovat
+              </Button>
+            </Link>
+            <Link to="/mass-add-articles" className="w-full sm:w-auto"> {/* New button for mass add */}
+              <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
+                <Boxes className="h-4 w-4 mr-2" /> Hromadné přidání
               </Button>
             </Link>
             <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">

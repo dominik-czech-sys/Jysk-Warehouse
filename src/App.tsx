@@ -9,8 +9,9 @@ import ManageArticles from "./pages/ManageArticles";
 import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import CteckaCarkoduPage from "./pages/CteckaCarkoduPage";
+import MassAddArticlesPage from "./pages/MassAddArticlesPage"; // Import new page
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
-import { LogProvider } from "./contexts/LogContext"; // Import LogProvider
+import { LogProvider } from "./contexts/LogContext";
 import { useContext } from "react";
 
 const queryClient = new QueryClient();
@@ -70,6 +71,14 @@ const AppContent = () => {
           </PrivateRoute>
         }
       />
+      <Route
+        path="/mass-add-articles" // New route for mass article addition
+        element={
+          <PrivateRoute>
+            <MassAddArticlesPage />
+          </PrivateRoute>
+        }
+      />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -82,7 +91,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <LogProvider> {/* LogProvider nyní obaluje AuthProvider */}
+        <LogProvider>
           <AuthProvider>
             <AppContent />
           </AuthProvider>

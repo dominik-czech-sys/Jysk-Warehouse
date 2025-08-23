@@ -24,10 +24,10 @@ const logCategories = {
   "User Add": ["Uživatel přidán", "Pokus o přidání existujícího uživatele"],
   "User Edit": ["Uživatel aktualizován"],
   "User Delete": ["Uživatel smazán"],
-  "Article Add": ["Článek přidán"],
-  "Article Edit": ["Článek aktualizován"],
+  "Article Add": ["Článek přidán", "Článek přidán (hromadné přidání)"],
+  "Article Edit": ["Článek aktualizován", "Článek aktualizován (hromadné přidání)"],
   "Article Delete": ["Článek smazán"],
-  "Article Search": ["Článek vyhledán", "Čárový kód naskenován"],
+  "Article Search": ["Článek vyhledán", "Čárový kód naskenován", "Čárový kód naskenován pro hromadné přidání"],
 };
 
 export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
@@ -93,7 +93,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="flex-grow p-0">
+        <CardContent className="flex-grow p-0 flex flex-col"> {/* Added flex flex-col here */}
           <ScrollArea className="h-full w-full rounded-md border p-4">
             {filteredAndGroupedLogs.length === 0 ? (
               <p className="text-center text-muted-foreground">Žádné záznamy pro vybraný filtr.</p>
