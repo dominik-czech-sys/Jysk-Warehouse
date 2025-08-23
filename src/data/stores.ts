@@ -54,8 +54,6 @@ export const useStores = () => {
           ...defaultArticle,
           rackId: "N/A", // Placeholder
           shelfNumber: "N/A", // Placeholder
-          location: "N/A", // Placeholder
-          floor: "N/A", // Placeholder
           storeId: newStore.id,
           quantity: 1, // Default quantity for default articles
         };

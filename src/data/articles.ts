@@ -221,18 +221,20 @@ const rawArticleData = `
 export const useArticles = () => {
   const { userStoreId, isAdmin, user } = useAuth();
   const { addLogEntry } = useLog();
-  const { shelfRacks } = useShelfRacks(); // Use the shelfRacks hook
+  const { allShelfRacks } = useShelfRacks(); // Use allShelfRacks here
 
   const [articles, setArticles] = useState<Article[]>(() => {
     const storedArticles = localStorage.getItem("articles");
-    if (storedArticles) {
-      return JSON.parse(storedArticles);
-    } else {
-      // Assign initial articles to a default store and rack for demonstration
+    return storedArticles ? JSON.parse(storedArticles) : []; // Initialize with empty array if no stored data
+  });
+
+  // Effect to load initial articles if localStorage is empty
+  useEffect(() => {
+    if (articles.length === 0 && localStorage.getItem("articles") === null) {
       const parsedArticles: Article[] = [];
       const lines = rawArticleData.trim().split('\n');
       lines.forEach(line => {
-        const match = line.match(/^(\d+) \((\d+)\)\s+(.+?)\s+(\d+)\s+KS/); // Capture quantity
+        const match = line.match(/^(\d+) \((\d+)\)\s+(.+?)\s+(\d+)\s+KS/);
         if (match) {
           const id = match[1];
           const status = match[2];
@@ -240,7 +242,8 @@ export const useArticles = () => {
           const quantity = parseInt(match[4], 10);
 
           // Assign to a default rack (e.g., "A-1" in "Sklad 1")
-          const defaultRack = shelfRacks.find(r => r.id === "A-1" && r.storeId === "Sklad 1");
+          // Now `allShelfRacks` is available from the hook context
+          const defaultRack = allShelfRacks.find(r => r.id === "A-1" && r.storeId === "Sklad 1");
           if (defaultRack && defaultRack.shelves.length > 0) {
             const randomShelf = defaultRack.shelves[Math.floor(Math.random() * defaultRack.shelves.length)];
             parsedArticles.push({
@@ -253,7 +256,6 @@ export const useArticles = () => {
               storeId: defaultRack.storeId,
             });
           } else {
-            // Fallback if default rack not found or has no shelves
             parsedArticles.push({
               id,
               name,
@@ -261,15 +263,17 @@ export const useArticles = () => {
               quantity,
               rackId: "N/A",
               shelfNumber: "N/A",
-              storeId: "Sklad 1", // Assign to a default store
+              storeId: "Sklad 1",
             });
           }
         }
       });
-      return parsedArticles;
+      setArticles(parsedArticles);
+      localStorage.setItem("articles", JSON.stringify(parsedArticles)); // Store immediately after parsing
     }
-  });
+  }, [articles.length, allShelfRacks]); // Depend on articles.length and allShelfRacks
 
+  // Effect to persist articles to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem("articles", JSON.stringify(articles));
   }, [articles]);
