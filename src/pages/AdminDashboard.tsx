@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, PlusCircle, Edit, Trash2 } from "lucide-react";
+import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText } from "lucide-react"; // Přidáno ScrollText ikona
 import { UserFormDialog } from "@/components/UserFormDialog";
 import { toast } from "sonner";
 import {
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { User } from "@/data/users";
+import { LogViewer } from "@/components/LogViewer"; // Import LogViewer
 
 const AdminDashboard: React.FC = () => {
   const { allUsers, addUser, updateUser, deleteUser } = useAuth();
@@ -33,6 +34,7 @@ const AdminDashboard: React.FC = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [userToDeleteUsername, setUserToDeleteUsername] = useState<string | null>(null);
+  const [isLogViewerOpen, setIsLogViewerOpen] = useState(false); // Stav pro LogViewer
 
   const handleAddUser = (newUser: User) => {
     addUser(newUser);
@@ -65,9 +67,14 @@ const AdminDashboard: React.FC = () => {
             </Button>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Správa uživatelů</h1>
-          <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">
-            <PlusCircle className="h-4 w-4 mr-2" /> Přidat uživatele
-          </Button>
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+            <Button onClick={() => setIsLogViewerOpen(true)} className="flex items-center bg-gray-600 hover:bg-gray-700 text-white w-full sm:w-auto">
+              <ScrollText className="h-4 w-4 mr-2" /> Zobrazit Log
+            </Button>
+            <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">
+              <PlusCircle className="h-4 w-4 mr-2" /> Přidat uživatele
+            </Button>
+          </div>
         </div>
 
         <div className="overflow-x-auto"> {/* Obalení tabulky pro horizontální posouvání */}
@@ -149,6 +156,8 @@ const AdminDashboard: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <LogViewer isOpen={isLogViewerOpen} onClose={() => setIsLogViewerOpen(false)} />
     </div>
   );
 };

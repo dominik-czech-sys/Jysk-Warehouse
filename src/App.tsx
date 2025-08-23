@@ -10,6 +10,7 @@ import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import CteckaCarkoduPage from "./pages/CteckaCarkoduPage";
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
+import { LogProvider } from "./contexts/LogContext"; // Import LogProvider
 import { useContext } from "react";
 
 const queryClient = new QueryClient();
@@ -82,7 +83,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <AppContent />
+          <LogProvider> {/* Obalení AppContent LogProviderem */}
+            <AppContent />
+          </LogProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

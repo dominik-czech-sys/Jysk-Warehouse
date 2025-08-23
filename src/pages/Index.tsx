@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { LogOut, Scan, Users } from "lucide-react";
 import { IframeViewer } from "@/components/IframeViewer";
+import { useLog } from "@/contexts/LogContext"; // Import useLog
 
 const Index = () => {
   const { getArticleById, articles } = useArticles();
   const [foundArticle, setFoundArticle] = useState<Article | null>(null);
   const { logout, isAdmin, user, userWarehouseId } = useAuth();
+  const { addLogEntry } = useLog(); // Použití useLog
   const [searchParams] = useSearchParams();
   const [iframeSrc, setIframeSrc] = useState<string | null>(null);
 
@@ -28,9 +30,11 @@ const Index = () => {
     if (article) {
       setFoundArticle(article);
       toast.success(`Článek ${articleId} nalezen!`);
+      addLogEntry("Článek vyhledán", { articleId, found: true });
     } else {
       setFoundArticle(null);
       toast.error(`Článek ${articleId} nebyl nalezen.`);
+      addLogEntry("Článek vyhledán", { articleId, found: false });
     }
   };
 

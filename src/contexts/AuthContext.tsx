@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { User, users as initialUsers } from "@/data/users"; // Rename initialUsers to avoid conflict
 import { toast } from "sonner";
+import { useLog } from "@/contexts/LogContext"; // Import useLog
 
 interface AuthContextType {
   user: User | null;
@@ -27,6 +28,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const storedUsers = localStorage.getItem("allUsers");
     return storedUsers ? JSON.parse(storedUsers) : initialUsers;
   });
+  const { addLogEntry } = useLog(); // Použití useLog
 
   useEffect(() => {
     const storedUser = localStorage.getItem("currentUser");
@@ -47,13 +49,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setCurrentUser(foundUser);
       localStorage.setItem("currentUser", JSON.stringify(foundUser));
       toast.success(`Vítejte, ${foundUser.username}!`);
+      addLogEntry("Uživatel se přihlásil", { username: foundUser.username, role: foundUser.role });
       return true;
     }
     toast.error("Neplatné uživatelské jméno nebo heslo.");
+    addLogEntry("Neúspěšné přihlášení", { username });
     return false;
   };
 
   const logout = () => {
+    if (currentUser) {
+      addLogEntry("Uživatel se odhlásil", { username: currentUser.username });
+    }
     setCurrentUser(null);
     localStorage.removeItem("currentUser");
     toast.info("Byli jste odhlášeni.");
@@ -62,10 +69,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const addUser = (newUser: User) => {
     if (allUsers.some(u => u.username === newUser.username)) {
       toast.error("Uživatel s tímto jménem již existuje.");
+      addLogEntry("Pokus o přidání existujícího uživatele", { username: newUser.username });
       return;
     }
     setAllUsers((prev) => [...prev, newUser]);
     toast.success(`Uživatel ${newUser.username} byl přidán.`);
+    addLogEntry("Uživatel přidán", { username: newUser.username, role: newUser.role, warehouseId: newUser.warehouseId });
   };
 
   const updateUser = (updatedUser: User) => {
@@ -77,6 +86,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem("currentUser", JSON.stringify(updatedUser));
     }
     toast.success(`Uživatel ${updatedUser.username} byl aktualizován.`);
+    addLogEntry("Uživatel aktualizován", { username: updatedUser.username, role: updatedUser.role, warehouseId: updatedUser.warehouseId });
   };
 
   const deleteUser = (username: string) => {
@@ -85,6 +95,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       logout();
     }
     toast.success(`Uživatel ${username} byl smazán.`);
+    addLogEntry("Uživatel smazán", { username });
   };
 
   const isAuthenticated = !!currentUser;

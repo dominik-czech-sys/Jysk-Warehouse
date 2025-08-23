@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useLog } from "@/contexts/LogContext"; // Import useLog
 
 export interface Article {
   id: string; // Číslo článku (Article Number)
@@ -248,6 +249,7 @@ const initialArticles: Article[] = parseArticleData(rawArticleData);
 
 export const useArticles = () => {
   const { userWarehouseId, isAdmin } = useAuth();
+  const { addLogEntry } = useLog(); // Použití useLog
   const [articles, setArticles] = useState<Article[]>(() => {
     const storedArticles = localStorage.getItem("articles");
     return storedArticles ? JSON.parse(storedArticles) : initialArticles;
@@ -265,16 +267,19 @@ export const useArticles = () => {
 
   const addArticle = (newArticle: Article) => {
     setArticles((prev) => [...prev, newArticle]);
+    addLogEntry("Článek přidán", { articleId: newArticle.id, name: newArticle.name, warehouseId: newArticle.warehouseId });
   };
 
   const updateArticle = (updatedArticle: Article) => {
     setArticles((prev) =>
       prev.map((article) => (article.id === updatedArticle.id ? updatedArticle : article))
     );
+    addLogEntry("Článek aktualizován", { articleId: updatedArticle.id, name: updatedArticle.name, warehouseId: updatedArticle.warehouseId });
   };
 
   const deleteArticle = (id: string) => {
     setArticles((prev) => prev.filter((article) => article.id !== id));
+    addLogEntry("Článek smazán", { articleId: id });
   };
 
   return { articles: filteredArticles, getArticleById, addArticle, updateArticle, deleteArticle };

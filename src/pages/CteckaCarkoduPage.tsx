@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Scan } from "lucide-react";
 import { toast } from "sonner";
+import { useLog } from "@/contexts/LogContext"; // Import useLog
 
 const CteckaCarkoduPage: React.FC = () => {
   const [scanResult, setScanResult] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { addLogEntry } = useLog(); // Použití useLog
 
   useEffect(() => {
     const html5QrcodeScanner = new Html5QrcodeScanner(
@@ -21,6 +23,7 @@ const CteckaCarkoduPage: React.FC = () => {
       html5QrcodeScanner.clear();
       setScanResult(decodedText);
       toast.success(`Čárový kód naskenován: ${decodedText}`);
+      addLogEntry("Čárový kód naskenován", { scannedCode: decodedText });
       navigate(`/?articleId=${decodedText}`);
     };
 
@@ -35,7 +38,7 @@ const CteckaCarkoduPage: React.FC = () => {
         console.error("Failed to clear html5QrcodeScanner", error);
       });
     };
-  }, [navigate]);
+  }, [navigate, addLogEntry]);
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
