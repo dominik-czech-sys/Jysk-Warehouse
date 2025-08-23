@@ -9,7 +9,8 @@ import { Separator } from "@/components/ui/separator";
 import { Trash2, Filter } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
-import { cs } from "date-fns/locale"; // Import Czech locale for date formatting
+import { cs, enUS, sk } from "date-fns/locale"; // Import locales for date formatting
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 interface LogViewerProps {
   isOpen: boolean;
@@ -24,15 +25,37 @@ const logCategories = {
   "User Add": ["Uživatel přidán", "Pokus o přidání existujícího uživatele"],
   "User Edit": ["Uživatel aktualizován"],
   "User Delete": ["Uživatel smazán"],
-  "Article Add": ["Článek přidán", "Článek přidán (hromadné přidání)"],
-  "Article Edit": ["Článek aktualizován", "Článek aktualizován (hromadné přidání)"],
-  "Article Delete": ["Článek smazán"],
-  "Article Search": ["Článek vyhledán", "Čárový kód naskenován", "Čárový kód naskenován pro hromadné přidání"],
+  "Article Add": ["Artikl přidán", "Artikl přidán (hromadné přidání)"],
+  "Article Edit": ["Artikl aktualizován", "Artikl aktualizován (hromadné přidání)"],
+  "Article Delete": ["Artikl smazán"],
+  "Article Search": ["Artikl vyhledán", "Čárový kód naskenován", "Čárový kód naskenován pro hromadné přidání"],
+  "Rack Add": ["Regál přidán", "Pokus o přidání existujícího regálu"],
+  "Rack Edit": ["Regál aktualizován"],
+  "Rack Delete": ["Regál smazán"],
+  "Store Add": ["Obchod přidán", "Pokus o přidání existujícího obchodu"],
+  "Store Edit": ["Obchod aktualizován"],
+  "Store Delete": ["Obchod smazán"],
+  "Default Articles Add": ["Výchozí artikly přidány do obchodu"],
+  "Article Copy": ["Artikly zkopírovány"],
 };
 
 export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
   const { logEntries, clearLog } = useLog();
+  const { t, i18n } = useTranslation(); // Initialize useTranslation
+
   const [selectedFilter, setSelectedFilter] = useState<keyof typeof logCategories>("Full Log");
+
+  const currentLocale = useMemo(() => {
+    switch (i18n.language) {
+      case "en":
+        return enUS;
+      case "sk":
+        return sk;
+      case "cs":
+      default:
+        return cs;
+    }
+  }, [i18n.language]);
 
   const filteredAndGroupedLogs = useMemo(() => {
     let filteredLogs = logEntries;
@@ -70,43 +93,43 @@ export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4">
       <Card className="w-full max-w-3xl h-[90vh] flex flex-col">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-2xl font-bold">Log Aktivity</CardTitle>
+          <CardTitle className="text-2xl font-bold">{t("common.logActivity")}</CardTitle>
           <div className="flex items-center space-x-2">
             <Select onValueChange={(value: keyof typeof logCategories) => setSelectedFilter(value)} value={selectedFilter}>
               <SelectTrigger className="w-[180px]">
                 <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Vyberte typ logu" />
+                <SelectValue placeholder={t("common.selectLogType")} />
               </SelectTrigger>
               <SelectContent>
                 {Object.keys(logCategories).map(category => (
                   <SelectItem key={category} value={category}>
-                    {category}
+                    {t(`common.${category.replace(/\s/g, "")}Log`)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Button variant="destructive" size="sm" onClick={clearLog}>
-              <Trash2 className="h-4 w-4 mr-2" /> Vyčistit log
+              <Trash2 className="h-4 w-4 mr-2" /> {t("common.clearLog")}
             </Button>
             <Button variant="outline" size="sm" onClick={onClose}>
-              Zavřít
+              {t("common.close")}
             </Button>
           </div>
         </CardHeader>
         <CardContent className="flex-grow p-0 flex flex-col min-h-0"> {/* Added min-h-0 here */}
           <ScrollArea className="h-full w-full rounded-md border p-4">
             {filteredAndGroupedLogs.length === 0 ? (
-              <p className="text-center text-muted-foreground">Žádné záznamy pro vybraný filtr.</p>
+              <p className="text-center text-muted-foreground">{t("common.noRecordsForFilter")}</p>
             ) : (
               filteredAndGroupedLogs.map(dayGroup => (
                 <div key={dayGroup.date} className="mb-6">
                   <h3 className="sticky top-0 bg-white dark:bg-gray-800 py-2 text-lg font-bold text-jyskBlue-dark dark:text-jyskBlue-light border-b mb-3">
-                    {format(new Date(dayGroup.date), "EEEE, d. MMMM yyyy", { locale: cs })}
+                    {format(new Date(dayGroup.date), "EEEE, d. MMMM yyyy", { locale: currentLocale })}
                   </h3>
                   {dayGroup.entries.map((entry) => (
                     <div key={entry.id} className="mb-4 last:mb-0">
                       <p className="text-sm text-muted-foreground">
-                        <span className="font-semibold">{format(new Date(entry.timestamp), "HH:mm:ss", { locale: cs })}</span> -{" "}
+                        <span className="font-semibold">{format(new Date(entry.timestamp), "HH:mm:ss", { locale: currentLocale })}</span> -{" "}
                         <span className="font-semibold text-jyskBlue-dark dark:text-jyskBlue-light">{entry.user}</span>
                       </p>
                       <p className="text-base font-medium">{entry.action}</p>

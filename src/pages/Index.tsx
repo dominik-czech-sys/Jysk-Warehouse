@@ -11,6 +11,8 @@ import { IframeViewer } from "@/components/IframeViewer";
 import { useLog } from "@/contexts/LogContext"; // Import useLog
 import { ManagementMenu } from "@/components/ManagementMenu"; // Import new ManagementMenu
 import { ThemeToggle } from "@/components/ThemeToggle"; // Import ThemeToggle
+import { LanguageSwitcher } from "@/components/LanguageSwitcher"; // Import LanguageSwitcher
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 const Index = () => {
   const { getArticleById, articles } = useArticles();
@@ -19,24 +21,26 @@ const Index = () => {
   const { addLogEntry } = useLog(); // Použití useLog
   const [searchParams] = useSearchParams();
   const [iframeSrc, setIframeSrc] = useState<string | null>(null);
+  const [isLogViewerOpen, setIsLogViewerOpen] = useState(false); // State for LogViewer
+  const { t } = useTranslation(); // Initialize useTranslation
 
   useEffect(() => {
     const articleIdFromUrl = searchParams.get("articleId");
     if (articleIdFromUrl) {
       handleSearch(articleIdFromUrl);
     }
-  }, [searchParams, articles, user?.username]); // Add user.username to dependencies
+  }, [searchParams, articles, user?.username, t]); // Add user.username and t to dependencies
 
   const handleSearch = (articleId: string) => {
     const article = getArticleById(articleId, userStoreId); // Pass userStoreId for store-specific search
     if (article) {
       setFoundArticle(article);
-      toast.success(`Článek ${articleId} nalezen!`);
-      addLogEntry("Článek vyhledán", { articleId, found: true, storeId: userStoreId }, user?.username); // Pass username and storeId
+      toast.success(t("common.articleFound", { articleId }));
+      addLogEntry(t("common.articleSearched"), { articleId, found: true, storeId: userStoreId }, user?.username); // Pass username and storeId
     } else {
       setFoundArticle(null);
-      toast.error(`Článek ${articleId} nebyl nalezen.`);
-      addLogEntry("Článek vyhledán", { articleId, found: false, storeId: userStoreId }, user?.username); // Pass username and storeId
+      toast.error(t("common.articleNotFound", { articleId }));
+      addLogEntry(t("common.articleSearched"), { articleId, found: false, storeId: userStoreId }, user?.username); // Pass username and storeId
     }
   };
 
@@ -52,10 +56,10 @@ const Index = () => {
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
       <div className="w-full max-w-4xl flex flex-col md:flex-row justify-between items-center md:items-start mb-8 space-y-4 md:space-y-0">
         <div className="flex flex-col items-center md:items-start space-y-2 md:space-x-4 md:flex-row">
-          <h1 className="text-4xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light text-center md:text-left">JYSK Sklad</h1>
+          <h1 className="text-4xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light text-center md:text-left">{t("common.jyskWarehouse")}</h1>
           {user && (
             <span className="text-lg text-gray-700 dark:text-gray-300 text-center md:text-left">
-              Přihlášen jako: <span className="font-semibold">{user.username}</span> ({user.role === "admin" ? "Admin" : `Skladník - ${userStoreId}`})
+              {t("common.loggedInAs")}: <span className="font-semibold">{user.username}</span> ({user.role === "admin" ? t("common.admin") : t("common.warehouseWorkerStore", { storeId: userStoreId })})
             </span>
           )}
         </div>
@@ -63,21 +67,22 @@ const Index = () => {
           {isAdmin && (
             <Link to="/admin/site-dashboard" className="w-full sm:w-auto">
               <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
-                <Users className="h-4 w-4 mr-2" /> Site Dashboard
+                <Users className="h-4 w-4 mr-2" /> {t("common.siteDashboard")}
               </Button>
             </Link>
           )}
-          {(hasPermission("article:view") || hasPermission("rack:view")) && <ManagementMenu />} {/* Use the new ManagementMenu component */}
+          {(hasPermission("article:view") || hasPermission("rack:view") || hasPermission("log:view")) && <ManagementMenu onViewLog={() => setIsLogViewerOpen(true)} />} {/* Pass onViewLog */}
           <ThemeToggle /> {/* Theme toggle */}
+          <LanguageSwitcher /> {/* Language switcher */}
           <Button onClick={logout} variant="outline" className="flex items-center w-full sm:w-auto">
-            <LogOut className="h-4 w-4 mr-2" /> Odhlásit se
+            <LogOut className="h-4 w-4 mr-2" /> {t("common.logout")}
           </Button>
         </div>
       </div>
 
       <div className="text-center mb-8 w-full">
         <p className="text-xl text-gray-600 dark:text-gray-400">
-          Zadejte ID článku pro zjištění jeho umístění a patra.
+          {t("common.searchArticleLocation")}
         </p>
       </div>
       <WarehouseSearch onSearch={handleSearch} />
@@ -88,7 +93,7 @@ const Index = () => {
         {hasPermission("article:scan") && (
           <Link to="/skenovat-carkod" className="w-full">
             <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
-              <Scan className="h-4 w-4 mr-2" /> Skenovat čárový kód
+              <Scan className="h-4 w-4 mr-2" /> {t("common.scanBarcode")}
             </Button>
           </Link>
         )}
@@ -101,17 +106,18 @@ const Index = () => {
           className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light w-full sm:w-auto"
           onClick={() => handleOpenIframe("https://myjysk.thinktime.com/ui/dashboards/177")}
         >
-          MyJysk
+          {t("common.goToMyJysk")}
         </Button>
         <Button
           variant="outline"
           className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light w-full sm:w-auto"
           onClick={() => handleOpenIframe("http://storefront.jysk.com/")}
         >
-          StoreFront
+          {t("common.goToStoreFront")}
         </Button>
       </div>
       <IframeViewer src={iframeSrc} onClose={handleCloseIframe} />
+      <LogViewer isOpen={isLogViewerOpen} onClose={() => setIsLogViewerOpen(false)} /> {/* LogViewer here */}
     </div>
   );
 };

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Store } from "@/data/stores";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 interface StoreFormDialogProps {
   isOpen: boolean;
@@ -32,6 +33,7 @@ export const StoreFormDialog: React.FC<StoreFormDialogProps> = ({
     name: "",
   });
   const [addDefaultArticles, setAddDefaultArticles] = useState(true);
+  const { t } = useTranslation(); // Initialize useTranslation
 
   useEffect(() => {
     if (store) {
@@ -54,7 +56,7 @@ export const StoreFormDialog: React.FC<StoreFormDialogProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.id.trim() || !formData.name.trim()) {
-      toast.error("Prosím, vyplňte ID a název obchodu.");
+      toast.error(t("common.fillStoreDetails"));
       return;
     }
     if (onSubmit(formData, addDefaultArticles)) {
@@ -66,15 +68,15 @@ export const StoreFormDialog: React.FC<StoreFormDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{store ? "Upravit obchod" : "Přidat nový obchod"}</DialogTitle>
+          <DialogTitle>{store ? t("common.editStore") : t("common.addStore")}</DialogTitle>
           <DialogDescription>
-            {store ? "Zde můžete upravit údaje obchodu." : "Přidejte nový obchod do systému."}
+            {store ? t("common.editStoreDescription") : t("common.addStoreDescription")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="id" className="sm:text-right">
-              ID Obchodu
+              {t("common.storeIdLabel")}
             </Label>
             <Input
               id="id"
@@ -87,7 +89,7 @@ export const StoreFormDialog: React.FC<StoreFormDialogProps> = ({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="sm:text-right">
-              Název Obchodu
+              {t("common.storeNameLabel")}
             </Label>
             <Input
               id="name"
@@ -105,13 +107,13 @@ export const StoreFormDialog: React.FC<StoreFormDialogProps> = ({
                 onCheckedChange={(checked) => setAddDefaultArticles(!!checked)}
               />
               <Label htmlFor="addDefaultArticles" className="text-sm font-medium leading-none">
-                Přidat výchozí články
+                {t("common.addDefaultArticles")}
               </Label>
             </div>
           )}
           <DialogFooter className="col-span-full mt-4">
             <Button type="submit" className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
-              {store ? "Uložit změny" : "Přidat obchod"}
+              {store ? t("common.saveChanges") : t("common.addStore")}
             </Button>
           </DialogFooter>
         </form>

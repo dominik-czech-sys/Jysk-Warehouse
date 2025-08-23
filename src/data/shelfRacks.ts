@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLog } from "@/contexts/LogContext";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 export interface Shelf {
   shelfNumber: string; // e.g., "1", "2", "3"
@@ -85,6 +86,8 @@ const initialShelfRacks: ShelfRack[] = [
 export const useShelfRacks = () => {
   const { userStoreId, isAdmin, user } = useAuth();
   const { addLogEntry } = useLog();
+  const { t } = useTranslation(); // Initialize useTranslation
+
   const [shelfRacks, setShelfRacks] = useState<ShelfRack[]>(() => {
     const storedRacks = localStorage.getItem("shelfRacks");
     return storedRacks ? JSON.parse(storedRacks) : initialShelfRacks;
@@ -107,13 +110,13 @@ export const useShelfRacks = () => {
 
   const addShelfRack = (newRack: ShelfRack) => {
     if (shelfRacks.some(r => r.id === newRack.id && r.storeId === newRack.storeId)) {
-      toast.error(`Regál s ID ${newRack.id} již existuje v tomto skladu.`);
-      addLogEntry("Pokus o přidání existujícího regálu", { rackId: newRack.id, storeId: newRack.storeId }, user?.username);
+      toast.error(t("common.rackExists", { rackId: newRack.id }));
+      addLogEntry(t("common.attemptToAddExistingRack"), { rackId: newRack.id, storeId: newRack.storeId }, user?.username);
       return false;
     }
     setShelfRacks((prev) => [...prev, newRack]);
-    toast.success(`Regál ${newRack.id} byl přidán.`);
-    addLogEntry("Regál přidán", { rackId: newRack.id, storeId: newRack.storeId, shelves: newRack.shelves.map(s => s.description) }, user?.username);
+    toast.success(t("common.rackAddedSuccess", { rackId: newRack.id }));
+    addLogEntry(t("common.rackAdded"), { rackId: newRack.id, storeId: newRack.storeId, shelves: newRack.shelves.map(s => s.description) }, user?.username);
     return true;
   };
 
@@ -121,14 +124,14 @@ export const useShelfRacks = () => {
     setShelfRacks((prev) =>
       prev.map((r) => (r.id === updatedRack.id && r.storeId === updatedRack.storeId ? updatedRack : r))
     );
-    toast.success(`Regál ${updatedRack.id} byl aktualizován.`);
-    addLogEntry("Regál aktualizován", { rackId: updatedRack.id, storeId: updatedRack.storeId, shelves: updatedRack.shelves.map(s => s.description) }, user?.username);
+    toast.success(t("common.rackUpdatedSuccess", { rackId: updatedRack.id }));
+    addLogEntry(t("common.rackUpdated"), { rackId: updatedRack.id, storeId: updatedRack.storeId, shelves: updatedRack.shelves.map(s => s.description) }, user?.username);
   };
 
   const deleteShelfRack = (id: string, storeId: string) => {
     setShelfRacks((prev) => prev.filter((r) => !(r.id === id && r.storeId === storeId)));
-    toast.success(`Regál ${id} byl smazán.`);
-    addLogEntry("Regál smazán", { rackId: id, storeId }, user?.username);
+    toast.success(t("common.rackDeletedSuccess", { rackId: id }));
+    addLogEntry(t("common.rackDeleted"), { rackId: id, storeId }, user?.username);
   };
 
   const getShelfRacksByStoreId = (storeId: string) => {

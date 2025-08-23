@@ -29,17 +29,19 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { User } from "@/data/users";
 import { LogViewer } from "@/components/LogViewer";
-import { useStores, Store } from "@/data/stores"; // Import Store type
+import { useStores, Store } from "@/data/stores";
 import { useArticles } from "@/data/articles";
 import { useShelfRacks } from "@/data/shelfRacks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 const SiteDashboard: React.FC = () => {
   const { allUsers, addUser, updateUser, deleteUser, isAdmin, hasPermission } = useAuth();
   const { stores, addStore, updateStore, deleteStore } = useStores();
   const { allArticles } = useArticles();
   const { allShelfRacks } = useShelfRacks();
+  const { t } = useTranslation(); // Initialize useTranslation
 
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
   const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
@@ -108,11 +110,11 @@ const SiteDashboard: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <Card className="p-6 text-center">
-          <CardTitle className="text-2xl font-bold text-red-600">Přístup odepřen</CardTitle>
+          <CardTitle className="text-2xl font-bold text-red-600">{t("common.accessDenied")}</CardTitle>
           <CardContent className="mt-4">
-            <p className="text-gray-700 dark:text-gray-300">Nemáte oprávnění k zobrazení této stránky.</p>
+            <p className="text-gray-700 dark:text-gray-300">{t("common.noPermission")}</p>
             <Link to="/" className="mt-4 inline-block">
-              <Button className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">Zpět na hlavní stránku</Button>
+              <Button className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">{t("common.backToMainPage")}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -126,10 +128,10 @@ const SiteDashboard: React.FC = () => {
         <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-6 space-y-4 sm:space-y-0">
           <Link to="/" className="w-full sm:w-auto">
             <Button variant="outline" className="flex items-center w-full">
-              <ArrowLeft className="h-4 w-4 mr-2" /> Zpět na hlavní stránku
+              <ArrowLeft className="h-4 w-4 mr-2" /> {t("common.backToMainPage")}
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Site Dashboard (Admin)</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("common.siteDashboard")} (Admin)</h1>
           <div className="w-full sm:w-auto"></div> {/* Placeholder for alignment */}
         </div>
 
@@ -137,7 +139,7 @@ const SiteDashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Celkem obchodů</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("common.totalStores")}</CardTitle>
               <StoreIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -146,7 +148,7 @@ const SiteDashboard: React.FC = () => {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Celkem uživatelů</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("common.totalUsers")}</CardTitle>
               <UsersIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -155,7 +157,7 @@ const SiteDashboard: React.FC = () => {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Celkem článků</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("common.totalArticles")}</CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -164,7 +166,7 @@ const SiteDashboard: React.FC = () => {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Celkem regálů</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("common.totalRacks")}</CardTitle>
               <WarehouseIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -178,16 +180,16 @@ const SiteDashboard: React.FC = () => {
         {/* Store Management Section */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Správa obchodů</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.storeManagement")}</h2>
             <div className="flex space-x-2">
               {hasPermission("store:create") && (
                 <Button onClick={() => setIsAddStoreDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
-                  <PlusCircle className="h-4 w-4 mr-2" /> Přidat obchod
+                  <PlusCircle className="h-4 w-4 mr-2" /> {t("common.addStore")}
                 </Button>
               )}
               {hasPermission("article:copy_from_store") && (
                 <Button onClick={() => setIsArticleCopyDialogOpen(true)} variant="outline" className="flex items-center">
-                  <Copy className="h-4 w-4 mr-2" /> Kopírovat články
+                  <Copy className="h-4 w-4 mr-2" /> {t("common.copyArticles")}
                 </Button>
               )}
             </div>
@@ -196,9 +198,9 @@ const SiteDashboard: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[100px]">ID Obchodu</TableHead>
-                  <TableHead className="min-w-[200px]">Název Obchodu</TableHead>
-                  <TableHead className="text-right min-w-[100px]">Akce</TableHead>
+                  <TableHead className="min-w-[100px]">{t("common.storeId")}</TableHead>
+                  <TableHead className="min-w-[200px]">{t("common.storeNameLabel")}</TableHead>
+                  <TableHead className="text-right min-w-[100px]">{t("common.action")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -236,7 +238,7 @@ const SiteDashboard: React.FC = () => {
             </Table>
           </div>
           {stores.length === 0 && (
-            <p className="text-center text-muted-foreground mt-4">Žádné obchody nebyly nalezeny.</p>
+            <p className="text-center text-muted-foreground mt-4">{t("common.noStoresFound")}</p>
           )}
         </div>
 
@@ -245,16 +247,11 @@ const SiteDashboard: React.FC = () => {
         {/* User Management Section */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Správa uživatelů</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.userManagement")}</h2>
             <div className="flex space-x-2">
-              {hasPermission("log:view") && (
-                <Button onClick={() => setIsLogViewerOpen(true)} className="flex items-center bg-gray-600 hover:bg-gray-700 text-white">
-                  <ScrollText className="h-4 w-4 mr-2" /> Zobrazit Log
-                </Button>
-              )}
               {hasPermission("user:create") && (
                 <Button onClick={() => setIsAddUserDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
-                  <PlusCircle className="h-4 w-4 mr-2" /> Přidat uživatele
+                  <PlusCircle className="h-4 w-4 mr-2" /> {t("common.addUser")}
                 </Button>
               )}
             </div>
@@ -263,18 +260,18 @@ const SiteDashboard: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[150px]">Uživatelské jméno</TableHead>
-                  <TableHead className="min-w-[100px]">Role</TableHead>
-                  <TableHead className="min-w-[100px]">ID Skladu</TableHead>
-                  <TableHead className="text-right min-w-[100px]">Akce</TableHead>
+                  <TableHead className="min-w-[150px]">{t("common.username")}</TableHead>
+                  <TableHead className="min-w-[100px]">{t("common.role")}</TableHead>
+                  <TableHead className="min-w-[100px]">{t("common.storeId")}</TableHead>
+                  <TableHead className="text-right min-w-[100px]">{t("common.action")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {allUsers.map((user) => (
                   <TableRow key={user.username}>
                     <TableCell className="font-medium">{user.username}</TableCell>
-                    <TableCell>{user.role === "admin" ? "Admin" : user.role}</TableCell>
-                    <TableCell>{user.storeId || "N/A"}</TableCell>
+                    <TableCell>{user.role === "admin" ? t("common.admin") : t(`common.${user.role.replace(/_([a-z])/g, (g) => g[1].toUpperCase())}`)}</TableCell>
+                    <TableCell>{user.storeId || t("common.unknown")}</TableCell>
                     <TableCell className="text-right">
                       {hasPermission("user:update") && (
                         <Button
@@ -305,7 +302,7 @@ const SiteDashboard: React.FC = () => {
             </Table>
           </div>
           {allUsers.length === 0 && (
-            <p className="text-center text-muted-foreground mt-4">Žádní uživatelé nebyli nalezeni.</p>
+            <p className="text-center text-muted-foreground mt-4">{t("common.noUsersFound")}</p>
           )}
         </div>
 
@@ -339,15 +336,16 @@ const SiteDashboard: React.FC = () => {
       <AlertDialog open={isDeleteUserDialogOpen} onOpenChange={setIsDeleteUserDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Jste si naprosto jisti?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tuto akci nelze vrátit zpět. Tímto trvale smažete uživatele{" "}
-              <span className="font-semibold">{userToDeleteUsername}</span> ze systému.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("common.confirmDeleteUserTitle")}</AlertDialogTitle>
+            <AlertDialogDescription
+              dangerouslySetInnerHTML={{
+                __html: t("common.confirmDeleteUserDescription", { username: userToDeleteUsername }),
+              }}
+            />
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Zrušit</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteUser} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Pokračovat</AlertDialogAction>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteUser} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">{t("common.continue")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -370,15 +368,16 @@ const SiteDashboard: React.FC = () => {
       <AlertDialog open={isDeleteStoreDialogOpen} onOpenChange={setIsDeleteStoreDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Jste si naprosto jisti?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tuto akci nelze vrátit zpět. Tímto trvale smažete obchod{" "}
-              <span className="font-semibold">{storeToDeleteId}</span> ze systému.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("common.confirmDeleteStoreTitle")}</AlertDialogTitle>
+            <AlertDialogDescription
+              dangerouslySetInnerHTML={{
+                __html: t("common.confirmDeleteStoreDescription", { storeId: storeToDeleteId }),
+              }}
+            />
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Zrušit</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteStore} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Pokračovat</AlertDialogAction>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteStore} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">{t("common.continue")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

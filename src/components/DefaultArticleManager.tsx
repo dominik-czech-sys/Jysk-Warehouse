@@ -14,6 +14,7 @@ import { PlusCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { defaultArticlesForNewStores } from "@/data/users"; // Import default articles
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 interface DefaultArticle {
   id: string;
@@ -23,6 +24,7 @@ interface DefaultArticle {
 
 export const DefaultArticleManager: React.FC = () => {
   const { hasPermission } = useAuth();
+  const { t } = useTranslation(); // Initialize useTranslation
   const [defaultArticles, setDefaultArticles] = useState<DefaultArticle[]>(defaultArticlesForNewStores);
   const [newArticleId, setNewArticleId] = useState("");
   const [newArticleName, setNewArticleName] = useState("");
@@ -30,15 +32,15 @@ export const DefaultArticleManager: React.FC = () => {
 
   const handleAddDefaultArticle = () => {
     if (!hasPermission("default_articles:manage")) {
-      toast.error("Nemáte oprávnění spravovat výchozí články.");
+      toast.error(t("common.noPermissionToManageDefaultArticles"));
       return;
     }
     if (!newArticleId.trim() || !newArticleName.trim() || !newArticleStatus.trim()) {
-      toast.error("Prosím, vyplňte všechna pole pro nový výchozí článek.");
+      toast.error(t("common.fillAllNewArticleFields"));
       return;
     }
     if (defaultArticles.some(a => a.id === newArticleId.trim().toUpperCase())) {
-      toast.error(`Výchozí článek s ID ${newArticleId.trim().toUpperCase()} již existuje.`);
+      toast.error(t("common.defaultArticleExists", { articleId: newArticleId.trim().toUpperCase() }));
       return;
     }
 
@@ -51,7 +53,7 @@ export const DefaultArticleManager: React.FC = () => {
     setDefaultArticles(prev => [...prev, newDefaultArticle]);
     // In a real app, you'd persist this change (e.g., to a backend or localStorage for defaultArticlesForNewStores)
     // For now, it's just in component state.
-    toast.success(`Výchozí článek ${newDefaultArticle.id} přidán.`);
+    toast.success(t("common.defaultArticleAddedSuccess", { articleId: newDefaultArticle.id }));
     setNewArticleId("");
     setNewArticleName("");
     setNewArticleStatus("");
@@ -59,39 +61,39 @@ export const DefaultArticleManager: React.FC = () => {
 
   const handleRemoveDefaultArticle = (idToRemove: string) => {
     if (!hasPermission("default_articles:manage")) {
-      toast.error("Nemáte oprávnění spravovat výchozí články.");
+      toast.error(t("common.noPermissionToManageDefaultArticles"));
       return;
     }
     setDefaultArticles(prev => prev.filter(article => article.id !== idToRemove));
-    toast.info(`Výchozí článek ${idToRemove} odstraněn.`);
+    toast.info(t("common.defaultArticleRemovedInfo", { articleId: idToRemove }));
   };
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">Správa výchozích článků</h2>
-      <p className="text-muted-foreground">Tyto články budou automaticky přidány do nově vytvořených obchodů.</p>
+      <h2 className="text-2xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("common.defaultArticleManagement")}</h2>
+      <p className="text-muted-foreground">{t("common.defaultArticlesInfo")}</p>
 
       <div className="flex flex-col sm:flex-row gap-2">
         <Input
-          placeholder="ID článku"
+          placeholder={t("common.articleIdPlaceholder")}
           value={newArticleId}
           onChange={(e) => setNewArticleId(e.target.value)}
           className="flex-1"
         />
         <Input
-          placeholder="Název článku"
+          placeholder={t("common.articleNamePlaceholder")}
           value={newArticleName}
           onChange={(e) => setNewArticleName(e.target.value)}
           className="flex-1"
         />
         <Input
-          placeholder="Status"
+          placeholder={t("common.articleStatusPlaceholder")}
           value={newArticleStatus}
           onChange={(e) => setNewArticleStatus(e.target.value)}
           className="w-24"
         />
         <Button onClick={handleAddDefaultArticle} disabled={!hasPermission("default_articles:manage")}>
-          <PlusCircle className="h-4 w-4 mr-2" /> Přidat
+          <PlusCircle className="h-4 w-4 mr-2" /> {t("common.add")}
         </Button>
       </div>
 
@@ -99,17 +101,17 @@ export const DefaultArticleManager: React.FC = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Název</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Akce</TableHead>
+              <TableHead>{t("common.articleId")}</TableHead>
+              <TableHead>{t("common.articleName")}</TableHead>
+              <TableHead>{t("common.status")}</TableHead>
+              <TableHead className="text-right">{t("common.action")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {defaultArticles.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} className="text-center text-muted-foreground">
-                  Žádné výchozí články.
+                  {t("common.noDefaultArticles")}
                 </TableCell>
               </TableRow>
             ) : (

@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useShelfRacks } from "@/data/shelfRacks";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 interface ArticleFormDialogProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
 }) => {
   const { userStoreId } = useAuth();
   const { shelfRacks } = useShelfRacks();
+  const { t } = useTranslation(); // Initialize useTranslation
 
   const [formData, setFormData] = useState<Article>({
     id: "",
@@ -101,7 +103,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.id || !formData.name || !selectedRackId || !selectedShelfNumber || !formData.status) {
-      toast.error("Prosím, vyplňte všechna povinná pole (ID článku, Název, Regál, Číslo police, Status).");
+      toast.error(t("common.fillAllArticleFields"));
       return;
     }
     onSubmit(formData);
@@ -116,15 +118,15 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{article ? "Upravit článek" : "Přidat nový článek"}</DialogTitle>
+          <DialogTitle>{article ? t("common.editArticle") : t("common.addArticle")}</DialogTitle>
           <DialogDescription>
-            {article ? "Zde můžete provést změny v článku." : "Přidejte nový článek do skladového inventáře."}
+            {article ? t("common.editArticleDescription") : t("common.addArticleDescription")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="id" className="sm:text-right">
-              ID článku
+              {t("common.articleId")}
             </Label>
             <Input
               id="id"
@@ -136,7 +138,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="sm:text-right">
-              Název
+              {t("common.articleName")}
             </Label>
             <Input
               id="name"
@@ -149,11 +151,11 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           {/* Shelf Rack Selection */}
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="rackId" className="sm:text-right">
-              Regál (Řada-Regál)
+              {t("common.rackRowRack")}
             </Label>
             <Select onValueChange={handleRackSelect} value={selectedRackId}>
               <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Vyberte regál" />
+                <SelectValue placeholder={t("common.selectRack")} />
               </SelectTrigger>
               <SelectContent>
                 {shelfRacks.filter(rack => !userStoreId || rack.storeId === userStoreId).map((rack) => (
@@ -168,16 +170,16 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           {/* Shelf Number Selection */}
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="shelfNumber" className="sm:text-right">
-              Číslo police
+              {t("common.shelfNumberLabel")}
             </Label>
             <Select onValueChange={handleShelfNumberSelect} value={selectedShelfNumber} disabled={!selectedRackId}>
               <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Vyberte číslo police" />
+                <SelectValue placeholder={t("common.selectShelfNumber")} />
               </SelectTrigger>
               <SelectContent>
                 {availableShelves.map((shelf) => (
                   <SelectItem key={shelf.shelfNumber} value={shelf.shelfNumber}>
-                    Police {shelf.shelfNumber} ({shelf.description})
+                    {t("common.shelf")} {shelf.shelfNumber} ({shelf.description})
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -187,14 +189,14 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           {/* Display derived fields as read-only */}
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="storeId" className="sm:text-right">
-              ID Skladu
+              {t("common.storeId")}
             </Label>
             <Input id="storeId" value={formData.storeId} readOnly className="col-span-3 bg-gray-100 dark:bg-gray-700" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="status" className="sm:text-right">
-              Status zboží
+              {t("common.itemStatus")}
             </Label>
             <Input
               id="status"
@@ -206,7 +208,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           </div>
           <DialogFooter>
             <Button type="submit" className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
-              {article ? "Uložit změny" : "Přidat článek"}
+              {article ? t("common.saveChanges") : t("common.addArticle")}
             </Button>
           </DialogFooter>
         </form>

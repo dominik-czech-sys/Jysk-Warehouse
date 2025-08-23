@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 export interface LogEntry {
   id: string;
@@ -33,6 +34,7 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
     }
     return [];
   });
+  const { t } = useTranslation(); // Initialize useTranslation
 
   useEffect(() => {
     localStorage.setItem("appLog", JSON.stringify(logEntries));
@@ -42,7 +44,7 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
     const newEntry: LogEntry = {
       id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
       timestamp: Date.now(), // Store as a number
-      user: username || "Neznámý", // Use provided username or "Neznámý"
+      user: username || t("common.unknown"), // Use provided username or "Neznámý"
       action,
       details,
     };

@@ -1,6 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 interface IframeViewerProps {
   src: string | null;
@@ -8,6 +9,8 @@ interface IframeViewerProps {
 }
 
 export const IframeViewer: React.FC<IframeViewerProps> = ({ src, onClose }) => {
+  const { t } = useTranslation(); // Initialize useTranslation
+
   if (!src) {
     return null;
   }

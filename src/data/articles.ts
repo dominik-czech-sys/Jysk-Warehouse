@@ -4,7 +4,7 @@ import { useLog } from "@/contexts/LogContext"; // Import useLog
 import { useShelfRacks } from "./shelfRacks"; // Import useShelfRacks to get rack details
 
 export interface Article {
-  id: string; // Číslo článku (Article Number)
+  id: string; // Číslo artiklu (Article Number)
   name: string; // Název
   rackId: string; // ID of the selected ShelfRack (e.g., "A-1")
   shelfNumber: string; // The specific shelf number within the rack (e.g., "1", "2")
@@ -291,19 +291,19 @@ export const useArticles = () => {
 
   const addArticle = (newArticle: Article) => {
     setArticles((prev) => [...prev, newArticle]);
-    addLogEntry("Článek přidán", { articleId: newArticle.id, name: newArticle.name, rackId: newArticle.rackId, shelfNumber: newArticle.shelfNumber, storeId: newArticle.storeId, quantity: newArticle.quantity }, user?.username);
+    addLogEntry("Artikl přidán", { articleId: newArticle.id, name: newArticle.name, rackId: newArticle.rackId, shelfNumber: newArticle.shelfNumber, storeId: newArticle.storeId, quantity: newArticle.quantity }, user?.username);
   };
 
   const updateArticle = (updatedArticle: Article) => {
     setArticles((prev) =>
       prev.map((article) => (article.id === updatedArticle.id && article.storeId === updatedArticle.storeId ? updatedArticle : article))
     );
-    addLogEntry("Článek aktualizován", { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, storeId: updatedArticle.storeId, quantity: updatedArticle.quantity }, user?.username);
+    addLogEntry("Artikl aktualizován", { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, storeId: updatedArticle.storeId, quantity: updatedArticle.quantity }, user?.username);
   };
 
   const deleteArticle = (id: string, storeId: string) => {
     setArticles((prev) => prev.filter((article) => !(article.id === id && article.storeId === storeId)));
-    addLogEntry("Článek smazán", { articleId: id, storeId }, user?.username);
+    addLogEntry("Artikl smazán", { articleId: id, storeId }, user?.username);
   };
 
   const getArticlesByStoreId = (storeId: string) => {

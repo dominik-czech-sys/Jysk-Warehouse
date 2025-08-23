@@ -16,6 +16,7 @@ import { useShelfRacks } from "@/data/shelfRacks";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 interface ArticleCopyDialogProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
   const { allArticles, addArticle } = useArticles();
   const { allShelfRacks } = useShelfRacks();
   const { user, hasPermission } = useAuth();
+  const { t } = useTranslation(); // Initialize useTranslation
 
   const [sourceStoreId, setSourceStoreId] = useState<string>("");
   const [targetStoreId, setTargetStoreId] = useState<string>("");
@@ -42,21 +44,21 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
 
   const handleCopyArticles = () => {
     if (!hasPermission("article:copy_from_store")) {
-      toast.error("Nemáte oprávnění kopírovat články mezi obchody.");
+      toast.error(t("common.noPermissionToCopyArticles"));
       return;
     }
     if (!sourceStoreId || !targetStoreId) {
-      toast.error("Prosím, vyberte zdrojový a cílový obchod.");
+      toast.error(t("common.fillSourceAndTargetStore"));
       return;
     }
     if (sourceStoreId === targetStoreId) {
-      toast.error("Zdrojový a cílový obchod nemohou být stejné.");
+      toast.error(t("common.sourceAndTargetCannotBeSame"));
       return;
     }
 
     const articlesToCopy = allArticles.filter(article => article.storeId === sourceStoreId);
     if (articlesToCopy.length === 0) {
-      toast.info(`V obchodě ${sourceStoreId} nejsou žádné články ke kopírování.`);
+      toast.info(t("common.noArticlesToCopy", { storeId: sourceStoreId }));
       onClose();
       return;
     }
@@ -102,7 +104,7 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
       copiedCount++;
     });
 
-    toast.success(`Zkopírováno ${copiedCount} článků do obchodu ${targetStoreId}. Přeskočeno ${skippedCount} existujících článků.`);
+    toast.success(t("common.articlesCopiedSuccess", { copiedCount, targetStoreId, skippedCount }));
     onClose();
   };
 
@@ -112,19 +114,19 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Kopírovat články mezi obchody</DialogTitle>
+          <DialogTitle>{t("common.copyArticlesBetweenStores")}</DialogTitle>
           <DialogDescription>
-            Zkopírujte všechny články z jednoho obchodu do druhého.
+            {t("common.copyArticlesDescription")}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="sourceStore" className="sm:text-right">
-              Zdrojový obchod
+              {t("common.sourceStore")}
             </Label>
             <Select onValueChange={setSourceStoreId} value={sourceStoreId}>
               <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Vyberte zdrojový obchod" />
+                <SelectValue placeholder={t("common.selectSourceStore")} />
               </SelectTrigger>
               <SelectContent>
                 {availableStores.map((store) => (
@@ -138,11 +140,11 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
 
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="targetStore" className="sm:text-right">
-              Cílový obchod
+              {t("common.targetStore")}
             </Label>
             <Select onValueChange={setTargetStoreId} value={targetStoreId}>
               <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Vyberte cílový obchod" />
+                <SelectValue placeholder={t("common.selectTargetStore")} />
               </SelectTrigger>
               <SelectContent>
                 {availableStores.map((store) => (
@@ -161,13 +163,13 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
               onCheckedChange={(checked) => setOverwriteExisting(!!checked)}
             />
             <Label htmlFor="overwriteExisting" className="text-sm font-medium leading-none">
-              Přepsat existující články v cílovém obchodě
+              {t("common.overwriteExistingArticles")}
             </Label>
           </div>
         </div>
         <DialogFooter>
           <Button onClick={handleCopyArticles} className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
-            Kopírovat články
+            {t("common.copyArticles")}
           </Button>
         </DialogFooter>
       </DialogContent>

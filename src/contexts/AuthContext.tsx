@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { User, users as initialUsers, Permission, defaultPermissions } from "@/data/users";
 import { toast } from "sonner";
 import { useLog } from "@/contexts/LogContext";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 interface AuthContextType {
   user: User | null;
@@ -31,6 +32,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return storedUsers ? JSON.parse(storedUsers) : initialUsers;
   });
   const { addLogEntry } = useLog();
+  const { t } = useTranslation(); // Initialize useTranslation
 
   useEffect(() => {
     const storedUser = localStorage.getItem("currentUser");
@@ -56,32 +58,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (foundUser) {
       setCurrentUser(foundUser);
       localStorage.setItem("currentUser", JSON.stringify(foundUser));
-      toast.success(`Vítejte, ${foundUser.username}!`);
-      addLogEntry("Uživatel se přihlásil", { username: foundUser.username, role: foundUser.role, storeId: foundUser.storeId }, foundUser.username);
+      toast.success(t("common.welcomeUser", { username: foundUser.username }));
+      addLogEntry(t("common.userLoggedIn"), { username: foundUser.username, role: foundUser.role, storeId: foundUser.storeId }, foundUser.username);
       return true;
     }
-    toast.error("Neplatné uživatelské jméno nebo heslo.");
-    addLogEntry("Neúspěšné přihlášení", { username }, username);
+    toast.error(t("common.invalidCredentials"));
+    addLogEntry(t("common.loginFailed"), { username }, username);
     return false;
   };
 
   const logout = () => {
     if (currentUser) {
-      addLogEntry("Uživatel se odhlásil", { username: currentUser.username, storeId: currentUser.storeId }, currentUser.username);
+      addLogEntry(t("common.userLoggedOut"), { username: currentUser.username, storeId: currentUser.storeId }, currentUser.username);
     }
     setCurrentUser(null);
     localStorage.removeItem("currentUser");
-    toast.info("Byli jste odhlášeni.");
+    toast.info(t("common.loggedOut"));
   };
 
   const addUser = (newUser: User) => {
     if (!hasPermission("user:create")) {
-      toast.error("Nemáte oprávnění přidávat uživatele.");
+      toast.error(t("common.noPermissionToAddUsers"));
       return;
     }
     if (allUsers.some(u => u.username === newUser.username)) {
-      toast.error("Uživatel s tímto jménem již existuje.");
-      addLogEntry("Pokus o přidání existujícího uživatele", { username: newUser.username }, currentUser?.username);
+      toast.error(t("common.userExists"));
+      addLogEntry(t("common.attemptToAddExistingUser"), { username: newUser.username }, currentUser?.username);
       return;
     }
 
@@ -90,10 +92,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!isAdmin && currentUser?.storeId) {
       userToAdd.storeId = currentUser.storeId;
     } else if (isAdmin && !userToAdd.storeId && userToAdd.role !== "admin") {
-      toast.error("Admin musí při vytváření uživatele zadat ID skladu pro ne-admin role.");
+      toast.error(t("common.adminMustSpecifyStoreId"));
       return;
     } else if (!isAdmin && !currentUser?.storeId) {
-      toast.error("Uživatel bez přiřazeného skladu nemůže přidávat uživatele.");
+      toast.error(t("common.userWithoutStoreCannotAddUsers"));
       return;
     }
 
@@ -103,23 +105,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     setAllUsers((prev) => [...prev, userToAdd]);
-    toast.success(`Uživatel ${userToAdd.username} byl přidán.`);
-    addLogEntry("Uživatel přidán", { username: userToAdd.username, role: userToAdd.role, storeId: userToAdd.storeId, permissions: userToAdd.permissions }, currentUser?.username);
+    toast.success(t("common.userAddedSuccess", { username: userToAdd.username }));
+    addLogEntry(t("common.userAdded"), { username: userToAdd.username, role: userToAdd.role, storeId: userToAdd.storeId, permissions: userToAdd.permissions }, currentUser?.username);
   };
 
   const updateUser = (updatedUser: User) => {
     if (!hasPermission("user:update")) {
-      toast.error("Nemáte oprávnění upravovat uživatele.");
+      toast.error(t("common.noPermissionToEditUsers"));
       return;
     }
 
     // Prevent non-admins from changing storeId or editing users outside their store
     if (!isAdmin && currentUser?.storeId && updatedUser.storeId !== currentUser.storeId) {
-      toast.error("Nemáte oprávnění měnit ID skladu uživatele nebo upravovat uživatele mimo váš sklad.");
+      toast.error(t("common.noPermissionToChangeStoreId"));
       return;
     }
     if (!isAdmin && !currentUser?.storeId) {
-      toast.error("Uživatel bez přiřazeného skladu nemůže upravovat uživatele.");
+      toast.error(t("common.userWithoutStoreCannotAddUsers"));
       return;
     }
 
@@ -130,29 +132,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setCurrentUser(updatedUser);
       localStorage.setItem("currentUser", JSON.stringify(updatedUser));
     }
-    toast.success(`Uživatel ${updatedUser.username} byl aktualizován.`);
-    addLogEntry("Uživatel aktualizován", { username: updatedUser.username, role: updatedUser.role, storeId: updatedUser.storeId, permissions: updatedUser.permissions }, currentUser?.username);
+    toast.success(t("common.userUpdatedSuccess", { username: updatedUser.username }));
+    addLogEntry(t("common.userUpdated"), { username: updatedUser.username, role: updatedUser.role, storeId: updatedUser.storeId, permissions: updatedUser.permissions }, currentUser?.username);
   };
 
   const deleteUser = (username: string) => {
     if (!hasPermission("user:delete")) {
-      toast.error("Nemáte oprávnění mazat uživatele.");
+      toast.error(t("common.noPermissionToDeleteUsers"));
       return;
     }
 
     const userToDelete = allUsers.find(u => u.username === username);
     if (!userToDelete) {
-      toast.error("Uživatel nenalezen.");
+      toast.error(t("common.userNotFound"));
       return;
     }
 
     // Prevent non-admins from deleting users outside their store
     if (!isAdmin && currentUser?.storeId && userToDelete.storeId !== currentUser.storeId) {
-      toast.error("Nemáte oprávnění mazat uživatele mimo váš sklad.");
+      toast.error(t("common.noPermissionToDeleteUsers")); // Re-using message, could be more specific
       return;
     }
     if (!isAdmin && !currentUser?.storeId) {
-      toast.error("Uživatel bez přiřazeného skladu nemůže mazat uživatele.");
+      toast.error(t("common.userWithoutStoreCannotAddUsers")); // Re-using message
       return;
     }
 
@@ -160,8 +162,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (currentUser?.username === username) {
       logout();
     }
-    toast.success(`Uživatel ${username} byl smazán.`);
-    addLogEntry("Uživatel smazán", { username }, currentUser?.username);
+    toast.success(t("common.userDeletedSuccess", { username }));
+    addLogEntry(t("common.userDeleted"), { username }, currentUser?.username);
   };
 
   const getStoreUsers = (storeId: string) => {

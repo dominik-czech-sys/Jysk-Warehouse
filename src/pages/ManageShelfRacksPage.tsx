@@ -25,10 +25,13 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useShelfRacks, ShelfRack } from "@/data/shelfRacks";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 const ManageShelfRacksPage: React.FC = () => {
   const { shelfRacks, addShelfRack, updateShelfRack, deleteShelfRack } = useShelfRacks();
   const { isAdmin, userStoreId, hasPermission } = useAuth();
+  const { t } = useTranslation(); // Initialize useTranslation
+
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingRack, setEditingRack] = useState<ShelfRack | null>(null);
@@ -38,7 +41,7 @@ const ManageShelfRacksPage: React.FC = () => {
 
   const handleAddShelfRack = (newRack: ShelfRack) => {
     if (!hasPermission("rack:create")) {
-      toast.error("Nemáte oprávnění přidávat regály.");
+      toast.error(t("common.noPermissionToAddRacks"));
       return false;
     }
     // Ensure the rack is added to the user's store if not admin
@@ -48,7 +51,7 @@ const ManageShelfRacksPage: React.FC = () => {
 
   const handleEditShelfRack = (updatedRack: ShelfRack) => {
     if (!hasPermission("rack:update")) {
-      toast.error("Nemáte oprávnění upravovat regály.");
+      toast.error(t("common.noPermissionToEditRacks"));
       return false;
     }
     // Ensure the rack is updated within the user's store if not admin
@@ -59,7 +62,7 @@ const ManageShelfRacksPage: React.FC = () => {
 
   const handleDeleteShelfRack = (id: string, storeId: string) => {
     if (!hasPermission("rack:delete")) {
-      toast.error("Nemáte oprávnění mazat regály.");
+      toast.error(t("common.noPermissionToDeleteRacks"));
       return;
     }
     setRackToDeleteId(id);
@@ -82,13 +85,13 @@ const ManageShelfRacksPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-6 space-y-4 sm:space-y-0">
           <Link to="/" className="w-full sm:w-auto">
             <Button variant="outline" className="flex items-center w-full">
-              <ArrowLeft className="h-4 w-4 mr-2" /> Zpět na hlavní stránku
+              <ArrowLeft className="h-4 w-4 mr-2" /> {t("common.backToMainPage")}
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Správa regálů</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("common.rackManagement")}</h1>
           {hasPermission("rack:create") && (
             <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">
-              <PlusCircle className="h-4 w-4 mr-2" /> Přidat regál
+              <PlusCircle className="h-4 w-4 mr-2" /> {t("common.addRack")}
             </Button>
           )}
         </div>
@@ -97,12 +100,12 @@ const ManageShelfRacksPage: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="min-w-[80px]">ID Regálu</TableHead>
-                <TableHead className="min-w-[80px]">Řada</TableHead>
-                <TableHead className="min-w-[80px]">Regál</TableHead>
-                <TableHead className="min-w-[150px]">Police (Popis)</TableHead>
-                {isAdmin && <TableHead className="min-w-[100px]">ID Skladu</TableHead>}
-                <TableHead className="text-right min-w-[100px]">Akce</TableHead>
+                <TableHead className="min-w-[80px]">{t("common.rackId")}</TableHead>
+                <TableHead className="min-w-[80px]">{t("common.rowId")}</TableHead>
+                <TableHead className="min-w-[80px]">{t("common.rack")}</TableHead>
+                <TableHead className="min-w-[150px]">{t("common.shelvesAndDescription")}</TableHead>
+                {isAdmin && <TableHead className="min-w-[100px]">{t("common.storeId")}</TableHead>}
+                <TableHead className="text-right min-w-[100px]">{t("common.action")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -112,7 +115,7 @@ const ManageShelfRacksPage: React.FC = () => {
                   <TableCell>{rack.rowId}</TableCell>
                   <TableCell>{rack.rackId}</TableCell>
                   <TableCell>
-                    {rack.shelves.map(s => `P${s.shelfNumber}: ${s.description}`).join('; ')}
+                    {rack.shelves.map(s => `${t("common.shelf")} ${s.shelfNumber}: ${s.description}`).join('; ')}
                   </TableCell>
                   {isAdmin && <TableCell>{rack.storeId}</TableCell>}
                   <TableCell className="text-right">
@@ -146,7 +149,7 @@ const ManageShelfRacksPage: React.FC = () => {
         </div>
 
         {shelfRacks.length === 0 && (
-          <p className="text-center text-muted-foreground mt-4">Žádné regály nebyly nalezeny. Přidejte nový!</p>
+          <p className="text-center text-muted-foreground mt-4">{t("common.noRacksFound")}</p>
         )}
       </div>
 
@@ -170,16 +173,16 @@ const ManageShelfRacksPage: React.FC = () => {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Jste si naprosto jisti?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tuto akci nelze vrátit zpět. Tímto trvale smažete regál{" "}
-              <span className="font-semibold">{rackToDeleteId}</span> ze skladu{" "}
-              <span className="font-semibold">{rackToDeleteStoreId}</span> ze systému.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("common.confirmDeleteRackTitle")}</AlertDialogTitle>
+            <AlertDialogDescription
+              dangerouslySetInnerHTML={{
+                __html: t("common.confirmDeleteRackDescription", { rackId: rackToDeleteId, storeId: rackToDeleteStoreId }),
+              }}
+            />
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Zrušit</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteShelfRack} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Pokračovat</AlertDialogAction>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteShelfRack} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">{t("common.continue")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

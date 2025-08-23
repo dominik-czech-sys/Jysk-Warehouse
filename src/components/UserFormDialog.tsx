@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/hooks/useAuth";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useStores } from "@/data/stores"; // Import useStores
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 // Define all possible permissions for display
 const allPermissions: Permission[] = [
@@ -48,6 +49,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
 }) => {
   const { isAdmin, userStoreId: currentUserStoreId } = useAuth();
   const { stores } = useStores(); // Get list of all stores
+  const { t } = useTranslation(); // Initialize useTranslation
 
   const [formData, setFormData] = useState<User>({
     username: "",
@@ -101,7 +103,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.username || !formData.password || !formData.role || (!formData.storeId && formData.role !== "admin")) {
-      toast.error("Prosím, vyplňte všechna povinná pole.");
+      toast.error(t("common.fillAllRequiredFields"));
       return;
     }
     onSubmit(formData);
@@ -115,15 +117,15 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{user ? "Upravit uživatele" : "Přidat nového uživatele"}</DialogTitle>
+          <DialogTitle>{user ? t("common.editUser") : t("common.addUser")}</DialogTitle>
           <DialogDescription>
-            {user ? "Zde můžete upravit údaje uživatele." : "Přidejte nového uživatele do systému."}
+            {user ? t("common.editUserDescription") : t("common.addUserDescription")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="username" className="sm:text-right">
-              Uživatelské jméno
+              {t("common.username")}
             </Label>
             <Input
               id="username"
@@ -135,7 +137,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="password" className="sm:text-right">
-              Heslo
+              {t("common.password")}
             </Label>
             <Input
               id="password"
@@ -147,26 +149,26 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="role" className="sm:text-right">
-              Role
+              {t("common.role")}
             </Label>
             <Select onValueChange={handleRoleChange} value={formData.role}>
               <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Vyberte roli" />
+                <SelectValue placeholder={t("common.selectRole")} />
               </SelectTrigger>
               <SelectContent>
-                {isAdmin && <SelectItem value="admin">Admin</SelectItem>}
-                <SelectItem value="vedouci_skladu">Vedoucí Skladu (LR)</SelectItem>
-                <SelectItem value="store_manager">Store Manager (SM)</SelectItem>
-                <SelectItem value="deputy_store_manager">Deputy Store Manager (DSM)</SelectItem>
-                <SelectItem value="ar_assistant_of_sale">AR Assistant Of Sale</SelectItem>
-                <SelectItem value="skladnik">Skladník</SelectItem>
+                {isAdmin && <SelectItem value="admin">{t("common.admin")}</SelectItem>}
+                <SelectItem value="vedouci_skladu">{t("common.warehouseManager")}</SelectItem>
+                <SelectItem value="store_manager">{t("common.storeManager")}</SelectItem>
+                <SelectItem value="deputy_store_manager">{t("common.deputyStoreManager")}</SelectItem>
+                <SelectItem value="ar_assistant_of_sale">{t("common.arAssistantOfSale")}</SelectItem>
+                <SelectItem value="skladnik">{t("common.warehouseWorker")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           {formData.role !== "admin" && (
             <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
               <Label htmlFor="storeId" className="sm:text-right">
-                ID Skladu
+                {t("common.storeId")}
               </Label>
               <Select
                 onValueChange={handleStoreSelect}
@@ -174,7 +176,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
                 disabled={!isAdmin && !!currentUserStoreId} // Disable if not admin and storeId is already set
               >
                 <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Vyberte sklad" />
+                  <SelectValue placeholder={t("common.selectStore")} />
                 </SelectTrigger>
                 <SelectContent>
                   {availableStores.map((store) => (
@@ -189,7 +191,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
 
           {/* Permissions Management */}
           <div className="col-span-full mt-4">
-            <Label className="text-base font-semibold mb-2 block">Oprávnění</Label>
+            <Label className="text-base font-semibold mb-2 block">{t("common.permissions")}</Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {allPermissions.map((permission) => (
                 <div key={permission} className="flex items-center space-x-2">
@@ -209,7 +211,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
 
           <DialogFooter className="col-span-full mt-4">
             <Button type="submit" className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
-              {user ? "Uložit změny" : "Přidat uživatele"}
+              {user ? t("common.saveChanges") : t("common.addUser")}
             </Button>
           </DialogFooter>
         </form>

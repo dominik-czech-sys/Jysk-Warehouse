@@ -14,6 +14,7 @@ import { ShelfRack, Shelf } from "@/data/shelfRacks";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { Plus, Minus } from "lucide-react";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 interface ShelfRackFormDialogProps {
   isOpen: boolean;
@@ -29,6 +30,8 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
   rack,
 }) => {
   const { userStoreId } = useAuth();
+  const { t } = useTranslation(); // Initialize useTranslation
+
   const [formData, setFormData] = useState<ShelfRack>({
     id: "",
     rowId: "",
@@ -84,7 +87,7 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.rowId || !formData.rackId || !formData.storeId || formData.shelves.length === 0 || formData.shelves.some(s => !s.description.trim())) {
-      toast.error("Prosím, vyplňte všechna pole, včetně popisu pro každou polici.");
+      toast.error(t("common.fillAllRackFields"));
       return;
     }
     // Generate ID if adding new rack
@@ -102,15 +105,15 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{rack ? "Upravit regál" : "Přidat nový regál"}</DialogTitle>
+          <DialogTitle>{rack ? t("common.editRack") : t("common.addRack")}</DialogTitle>
           <DialogDescription>
-            {rack ? "Zde můžete upravit údaje regálu." : "Přidejte nový regál do systému."}
+            {rack ? t("common.editRackDescription") : t("common.addRackDescription")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="rowId" className="sm:text-right">
-              ID Řady
+              {t("common.rowId")}
             </Label>
             <Input
               id="rowId"
@@ -123,7 +126,7 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="rackId" className="sm:text-right">
-              ID Regálu
+              {t("common.rackId")}
             </Label>
             <Input
               id="rackId"
@@ -136,7 +139,7 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="storeId" className="sm:text-right">
-              ID Skladu
+              {t("common.storeId")}
             </Label>
             <Input
               id="storeId"
@@ -150,14 +153,14 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
 
           {/* Shelves Management */}
           <div className="col-span-full">
-            <Label className="text-base font-semibold mb-2 block">Police a jejich popis</Label>
+            <Label className="text-base font-semibold mb-2 block">{t("common.shelvesAndDescription")}</Label>
             {formData.shelves.map((shelf, index) => (
               <div key={index} className="flex items-center gap-2 mb-2">
-                <Label className="w-16 text-right">Police {shelf.shelfNumber}:</Label>
+                <Label className="w-16 text-right">{t("common.shelf")} {shelf.shelfNumber}:</Label>
                 <Input
                   value={shelf.description}
                   onChange={(e) => handleShelfDescriptionChange(index, e.target.value)}
-                  placeholder={`Popis pro polici ${shelf.shelfNumber}`}
+                  placeholder={t("common.descriptionForShelf", { shelfNumber: shelf.shelfNumber })}
                   className="flex-grow"
                 />
                 {formData.shelves.length > 1 && (
@@ -173,13 +176,13 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
               </div>
             ))}
             <Button type="button" variant="outline" onClick={handleAddShelf} className="w-full mt-2">
-              <Plus className="h-4 w-4 mr-2" /> Přidat polici
+              <Plus className="h-4 w-4 mr-2" /> {t("common.addShelf")}
             </Button>
           </div>
 
           <DialogFooter className="col-span-full mt-4">
             <Button type="submit" className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
-              {rack ? "Uložit změny" : "Přidat regál"}
+              {rack ? t("common.saveChanges") : t("common.addRack")}
             </Button>
           </DialogFooter>
         </form>

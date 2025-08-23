@@ -59,8 +59,8 @@ export const useStores = () => {
         };
         addArticle(newArticle); // Add to the global articles list
       });
-      toast.info(`Výchozí články byly přidány do obchodu ${newStore.id}.`);
-      addLogEntry("Výchozí články přidány do obchodu", { storeId: newStore.id, articlesCount: defaultArticlesForNewStores.length }, user?.username);
+      toast.info(`Výchozí artikly byly přidány do obchodu ${newStore.id}.`);
+      addLogEntry("Výchozí artikly přidány do obchodu", { storeId: newStore.id, articlesCount: defaultArticlesForNewStores.length }, user?.username);
     }
     return true;
   };

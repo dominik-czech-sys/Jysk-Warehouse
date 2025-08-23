@@ -17,6 +17,8 @@ import { LogProvider } from "./contexts/LogContext";
 import { useContext } from "react";
 import { Permission } from "./data/users"; // Import Permission type
 import { ThemeProvider } from "./contexts/ThemeContext"; // Import ThemeProvider
+import { I18nextProvider } from "react-i18next"; // Import I18nextProvider
+import i18n from "./i18n"; // Import i18n instance
 
 const queryClient = new QueryClient();
 
@@ -53,7 +55,7 @@ const AppContent = () => {
         }
       />
       <Route
-        path="/spravovat-clanky"
+        path="/spravovat-artikly"
         element={
           <PrivateRoute requiredPermission="article:view">
             <ManageArticles />
@@ -93,7 +95,7 @@ const AppContent = () => {
         }
       />
       <Route
-        path="/mass-add-articles"
+        path="/mass-add-artikly"
         element={
           <PrivateRoute requiredPermission="article:mass_add">
             <MassAddArticlesPage />
@@ -114,8 +116,10 @@ const App = () => (
       <BrowserRouter>
         <LogProvider>
           <AuthProvider>
-            <ThemeProvider> {/* Wrap AppContent with ThemeProvider */}
-              <AppContent />
+            <ThemeProvider>
+              <I18nextProvider i18n={i18n}> {/* Wrap AppContent with I18nextProvider */}
+                <AppContent />
+              </I18nextProvider>
             </ThemeProvider>
           </AuthProvider>
         </LogProvider>
