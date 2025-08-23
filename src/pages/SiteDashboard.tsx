@@ -40,7 +40,7 @@ const SiteDashboard: React.FC = () => {
   const { allUsers, addUser, updateUser, deleteUser, isAdmin, hasPermission, userStoreId, user: currentUser } = useAuth();
   const { stores, addStore, updateStore, deleteStore } = useStores();
   const { allArticles } = useArticles();
-  const { allShelfRacks } = useShelfRacks(); // Opraven překlep useShelfRhelfRacks na useShelfRacks
+  const { allShelfRacks } = useShelfRacks();
   const { t } = useTranslation();
 
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
@@ -103,7 +103,7 @@ const SiteDashboard: React.FC = () => {
       deleteStore(storeToDeleteId);
       setStoreToDeleteId(null);
     }
-    setIsDeleteUserDialogOpen(false); // Opraveno na setIsDeleteStoreDialogOpen
+    setIsDeleteStoreDialogOpen(false);
   };
 
   // Filter users based on current user's role and storeId
@@ -112,7 +112,7 @@ const SiteDashboard: React.FC = () => {
     : allUsers.filter(user => user.storeId === userStoreId);
 
   // Function to translate role names
-  const translateRole = (role: User['role'] | "unknown") => { // Upraven typ pro přijetí "unknown"
+  const translateRole = (role: User['role'] | "unknown") => {
     switch (role) {
       case "admin": return t("common.admin");
       case "vedouci_skladu": return t("common.warehouseManager");
@@ -120,11 +120,11 @@ const SiteDashboard: React.FC = () => {
       case "deputy_store_manager": return t("common.deputyStoreManager");
       case "ar_assistant_of_sale": return t("common.arAssistantOfSale");
       case "skladnik": return t("common.warehouseWorker");
-      default: return t("common.unknown"); // Překlad pro neznámou roli
+      default: return t("common.unknown");
     }
   };
 
-  if (!hasPermission("store:view") && !hasPermission("user:view")) { // Check if user has any permission to view this dashboard
+  if (!hasPermission("store:view") && !hasPermission("user:view")) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <Card className="p-6 text-center">
@@ -294,7 +294,6 @@ const SiteDashboard: React.FC = () => {
                       <TableCell>{translateRole(user.role)}</TableCell>
                       <TableCell>{user.storeId || t("common.unknown")}</TableCell>
                       <TableCell className="text-right">
-                        {/* Opraven JSX komentář */}
                         {hasPermission("user:update") && (
                           <Button
                             variant="ghost"
@@ -304,18 +303,24 @@ const SiteDashboard: React.FC = () => {
                               setEditingUser(user);
                               setIsEditUserDialogOpen(true);
                             }}
-                            disabled={!isAdmin && user.role === "admin"}
+                            disabled={
+                              (!isAdmin && user.role === "admin") || // Non-admin cannot edit admins
+                              (!isAdmin && user.storeId !== currentUser?.storeId) // Non-admin cannot edit users outside their store
+                            }
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
                         )}
-                        {/* Opraven JSX komentář */}
                         {hasPermission("user:delete") && (
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteUser(user.username)}
-                            disabled={!isAdmin && user.role === "admin"}
+                            disabled={
+                              (!isAdmin && user.role === "admin") || // Non-admin cannot delete admins
+                              (!isAdmin && user.storeId !== currentUser?.storeId) || // Non-admin cannot delete users outside their store
+                              (currentUser?.username === user.username) // Cannot delete self
+                            }
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

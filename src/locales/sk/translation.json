@@ -87,6 +87,8 @@
     "addRack": "Pridať regál",
     "confirmDeleteRackTitle": "Potvrdiť vymazanie regálu",
     "confirmDeleteRackDescription": "Naozaj chcete vymazať regál <strong>{{rackId}}</strong> z obchodu <strong>{{storeId}}</strong>? Táto akcia je nezvratná a vymaže všetky artikle v tomto regáli.",
+    "cancel": "Zrušiť",
+    "continue": "Pokračovať",
     "noPermissionToAddRacks": "Nemáte povolenie pridávať regály.",
     "noPermissionToEditRacks": "Nemáte povolenie upravovať regály.",
     "noPermissionToDeleteRacks": "Nemáte povolenie odstraňovať regály.",
@@ -241,11 +243,12 @@
     "exportAll": "Exportovať všetko",
     "exportSelected": "Exportovať vybrané",
     "selectDataToExport": "Vyberte dáta na export",
-    "passwordTooShort": "Heslo musí mať aspoň 8 znakov.",
-    "passwordNoNumber": "Heslo musí obsahovať aspoň jedno číslo.",
-    "passwordNoUppercase": "Heslo musí obsahovať aspoň jedno veľké písmeno.",
-    "passwordNoLowercase": "Heslo musí obsahovať aspoň jedno malé písmeno.",
-    "passwordNoSpecialChar": "Heslo musí obsahovať aspoň jeden špeciálny znak.",
+    "passwordRequiredForNewUser": "Heslo je povinné pre nového používateľa.",
+    "noPermissionToAssignToOtherStore": "Nemáte povolenie priradiť používateľa k inému obchodu.",
+    "userWithoutStoreCannotEditUsers": "Používateľ bez priradeného obchodu nemôže upravovať používateľov.",
+    "noPermissionToEditUsersInOtherStore": "Nemáte povolenie upravovať používateľov v inom obchode.",
+    "userWithoutStoreCannotDeleteUsers": "Používateľ bez priradeného obchodu nemôže odstraňovať používateľov.",
+    "noPermissionToDeleteUsersInOtherStore": "Nemáte povolenie odstraňovať používateľov v inom obchode.",
     "noPermissionToEditAdmins": "Nemáte povolenie upravovať administrátorov.",
     "noPermissionToChangeRoleToAdmin": "Nemáte povolenie zmeniť rolu na administrátora.",
     "noPermissionToChangeAdminRole": "Nemáte povolenie zmeniť rolu administrátora.",
@@ -269,7 +272,7 @@
     "storeAdd": "Pridanie obchodu",
     "storeEdit": "Úprava obchodu",
     "storeDelete": "Vymazanie obchodu",
-    "defaultArticlesAdd": "Pridanie predvolených artiklov do obchodu",
+    "defaultArticlesAdd": "Predvolené artikly pridané do obchodu",
     "articleCopy": "Kopírovanie artiklov"
   },
   "permission": {
@@ -304,7 +307,7 @@
       "view": "Zobraziť logy aplikácie"
     },
     "defaultArticles": {
-      "manage": "Spravovať predvolené artikle pre nové obchody"
+      "manage": "Spravovať predvolené artikly pre nové obchody"
     }
   }
 }

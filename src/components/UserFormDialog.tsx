@@ -67,7 +67,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
   onSubmit,
   user,
 }) => {
-  const { isAdmin, userStoreId: currentUserStoreId } = useAuth();
+  const { isAdmin, userStoreId: currentUserStoreId, user: currentUser } = useAuth();
   const { stores } = useStores(); // Get list of all stores
   const { t } = useTranslation(); // Initialize useTranslation
 
@@ -124,16 +124,29 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.username || !formData.password || !formData.role || (!formData.storeId && formData.role !== "admin")) {
+    if (!formData.username || !formData.role || (!formData.storeId && formData.role !== "admin")) {
       toast.error(t("common.fillAllRequiredFields"));
+      return;
+    }
+    // For new users, password is required. For existing users, it's optional.
+    if (!user && !formData.password) {
+      toast.error(t("common.passwordRequiredForNewUser"));
       return;
     }
     await onSubmit(formData);
     onClose();
   };
 
-  // Filter stores if current user is not admin
-  const availableStores = isAdmin ? stores : stores.filter(s => s.id === currentUserStoreId);
+  // Filter stores based on current user's role
+  const availableStores = isAdmin
+    ? stores
+    : stores.filter(s => s.id === currentUserStoreId);
+
+  // Determine if role selection should be disabled
+  const isRoleSelectDisabled = !isAdmin && user?.username === currentUser?.username; // Non-admin cannot change their own role
+
+  // Determine if store selection should be disabled
+  const isStoreSelectDisabled = !isAdmin && !!currentUserStoreId && formData.role !== "admin"; // Non-admin cannot change storeId if they have one, unless setting to admin
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -174,7 +187,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
             <Label htmlFor="role" className="sm:text-right">
               {t("common.role")}
             </Label>
-            <Select onValueChange={handleRoleChange} value={formData.role}>
+            <Select onValueChange={handleRoleChange} value={formData.role} disabled={isRoleSelectDisabled}>
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder={t("common.selectRole")} />
               </SelectTrigger>
@@ -196,7 +209,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
               <Select
                 onValueChange={handleStoreSelect}
                 value={formData.storeId || ""}
-                disabled={!isAdmin && !!currentUserStoreId} // Disable if not admin and storeId is already set
+                disabled={isStoreSelectDisabled}
               >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder={t("common.selectStore")} />
