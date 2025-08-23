@@ -15,10 +15,12 @@ import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useStores } from "@/data/stores"; // Import useStores
 
 // Define all possible permissions for display
 const allPermissions: Permission[] = [
   "user:view", "user:create", "user:update", "user:delete",
+  "store:view", "store:create", "store:update", "store:delete",
   "rack:view", "rack:create", "rack:update", "rack:delete",
   "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add",
   "log:view",
@@ -45,6 +47,8 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
   user,
 }) => {
   const { isAdmin, userStoreId: currentUserStoreId } = useAuth();
+  const { stores } = useStores(); // Get list of all stores
+
   const [formData, setFormData] = useState<User>({
     username: "",
     password: "",
@@ -81,6 +85,10 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
     }));
   };
 
+  const handleStoreSelect = (value: string) => {
+    setFormData((prev) => ({ ...prev, storeId: value }));
+  };
+
   const handlePermissionChange = (permission: Permission, checked: boolean) => {
     setFormData((prev) => {
       const newPermissions = checked
@@ -99,6 +107,9 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
     onSubmit(formData);
     onClose();
   };
+
+  // Filter stores if current user is not admin
+  const availableStores = isAdmin ? stores : stores.filter(s => s.id === currentUserStoreId);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -157,14 +168,22 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
               <Label htmlFor="storeId" className="sm:text-right">
                 ID Skladu
               </Label>
-              <Input
-                id="storeId"
+              <Select
+                onValueChange={handleStoreSelect}
                 value={formData.storeId || ""}
-                onChange={handleChange}
-                className="col-span-3"
-                readOnly={!isAdmin && !!currentUserStoreId} // Non-admin can't change storeId if they have one
-                placeholder="Např. Sklad 1"
-              />
+                disabled={!isAdmin && !!currentUserStoreId} // Disable if not admin and storeId is already set
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Vyberte sklad" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableStores.map((store) => (
+                    <SelectItem key={store.id} value={store.id}>
+                      {store.name} ({store.id})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
 
