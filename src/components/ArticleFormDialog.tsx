@@ -37,11 +37,9 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
     name: "",
     rackId: "",
     shelfNumber: "",
-    location: "",
-    floor: "",
     storeId: userStoreId || "",
     status: "",
-    quantity: 1, // Added missing quantity
+    quantity: 1,
   });
   const [selectedRackId, setSelectedRackId] = useState<string>("");
   const [selectedShelfNumber, setSelectedShelfNumber] = useState<string>("");
@@ -57,11 +55,9 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
         name: "",
         rackId: "",
         shelfNumber: "",
-        location: "",
-        floor: "",
         storeId: userStoreId || "",
         status: "",
-        quantity: 1, // Added missing quantity
+        quantity: 1,
       });
       setSelectedRackId("");
       setSelectedShelfNumber("");
@@ -71,13 +67,11 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
   useEffect(() => {
     const currentRack = shelfRacks.find(rack => rack.id === selectedRackId && rack.storeId === formData.storeId);
     if (currentRack) {
-      // Update location, floor, and storeId from the selected rack
+      // Update storeId from the selected rack
       setFormData(prev => ({
         ...prev,
         rackId: currentRack.id,
         shelfNumber: selectedShelfNumber,
-        location: currentRack.location,
-        floor: currentRack.floor,
         storeId: currentRack.storeId,
       }));
     } else if (!article) { // Clear if no rack selected and not editing an existing article
@@ -85,8 +79,6 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
         ...prev,
         rackId: "",
         shelfNumber: "",
-        location: "",
-        floor: "",
         storeId: userStoreId || "",
       }));
     }
@@ -193,18 +185,6 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           </div>
 
           {/* Display derived fields as read-only */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="location" className="sm:text-right">
-              Umístění
-            </Label>
-            <Input id="location" value={formData.location} readOnly className="col-span-3 bg-gray-100 dark:bg-gray-700" />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="floor" className="sm:text-right">
-              Patro
-            </Label>
-            <Input id="floor" value={formData.floor} readOnly className="col-span-3 bg-gray-100 dark:bg-gray-700" />
-          </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="storeId" className="sm:text-right">
               ID Skladu

@@ -126,8 +126,6 @@ const ManageArticles = () => {
                 <TableHead className="min-w-[150px]">Název</TableHead>
                 <TableHead className="min-w-[80px]">Regál ID</TableHead>
                 <TableHead className="min-w-[100px]">Číslo police</TableHead>
-                <TableHead className="min-w-[120px]">Umístění</TableHead>
-                <TableHead className="min-w-[80px]">Patro</TableHead>
                 <TableHead className="min-w-[100px]">Status</TableHead>
                 {isAdmin && <TableHead className="min-w-[100px]">ID Skladu</TableHead>}
                 <TableHead className="text-right min-w-[100px]">Akce</TableHead>
@@ -140,8 +138,6 @@ const ManageArticles = () => {
                   <TableCell>{article.name}</TableCell>
                   <TableCell>{article.rackId}</TableCell>
                   <TableCell>{article.shelfNumber}</TableCell>
-                  <TableCell>{article.location}</TableCell>
-                  <TableCell>{article.floor}</TableCell>
                   <TableCell>{article.status}</TableCell>
                   {isAdmin && <TableCell>{article.storeId}</TableCell>}
                   <TableCell className="text-right">

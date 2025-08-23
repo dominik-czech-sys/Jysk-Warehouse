@@ -18,8 +18,6 @@ import { useShelfRacks, ShelfRack } from "@/data/shelfRacks";
 interface ShelfDetails {
   rackId: string;
   shelfNumber: string;
-  location: string;
-  floor: string;
   storeId: string; // Renamed from warehouseId
 }
 
@@ -33,8 +31,6 @@ const MassAddArticlesPage: React.FC = () => {
   const [shelfDetails, setShelfDetails] = useState<ShelfDetails>({
     rackId: "",
     shelfNumber: "",
-    location: "",
-    floor: "",
     storeId: userStoreId || "",
   });
   const [isShelfDetailsLocked, setIsShelfDetailsLocked] = useState(false);
@@ -86,20 +82,16 @@ const MassAddArticlesPage: React.FC = () => {
   useEffect(() => {
     const currentRack = shelfRacks.find(rack => rack.id === selectedRackId && rack.storeId === userStoreId);
     if (currentRack) {
-      // Update location, floor, and storeId from the selected rack
+      // Update storeId from the selected rack
       setShelfDetails({
         rackId: currentRack.id,
         shelfNumber: selectedShelfNumber,
-        location: currentRack.location,
-        floor: currentRack.floor,
         storeId: currentRack.storeId,
       });
     } else {
       setShelfDetails({
         rackId: "",
         shelfNumber: "",
-        location: "",
-        floor: "",
         storeId: userStoreId || "",
       });
     }
@@ -244,14 +236,6 @@ const MassAddArticlesPage: React.FC = () => {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-            <div>
-              <Label htmlFor="location">Umístění</Label>
-              <Input id="location" value={shelfDetails.location} readOnly className="mt-1 bg-gray-100 dark:bg-gray-700" />
-            </div>
-            <div>
-              <Label htmlFor="floor">Patro</Label>
-              <Input id="floor" value={shelfDetails.floor} readOnly className="mt-1 bg-gray-100 dark:bg-gray-700" />
             </div>
             <div>
               <Label htmlFor="storeId">ID Skladu</Label>

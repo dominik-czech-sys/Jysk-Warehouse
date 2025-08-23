@@ -33,8 +33,6 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
     id: "",
     rowId: "",
     rackId: "",
-    location: "", // Will be derived/set by store layout, not directly input here
-    floor: "",    // Will be derived/set by store layout, not directly input here
     shelves: [{ shelfNumber: "1", description: "" }], // Initialize with one shelf
     storeId: userStoreId || "",
   });
@@ -47,8 +45,6 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
         id: "",
         rowId: "",
         rackId: "",
-        location: "",
-        floor: "",
         shelves: [{ shelfNumber: "1", description: "" }],
         storeId: userStoreId || "",
       });
@@ -95,10 +91,6 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
     const finalFormData = {
       ...formData,
       id: rack ? formData.id : `${formData.rowId}-${formData.rackId}`.toUpperCase(),
-      // For now, location and floor are hardcoded or left empty as they are not input directly
-      // In a real app, these would be derived from a store's layout configuration
-      location: formData.location || "Neznámé umístění",
-      floor: formData.floor || "Neznámé patro",
     };
 
     if (onSubmit(finalFormData)) {
@@ -142,7 +134,6 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
               placeholder="Např. 1"
             />
           </div>
-          {/* Removed Location and Floor inputs as per user request */}
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="storeId" className="sm:text-right">
               ID Skladu

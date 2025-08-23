@@ -100,8 +100,6 @@ const ManageShelfRacksPage: React.FC = () => {
                 <TableHead className="min-w-[80px]">ID Regálu</TableHead>
                 <TableHead className="min-w-[80px]">Řada</TableHead>
                 <TableHead className="min-w-[80px]">Regál</TableHead>
-                <TableHead className="min-w-[120px]">Umístění</TableHead>
-                <TableHead className="min-w-[80px]">Patro</TableHead>
                 <TableHead className="min-w-[150px]">Police (Popis)</TableHead>
                 {isAdmin && <TableHead className="min-w-[100px]">ID Skladu</TableHead>}
                 <TableHead className="text-right min-w-[100px]">Akce</TableHead>
@@ -113,8 +111,6 @@ const ManageShelfRacksPage: React.FC = () => {
                   <TableCell className="font-medium">{rack.id}</TableCell>
                   <TableCell>{rack.rowId}</TableCell>
                   <TableCell>{rack.rackId}</TableCell>
-                  <TableCell>{rack.location}</TableCell>
-                  <TableCell>{rack.floor}</TableCell>
                   <TableCell>
                     {rack.shelves.map(s => `P${s.shelfNumber}: ${s.description}`).join('; ')}
                   </TableCell>

@@ -12,8 +12,6 @@ export interface ShelfRack {
   id: string; // Unique ID for the rack (e.g., "A-1")
   rowId: string; // e.g., "A"
   rackId: string; // e.g., "1"
-  location: string; // e.g., "Ulička A" - derived from store layout, but stored for article context
-  floor: string;    // e.g., "Patro 1" - derived from store layout, but stored for article context
   shelves: Shelf[]; // Array of individual shelves with descriptions
   storeId: string; // ID of the store this rack belongs to
 }
@@ -24,8 +22,6 @@ const initialShelfRacks: ShelfRack[] = [
     id: "A-1",
     rowId: "A",
     rackId: "1",
-    location: "Ulička A",
-    floor: "Patro 1",
     shelves: [
       { shelfNumber: "1", description: "Homeware" },
       { shelfNumber: "2", description: "Decorations" },
@@ -39,8 +35,6 @@ const initialShelfRacks: ShelfRack[] = [
     id: "A-2",
     rowId: "A",
     rackId: "2",
-    location: "Ulička A",
-    floor: "Patro 1",
     shelves: [
       { shelfNumber: "1", description: "Electronics" },
       { shelfNumber: "2", description: "Kitchenware" },
@@ -52,8 +46,6 @@ const initialShelfRacks: ShelfRack[] = [
     id: "B-1",
     rowId: "B",
     rackId: "1",
-    location: "Ulička B",
-    floor: "Patro 2",
     shelves: [
       { shelfNumber: "1", description: "Large Furniture" },
       { shelfNumber: "2", description: "Mattresses" },
@@ -72,8 +64,6 @@ const initialShelfRacks: ShelfRack[] = [
     id: "K-1",
     rowId: "K",
     rackId: "1",
-    location: "Ulička K",
-    floor: "Přízemí",
     shelves: [
       { shelfNumber: "1", description: "Koberce" },
       { shelfNumber: "2", description: "Zrcadla" },
@@ -84,8 +74,6 @@ const initialShelfRacks: ShelfRack[] = [
     id: "T-1",
     rowId: "T",
     rackId: "1",
-    location: "Ulička T",
-    floor: "Přízemí",
     shelves: [
       { shelfNumber: "1", description: "Stoly" },
       { shelfNumber: "2", description: "Židle" },

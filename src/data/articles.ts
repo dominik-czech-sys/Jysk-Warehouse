@@ -8,8 +8,6 @@ export interface Article {
   name: string; // Název
   rackId: string; // ID of the selected ShelfRack (e.g., "A-1")
   shelfNumber: string; // The specific shelf number within the rack (e.g., "1", "2")
-  location: string; // Derived from ShelfRack
-  floor: string;    // Derived from ShelfRack
   storeId: string; // Derived from ShelfRack (renamed from warehouseId)
   status: string; // Nové pole pro status zboží
   quantity: number; // New field for article quantity
@@ -252,8 +250,6 @@ export const useArticles = () => {
               quantity,
               rackId: defaultRack.id,
               shelfNumber: randomShelf.shelfNumber,
-              location: defaultRack.location,
-              floor: defaultRack.floor,
               storeId: defaultRack.storeId,
             });
           } else {
@@ -265,8 +261,6 @@ export const useArticles = () => {
               quantity,
               rackId: "N/A",
               shelfNumber: "N/A",
-              location: "N/A",
-              floor: "N/A",
               storeId: "Sklad 1", // Assign to a default store
             });
           }

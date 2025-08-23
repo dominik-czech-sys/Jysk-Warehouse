@@ -78,16 +78,12 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
       const targetStoreRacks = allShelfRacks.filter(rack => rack.storeId === targetStoreId);
       let targetRackId = "N/A";
       let targetShelfNumber = "N/A";
-      let targetLocation = "N/A";
-      let targetFloor = "N/A";
 
       if (targetStoreRacks.length > 0 && targetStoreRacks[0].shelves.length > 0) {
         // For simplicity, assign to the first shelf of the first rack in the target store
         // In a real scenario, this logic would be more sophisticated (e.g., finding an empty spot)
         targetRackId = targetStoreRacks[0].id;
         targetShelfNumber = targetStoreRacks[0].shelves[0].shelfNumber;
-        targetLocation = targetStoreRacks[0].location;
-        targetFloor = targetStoreRacks[0].floor;
       }
 
       const newArticle = {
@@ -95,8 +91,6 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
         storeId: targetStoreId,
         rackId: targetRackId,
         shelfNumber: targetShelfNumber,
-        location: targetLocation,
-        floor: targetFloor,
       };
 
       if (existingArticleInTarget && overwriteExisting) {

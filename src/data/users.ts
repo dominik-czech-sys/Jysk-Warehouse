@@ -120,7 +120,7 @@ export const users: User[] = [
 ];
 
 // Default articles for new stores (if needed)
-export const defaultArticlesForNewStores: Omit<Article, 'rackId' | 'shelfNumber' | 'location' | 'floor' | 'storeId' | 'quantity'>[] = [
+export const defaultArticlesForNewStores: Omit<Article, 'rackId' | 'shelfNumber' | 'storeId' | 'quantity'>[] = [
   { id: "DEFAULT-001", name: "Výchozí produkt A", status: "21" },
   { id: "DEFAULT-002", name: "Výchozí produkt B", status: "11" },
   { id: "DEFAULT-003", name: "Výchozí produkt C", status: "41" },
