@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Article } from "@/data/articles";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth"; // Import useAuth
 
 interface ArticleFormDialogProps {
   isOpen: boolean;
@@ -26,6 +27,8 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
   onSubmit,
   article,
 }) => {
+  const { userWarehouseId } = useAuth(); // Get user's warehouse ID
+
   const [formData, setFormData] = useState<Article>({
     id: "",
     name: "",
@@ -33,6 +36,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
     shelfNumber: "",
     location: "",
     floor: "",
+    warehouseId: userWarehouseId || "", // Initialize with user's warehouseId
   });
 
   useEffect(() => {
@@ -46,9 +50,10 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
         shelfNumber: "",
         location: "",
         floor: "",
+        warehouseId: userWarehouseId || "", // Reset with user's warehouseId
       });
     }
-  }, [article, isOpen]);
+  }, [article, isOpen, userWarehouseId]); // Add userWarehouseId to dependencies
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -57,8 +62,8 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.id || !formData.name || !formData.shelf || !formData.shelfNumber || !formData.location || !formData.floor) {
-      toast.error("Please fill in all fields.");
+    if (!formData.id || !formData.name || !formData.shelf || !formData.shelfNumber || !formData.location || !formData.floor || !formData.warehouseId) {
+      toast.error("Prosím, vyplňte všechna pole.");
       return;
     }
     onSubmit(formData);
@@ -69,15 +74,15 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{article ? "Edit Article" : "Add New Article"}</DialogTitle>
+          <DialogTitle>{article ? "Upravit článek" : "Přidat nový článek"}</DialogTitle>
           <DialogDescription>
-            {article ? "Make changes to the article here." : "Add a new article to the warehouse inventory."}
+            {article ? "Zde můžete provést změny v článku." : "Přidejte nový článek do skladového inventáře."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="id" className="text-right">
-              Article ID
+              ID článku
             </Label>
             <Input
               id="id"
@@ -89,7 +94,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="text-right">
-              Name
+              Název
             </Label>
             <Input
               id="name"
@@ -100,7 +105,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="shelf" className="text-right">
-              Shelf
+              Regál
             </Label>
             <Input
               id="shelf"
@@ -111,7 +116,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="shelfNumber" className="text-right">
-              Shelf Number
+              Číslo regálu
             </Label>
             <Input
               id="shelfNumber"
@@ -122,7 +127,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="location" className="text-right">
-              Location
+              Umístění
             </Label>
             <Input
               id="location"
@@ -133,7 +138,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="floor" className="text-right">
-              Floor
+              Patro
             </Label>
             <Input
               id="floor"
@@ -142,8 +147,22 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               className="col-span-3"
             />
           </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="warehouseId" className="text-right">
+              ID Skladu
+            </Label>
+            <Input
+              id="warehouseId"
+              value={formData.warehouseId}
+              onChange={handleChange}
+              className="col-span-3"
+              readOnly={!userWarehouseId} // Make warehouseId read-only if user has one
+            />
+          </div>
           <DialogFooter>
-            <Button type="submit">{article ? "Save changes" : "Add Article"}</Button>
+            <Button type="submit" className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+              {article ? "Uložit změny" : "Přidat článek"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
