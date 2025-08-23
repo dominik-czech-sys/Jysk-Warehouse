@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Copy, Users as UsersIcon, Package, Warehouse as WarehouseIcon, Download } from "lucide-react";
+import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Copy, Users as UsersIcon, Package, Warehouse as WarehouseIcon, Download, Database } from "lucide-react";
 import { UserFormDialog } from "@/components/UserFormDialog";
 import { StoreFormDialog } from "@/components/StoreFormDialog";
 import { ArticleCopyDialog } from "@/components/ArticleCopyDialog";
@@ -35,9 +35,11 @@ import { useShelfRacks } from "@/data/shelfRacks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "react-i18next";
+import AdminApiConfig from '@/components/Admin/AdminApiConfig'; // Import AdminApiConfig
+import { initDatabase } from '@/api'; // Import initDatabase API function
 
 const SiteDashboard: React.FC = () => {
-  const { allUsers, addUser, updateUser, deleteUser, isAdmin, hasPermission, userStoreId, user: currentUser } = useAuth();
+  const { allUsers, addUser, updateUser, deleteUser, isAdmin, hasPermission, userStoreId, user: currentUser, refreshUsers } = useAuth();
   const { stores, addStore, updateStore, deleteStore } = useStores();
   const { allArticles } = useArticles();
   const { allShelfRacks } = useShelfRacks();
@@ -57,6 +59,8 @@ const SiteDashboard: React.FC = () => {
 
   const [isLogViewerOpen, setIsLogViewerOpen] = useState(false);
   const [isArticleCopyDialogOpen, setIsArticleCopyDialogOpen] = useState(false);
+
+  const [isDbInitConfirmationOpen, setIsDbInitConfirmationOpen] = useState(false); // Stav pro potvrzení inicializace DB
 
   // Statistics
   const totalUsers = allUsers.length;
@@ -104,6 +108,31 @@ const SiteDashboard: React.FC = () => {
       setStoreToDeleteId(null);
     }
     setIsDeleteStoreDialogOpen(false);
+  };
+
+  // Funkce pro inicializaci databáze
+  const handleInitializeDatabase = () => {
+    setIsDbInitConfirmationOpen(true);
+  };
+
+  const confirmInitializeDatabase = async () => {
+    setIsDbInitConfirmationOpen(false);
+    try {
+      const success = await initDatabase();
+      if (success) {
+        toast.success(t('common.dbInitSuccess'));
+        await refreshUsers(); // Obnovení uživatelů po inicializaci DB
+      } else {
+        toast.error(t('common.dbInitFailed'));
+      }
+    } catch (error) {
+      console.error("Error initializing database:", error);
+      toast.error(t('common.dbInitFailed'));
+    }
+  };
+
+  const cancelInitializeDatabase = () => {
+    setIsDbInitConfirmationOpen(false);
   };
 
   // Filter users based on current user's role and storeId
@@ -304,8 +333,8 @@ const SiteDashboard: React.FC = () => {
                               setIsEditUserDialogOpen(true);
                             }}
                             disabled={
-                              (!isAdmin && user.role === "admin") || // Non-admin cannot edit admins
-                              (!isAdmin && user.storeId !== currentUser?.storeId) // Non-admin cannot edit users outside their store
+                              (!isAdmin && user.role === "admin") ||
+                              (!isAdmin && user.storeId !== currentUser?.storeId)
                             }
                           >
                             <Edit className="h-4 w-4" />
@@ -317,9 +346,9 @@ const SiteDashboard: React.FC = () => {
                             size="sm"
                             onClick={() => handleDeleteUser(user.username)}
                             disabled={
-                              (!isAdmin && user.role === "admin") || // Non-admin cannot delete admins
-                              (!isAdmin && user.storeId !== currentUser?.storeId) || // Non-admin cannot delete users outside their store
-                              (currentUser?.username === user.username) // Cannot delete self
+                              (!isAdmin && user.role === "admin") ||
+                              (!isAdmin && user.storeId !== currentUser?.storeId) ||
+                              (currentUser?.username === user.username)
                             }
                           >
                             <Trash2 className="h-4 w-4" />
@@ -372,6 +401,26 @@ const SiteDashboard: React.FC = () => {
                   <Download className="h-4 w-4 mr-2" /> {t("common.exportData")}
                 </Button>
               </Link>
+            </div>
+          </div>
+        )}
+
+        <Separator className="my-8" />
+
+        {/* Admin Settings Section */}
+        {isAdmin && (
+          <div className="mb-8 w-full animate-fade-in">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('common.adminSettings')}</h2>
+            <div className="space-y-6">
+              <AdminApiConfig /> {/* Komponent pro konfiguraci API URL */}
+
+              {/* Tlačítko pro inicializaci databáze */}
+              <Button
+                className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex items-center"
+                onClick={handleInitializeDatabase}
+              >
+                <Database className="h-4 w-4 mr-2" /> {t('common.initializeDatabase')}
+              </Button>
             </div>
           </div>
         )}
@@ -449,6 +498,22 @@ const SiteDashboard: React.FC = () => {
       />
 
       <LogViewer isOpen={isLogViewerOpen} onClose={() => setIsLogViewerOpen(false)} />
+
+      {/* Dialog pro potvrzení inicializace databáze */}
+      <AlertDialog open={isDbInitConfirmationOpen} onOpenChange={setIsDbInitConfirmationOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('common.dbInitTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('common.dbInitConfirm')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelInitializeDatabase}>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmInitializeDatabase} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {t('common.initialize')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

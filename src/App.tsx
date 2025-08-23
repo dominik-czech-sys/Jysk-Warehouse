@@ -20,6 +20,7 @@ import { Permission } from "./data/users"; // Import Permission type
 import { ThemeProvider } from "./contexts/ThemeContext"; // Import ThemeProvider
 import { I18nextProvider } from "react-i18next"; // Import I18nextProvider
 import i18n from "./i18n"; // Import i18n instance
+import { useTranslation } from "react-i18next"; // Import useTranslation for loading message
 
 const queryClient = new QueryClient();
 
@@ -29,7 +30,20 @@ const PrivateRoute: React.FC<{ children: JSX.Element; requiredPermission?: Permi
   requiredPermission,
 }) => {
   const auth = useContext(AuthContext);
-  if (!auth) return <Navigate to="/prihlaseni" replace />;
+  const { t } = useTranslation();
+
+  if (!auth) {
+    // This should ideally not happen if AuthProvider wraps AppContent
+    return <Navigate to="/prihlaseni" replace />;
+  }
+
+  if (auth.isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+        <p className="text-xl font-semibold text-gray-700 dark:text-gray-300">{t("common.loading")}</p>
+      </div>
+    );
+  }
 
   if (!auth.isAuthenticated) {
     return <Navigate to="/prihlaseni" replace />;

@@ -11,14 +11,15 @@ import { useTranslation } from "react-i18next"; // Import useTranslation
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const { login, isLoading } = useAuth(); // Získání isLoading
   const navigate = useNavigate();
   const [iframeSrc, setIframeSrc] = useState<string | null>(null); // Stav pro iframe
   const { t } = useTranslation(); // Initialize useTranslation
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => { // Změna na async
     e.preventDefault();
-    if (login(username, password)) {
+    const success = await login(username, password); // Volání async login
+    if (success) {
       navigate("/");
     } else {
       // toast.error is already called in AuthContext
@@ -65,14 +66,15 @@ const LoginPage: React.FC = () => {
                 className="mt-1"
               />
             </div>
-            <Button type="submit" className="w-full bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
-              {t("common.login")}
+            <Button type="submit" className="w-full bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground" disabled={isLoading}>
+              {isLoading ? t("common.loading") : t("common.login")}
             </Button>
             <Button
               type="button"
               variant="outline"
               className="w-full mt-4 border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light"
               onClick={() => handleOpenIframe("https://myjysk.thinktime.com/ui/dashboards/177")}
+              disabled={isLoading}
             >
               {t("common.goToMyJysk")}
             </Button>
@@ -81,6 +83,7 @@ const LoginPage: React.FC = () => {
               variant="outline"
               className="w-full mt-4 border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light"
               onClick={() => handleOpenIframe("http://storefront.jysk.com/")}
+              disabled={isLoading}
             >
               {t("common.goToStoreFront")}
             </Button>

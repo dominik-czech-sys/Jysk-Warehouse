@@ -1,6 +1,7 @@
 {
   "common": {
     "unknown": "Unknown",
+    "loading": "Loading...",
     "welcomeUser": "Welcome, {{username}}!",
     "userLoggedIn": "User logged in",
     "invalidCredentials": "Invalid username or password.",
@@ -255,7 +256,23 @@
     "noPermissionToDeleteAdmins": "You do not have permission to delete administrators.",
     "cannotDeleteSelf": "You cannot delete your own account.",
     "confirmDeleteStoreTitle": "Confirm Store Deletion",
-    "confirmDeleteStoreDescription": "Are you sure you want to delete store <strong>{{storeId}}</strong>? This action is irreversible and will delete all articles and racks associated with this store."
+    "confirmDeleteStoreDescription": "Are you sure you want to delete store <strong>{{storeId}}</strong>? This action is irreversible and will delete all articles and racks associated with this store.",
+    "adminSettings": "Admin Settings",
+    "backendApiConfiguration": "Backend API Configuration",
+    "apiUrlLabel": "API URL",
+    "saveApiUrl": "Save API URL",
+    "apiUrlCannotBeEmpty": "API URL cannot be empty.",
+    "apiUrlSavedSuccess": "API URL saved successfully.",
+    "initializeDatabase": "Initialize Database",
+    "dbInitTitle": "Confirm Database Initialization",
+    "dbInitConfirm": "Are you sure you want to initialize the database? This action will erase all existing data and load the default schema and data. This action is irreversible.",
+    "initialize": "Initialize",
+    "dbInitSuccess": "Database initialized successfully.",
+    "dbInitFailed": "Database initialization failed.",
+    "userAddFailed": "User addition failed.",
+    "userUpdateFailed": "User update failed.",
+    "userDeleteFailed": "User deletion failed.",
+    "usersFetchFailed": "Failed to fetch users."
   },
   "logCategory": {
     "fullLog": "Full Log",

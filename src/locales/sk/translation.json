@@ -1,6 +1,7 @@
 {
   "common": {
     "unknown": "Neznáme",
+    "loading": "Načítava sa...",
     "welcomeUser": "Vitajte, {{username}}!",
     "userLoggedIn": "Používateľ sa prihlásil",
     "invalidCredentials": "Neplatné používateľské meno alebo heslo.",
@@ -215,8 +216,8 @@
     "tutorialStep2Content": "Použite funkciu skenovania čiarových kódov pre rýchle vyhľadávanie a pridávanie artiklov. Je to efektívne a znižuje chyby.",
     "tutorialStep3Title": "Správa regálov",
     "tutorialStep3Content": "Ako vedúci skladu sa naučíte vytvárať, upravovať a mazať regály. Správna organizácia regálov je základom efektívneho skladu.",
-    "tutorialStep4Title": "Hromadné pridávanie artiklov",
-    "tutorialStep4Content": "Objavte, ako hromadne pridávať artikly do regálov. Táto funkcia vám ušetrí veľa času pri naskladňovaní nového tovaru.",
+    "tutorialStep4Title": "Hromadné pridávanie artiklů",
+    "tutorialStep4Content": "Objavte, ako hromadne pridávať artikly do regálov. Táto funkcia vám ušetrí veľa času pri naskladňování nového tovaru.",
     "tutorialStep5Title": "Správa používateľov",
     "tutorialStep5Content": "Ako administrátor sa naučíte spravovať používateľské účty, role a oprávnenia. Zabezpečenie správneho prístupu je kľúčové pre bezpečnosť systému.",
     "tutorialStep6Title": "Správa obchodov",
@@ -255,7 +256,23 @@
     "noPermissionToDeleteAdmins": "Nemáte povolenie odstraňovať administrátorov.",
     "cannotDeleteSelf": "Nemôžete odstrániť svoj vlastný účet.",
     "confirmDeleteStoreTitle": "Potvrdiť vymazanie obchodu",
-    "confirmDeleteStoreDescription": "Naozaj chcete vymazať obchod <strong>{{storeId}}</strong>? Táto akcia je nezvratná a vymaže všetky artikle a regály spojené s týmto obchodom."
+    "confirmDeleteStoreDescription": "Naozaj chcete vymazať obchod <strong>{{storeId}}</strong>? Táto akcia je nezvratná a vymaže všetky artikle a regály spojené s týmto obchodom.",
+    "adminSettings": "Nastavenia administrácie",
+    "backendApiConfiguration": "Konfigurácia Backend API",
+    "apiUrlLabel": "URL API",
+    "saveApiUrl": "Uložiť URL API",
+    "apiUrlCannotBeEmpty": "URL API nemôže byť prázdna.",
+    "apiUrlSavedSuccess": "URL API úspešne uložená.",
+    "initializeDatabase": "Inicializovať databázu",
+    "dbInitTitle": "Potvrdiť inicializáciu databázy",
+    "dbInitConfirm": "Naozaj chcete inicializovať databázu? Táto akcia vymaže všetky existujúce dáta a nahrá predvolenú schému a dáta. Táto akcia je nezvratná.",
+    "initialize": "Inicializovať",
+    "dbInitSuccess": "Databáza úspešne inicializovaná.",
+    "dbInitFailed": "Inicializácia databázy zlyhala.",
+    "userAddFailed": "Pridanie používateľa zlyhalo.",
+    "userUpdateFailed": "Aktualizácia používateľa zlyhala.",
+    "userDeleteFailed": "Vymazanie používateľa zlyhalo.",
+    "usersFetchFailed": "Načítanie používateľov zlyhalo."
   },
   "logCategory": {
     "fullLog": "Celý log",
@@ -303,7 +320,7 @@
       "delete": "Vymazať artikle",
       "scan": "Skenovať čiarové kódy pre artikle",
       "massAdd": "Hromadne pridávať artikly",
-      "copyFromStore": "Kopírovať artikle z iných obchodov"
+      "copyFromStore": "Kopírovať artikly z iných obchodov"
     },
     "log": {
       "view": "Zobraziť logy aplikácie"

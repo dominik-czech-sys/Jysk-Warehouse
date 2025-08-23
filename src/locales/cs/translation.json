@@ -1,6 +1,7 @@
 {
   "common": {
     "unknown": "Neznámý",
+    "loading": "Načítání...",
     "welcomeUser": "Vítejte, {{username}}!",
     "userLoggedIn": "Uživatel se přihlásil",
     "invalidCredentials": "Neplatné uživatelské jméno nebo heslo.",
@@ -208,7 +209,7 @@
     "tutorialWelcome": "Vítejte v tutoriálu!",
     "tutorialIntro": "Tento tutoriál vás provede základními funkcemi systému JYSK Sklad.",
     "tutorialStep1Title": "Vyhledávání artiklů",
-    "tutorialStep1Content": "Naučte se, jak rychle najít artikly pomocí ID nebo skenování čárového kódu. To je kľúčové pro každodenní práci.",
+    "tutorialStep1Content": "Naučte se, jak rychle najít artikly pomocí ID nebo skenování čárového kódu. To je klíčové pro každodenní práci.",
     "tutorialStep2Title": "Skenování čárových kódů",
     "tutorialStep2Content": "Použijte funkci skenování čárových kódů pro rychlé vyhledávání a přidávání artiklů. Je to efektivní a snižuje chyby.",
     "tutorialStep3Title": "Správa regálů",
@@ -251,7 +252,25 @@
     "noPermissionToChangeRoleToAdmin": "Nemáte oprávnění změnit roli na administrátora.",
     "noPermissionToChangeAdminRole": "Nemáte oprávnění měnit roli administrátora.",
     "noPermissionToDeleteAdmins": "Nemáte oprávnění mazat administrátory.",
-    "cannotDeleteSelf": "Nemůžete smazat svůj vlastní účet."
+    "cannotDeleteSelf": "Nemůžete smazat svůj vlastní účet.",
+    "confirmDeleteStoreTitle": "Potvrdit smazání obchodu",
+    "confirmDeleteStoreDescription": "Opravdu chcete smazat obchod <strong>{{storeId}}</strong>? Tato akce je nevratná a smaže všechny artikly a regály spojené s tímto obchodem.",
+    "adminSettings": "Nastavení administrace",
+    "backendApiConfiguration": "Konfigurace Backend API",
+    "apiUrlLabel": "URL API",
+    "saveApiUrl": "Uložit URL API",
+    "apiUrlCannotBeEmpty": "URL API nemůže být prázdná.",
+    "apiUrlSavedSuccess": "URL API úspěšně uložena.",
+    "initializeDatabase": "Inicializovat databázi",
+    "dbInitTitle": "Potvrdit inicializaci databáze",
+    "dbInitConfirm": "Opravdu chcete inicializovat databázi? Tato akce vymaže všechna existující data a nahraje výchozí schéma a data. Tato akce je nevratná.",
+    "initialize": "Inicializovat",
+    "dbInitSuccess": "Databáze úspěšně inicializována.",
+    "dbInitFailed": "Inicializace databáze selhala.",
+    "userAddFailed": "Přidání uživatele selhalo.",
+    "userUpdateFailed": "Aktualizace uživatele selhala.",
+    "userDeleteFailed": "Smazání uživatele selhalo.",
+    "usersFetchFailed": "Načtení uživatelů selhalo."
   },
   "logCategory": {
     "fullLog": "Celý log",

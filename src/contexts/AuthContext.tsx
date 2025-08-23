@@ -4,21 +4,24 @@ import { toast } from "sonner";
 import { useLog } from "@/contexts/LogContext";
 import { useTranslation } from "react-i18next";
 import * as bcrypt from 'bcryptjs'; // Import bcryptjs
+import { loginUser, getUser, createUser, updateUser as apiUpdateUser, deleteUser as apiDeleteUser, getAllUsers } from "@/api"; // Import API functions
 
 interface AuthContextType {
   user: User | null;
-  login: (username: string, password: string) => Promise<boolean>; // Changed to async
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
   userStoreId: string | undefined;
-  allUsers: User[];
-  addUser: (newUser: User) => Promise<void>; // Changed to async
-  updateUser: (updatedUser: User) => Promise<void>; // Changed to async
+  allUsers: User[]; // Toto bude nyní načítáno z API
+  addUser: (newUser: User) => Promise<void>;
+  updateUser: (updatedUser: User) => Promise<void>;
   deleteUser: (username: string) => void;
   hasPermission: (permission: Permission) => boolean;
   getStoreUsers: (storeId: string) => User[];
-  changePasswordOnFirstLogin: (username: string, newPassword: string) => Promise<boolean>; // New function
+  changePasswordOnFirstLogin: (username: string, newPassword: string) => Promise<boolean>;
+  isLoading: boolean; // Add isLoading state
+  refreshUsers: () => Promise<void>; // Funkce pro obnovení seznamu uživatelů
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,31 +32,45 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [allUsers, setAllUsers] = useState<User[]>(() => {
-    const storedUsers = localStorage.getItem("allUsers");
-    if (storedUsers) {
-      return JSON.parse(storedUsers);
-    }
-    // Hash initial passwords only once if not already stored
-    const hashedInitialUsers = initialUsers.map(u => {
-      // Only hash if it looks like a plain text password (simple check)
-      if (u.password.length < 60 || !u.password.startsWith('$2a$')) { // bcrypt hashes are usually 60 chars and start with $2a$
-        return { ...u, password: bcrypt.hashSync(u.password, 10) };
-      }
-      return u;
-    });
-    return hashedInitialUsers;
-  });
+  const [allUsers, setAllUsers] = useState<User[]>([]); // Nyní se načítá z API
+  const [isLoading, setIsLoading] = useState(true); // Initialize isLoading to true
   const { addLogEntry } = useLog();
   const { t } = useTranslation();
 
+  // Načtení aktuálního uživatele z localStorage a všech uživatelů z API při startu
   useEffect(() => {
-    const storedUser = localStorage.getItem("currentUser");
-    if (storedUser) {
-      setCurrentUser(JSON.parse(storedUser));
-    }
+    const initializeAuth = async () => {
+      setIsLoading(true);
+      const storedUser = localStorage.getItem("currentUser");
+      if (storedUser) {
+        setCurrentUser(JSON.parse(storedUser));
+      }
+      await refreshUsers(); // Načtení všech uživatelů z API
+      setIsLoading(false);
+    };
+    initializeAuth();
   }, []);
 
+  // Funkce pro obnovení seznamu uživatelů z API
+  const refreshUsers = async () => {
+    try {
+      const usersFromApi = await getAllUsers();
+      // Hashování hesel pro initialUsers, pokud ještě nejsou hashovaná (pouze pro první spuštění)
+      const processedUsers = usersFromApi.map((u: any) => {
+        if (u.password && (u.password.length < 60 || !u.password.startsWith('$2a$'))) {
+          return { ...u, password: bcrypt.hashSync(u.password, 10) };
+        }
+        return u;
+      });
+      setAllUsers(processedUsers);
+    } catch (error) {
+      console.error("Failed to fetch all users from API:", error);
+      toast.error(t("common.usersFetchFailed"));
+      setAllUsers([]); // V případě chyby nastavíme prázdné pole
+    }
+  };
+
+  // Ukládání allUsers do localStorage (pro persistenci, i když primární zdroj je API)
   useEffect(() => {
     localStorage.setItem("allUsers", JSON.stringify(allUsers));
   }, [allUsers]);
@@ -65,20 +82,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const login = async (username: string, password: string): Promise<boolean> => {
-    const foundUser = allUsers.find((u) => u.username === username);
-    if (foundUser) {
-      const isPasswordCorrect = await bcrypt.compare(password, foundUser.password);
-      if (isPasswordCorrect) {
-        setCurrentUser(foundUser);
-        localStorage.setItem("currentUser", JSON.stringify(foundUser));
-        toast.success(t("common.welcomeUser", { username: foundUser.username }));
-        addLogEntry(t("common.userLoggedIn"), { username: foundUser.username, role: foundUser.role, storeId: foundUser.storeId }, foundUser.username);
-        return true;
+    setIsLoading(true);
+    try {
+      const userFromApi = await loginUser(username, password);
+      if (userFromApi) {
+        // Získání kompletních dat uživatele z API po úspěšném přihlášení
+        const fullUser = await getUser(username);
+        if (fullUser) {
+          setCurrentUser(fullUser as User); // Přetypování na User
+          localStorage.setItem("currentUser", JSON.stringify(fullUser));
+          toast.success(t("common.welcomeUser", { username: fullUser.username }));
+          addLogEntry(t("common.userLoggedIn"), { username: fullUser.username, role: fullUser.role, storeId: fullUser.storeId }, fullUser.username);
+          return true;
+        }
       }
+      toast.error(t("common.invalidCredentials"));
+      addLogEntry(t("common.loginFailed"), { username }, username);
+      return false;
+    } catch (error: any) {
+      toast.error(error.message || t("common.loginFailed"));
+      addLogEntry(t("common.loginFailed"), { username, error: error.message }, username);
+      return false;
+    } finally {
+      setIsLoading(false);
     }
-    toast.error(t("common.invalidCredentials"));
-    addLogEntry(t("common.loginFailed"), { username }, username);
-    return false;
   };
 
   const logout = () => {
@@ -103,7 +130,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const userToAdd = { ...newUser };
 
-    // Admin can assign to any store, non-admin can only assign to their own store
     if (!isAdmin) {
       if (!currentUser?.storeId) {
         toast.error(t("common.userWithoutStoreCannotAddUsers"));
@@ -113,7 +139,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         toast.error(t("common.noPermissionToAssignToOtherStore"));
         return;
       }
-      userToAdd.storeId = currentUser.storeId; // Ensure non-admin adds to their own store
+      userToAdd.storeId = currentUser.storeId;
     } else if (userToAdd.role !== "admin" && !userToAdd.storeId) {
       toast.error(t("common.adminMustSpecifyStoreId"));
       return;
@@ -123,12 +149,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       userToAdd.permissions = defaultPermissions[userToAdd.role] || [];
     }
 
-    userToAdd.password = await bcrypt.hash(userToAdd.password, 10);
-    userToAdd.firstLogin = true; // New users always have firstLogin true
+    userToAdd.password = await bcrypt.hash(userToAdd.password, 10); // Heslo hashujeme před odesláním na backend
 
-    setAllUsers((prev) => [...prev, userToAdd]);
-    toast.success(t("common.userAddedSuccess", { username: userToAdd.username }));
-    addLogEntry(t("common.userAdded"), { username: userToAdd.username, role: userToAdd.role, storeId: userToAdd.storeId, permissions: userToAdd.permissions }, currentUser?.username);
+    try {
+      const createdUser = await createUser(userToAdd);
+      if (createdUser) {
+        await refreshUsers(); // Obnovení seznamu uživatelů po přidání
+        toast.success(t("common.userAddedSuccess", { username: createdUser.username }));
+        addLogEntry(t("common.userAdded"), { username: createdUser.username, role: createdUser.role, storeId: createdUser.storeId, permissions: createdUser.permissions }, currentUser?.username);
+      }
+    } catch (error: any) {
+      toast.error(error.message || t("common.userAddFailed"));
+      addLogEntry(t("common.userAddFailed"), { username: userToAdd.username, error: error.message }, currentUser?.username);
+    }
   };
 
   const updateUser = async (updatedUser: User) => {
@@ -143,8 +176,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
-    // Admin can update any user
-    // Non-admin can only update users within their own store
     if (!isAdmin) {
       if (!currentUser?.storeId) {
         toast.error(t("common.userWithoutStoreCannotEditUsers"));
@@ -154,48 +185,47 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         toast.error(t("common.noPermissionToEditUsersInOtherStore"));
         return;
       }
-      if (updatedUser.storeId !== currentUser.storeId) { // Prevent changing storeId
+      if (updatedUser.storeId !== currentUser.storeId) {
         toast.error(t("common.noPermissionToChangeStoreId"));
         return;
       }
-      if (existingUser.role === "admin") { // Prevent non-admins from editing admins
+      if (existingUser.role === "admin") {
         toast.error(t("common.noPermissionToEditAdmins"));
         return;
       }
-      if (currentUser?.username === updatedUser.username && updatedUser.role === "admin") { // Prevent non-admins from changing their own role to admin
+      if (currentUser?.username === updatedUser.username && updatedUser.role === "admin") {
         toast.error(t("common.noPermissionToChangeRoleToAdmin"));
         return;
       }
-      // The problematic line was here, it's removed as it's redundant:
-      // if (existingUser.role === "admin" && updatedUser.role !== "admin") { // Prevent non-admins from changing admin's role
-      //   toast.error(t("common.noPermissionToChangeAdminRole"));
-      //   return;
-      // }
     }
 
     let finalPassword = existingUser.password;
-    if (updatedUser.password && updatedUser.password !== existingUser.password) { // Only hash if password has changed and is not empty
+    if (updatedUser.password && updatedUser.password !== existingUser.password) {
       finalPassword = await bcrypt.hash(updatedUser.password, 10);
     } else if (!updatedUser.password) {
-      // If password field is empty, keep the old password
       finalPassword = existingUser.password;
     }
 
-
     const userToUpdate = { ...updatedUser, password: finalPassword };
 
-    setAllUsers((prev) =>
-      prev.map((u) => (u.username === userToUpdate.username ? userToUpdate : u))
-    );
-    if (currentUser?.username === userToUpdate.username) {
-      setCurrentUser(userToUpdate);
-      localStorage.setItem("currentUser", JSON.stringify(userToUpdate));
+    try {
+      const updatedUserFromApi = await apiUpdateUser(userToUpdate.username, userToUpdate);
+      if (updatedUserFromApi) {
+        await refreshUsers(); // Obnovení seznamu uživatelů po aktualizaci
+        if (currentUser?.username === updatedUserFromApi.username) {
+          setCurrentUser(updatedUserFromApi as User);
+          localStorage.setItem("currentUser", JSON.stringify(updatedUserFromApi));
+        }
+        toast.success(t("common.userUpdatedSuccess", { username: updatedUserFromApi.username }));
+        addLogEntry(t("common.userUpdated"), { username: updatedUserFromApi.username, role: updatedUserFromApi.role, storeId: updatedUserFromApi.storeId, permissions: updatedUserFromApi.permissions }, currentUser?.username);
+      }
+    } catch (error: any) {
+      toast.error(error.message || t("common.userUpdateFailed"));
+      addLogEntry(t("common.userUpdateFailed"), { username: updatedUser.username, error: error.message }, currentUser?.username);
     }
-    toast.success(t("common.userUpdatedSuccess", { username: userToUpdate.username }));
-    addLogEntry(t("common.userUpdated"), { username: userToUpdate.username, role: userToUpdate.role, storeId: userToUpdate.storeId, permissions: userToUpdate.permissions }, currentUser?.username);
   };
 
-  const deleteUser = (username: string) => {
+  const deleteUser = async (username: string) => {
     if (!hasPermission("user:delete")) {
       toast.error(t("common.noPermissionToDeleteUsers"));
       return;
@@ -207,8 +237,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
-    // Admin can delete any user
-    // Non-admin can only delete users within their own store
     if (!isAdmin) {
       if (!currentUser?.storeId) {
         toast.error(t("common.userWithoutStoreCannotDeleteUsers"));
@@ -218,22 +246,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         toast.error(t("common.noPermissionToDeleteUsersInOtherStore"));
         return;
       }
-      if (userToDelete.role === "admin") { // Prevent non-admins from deleting admins
+      if (userToDelete.role === "admin") {
         toast.error(t("common.noPermissionToDeleteAdmins"));
         return;
       }
-      if (currentUser?.username === username) { // Prevent user from deleting themselves
+      if (currentUser?.username === username) {
         toast.error(t("common.cannotDeleteSelf"));
         return;
       }
     }
 
-    setAllUsers((prev) => prev.filter((u) => u.username !== username));
-    if (currentUser?.username === username) {
-      logout();
+    try {
+      const success = await apiDeleteUser(username);
+      if (success) {
+        await refreshUsers(); // Obnovení seznamu uživatelů po smazání
+        if (currentUser?.username === username) {
+          logout();
+        }
+        toast.success(t("common.userDeletedSuccess", { username }));
+        addLogEntry(t("common.userDeleted"), { username }, currentUser?.username);
+      }
+    } catch (error: any) {
+      toast.error(error.message || t("common.userDeleteFailed"));
+      addLogEntry(t("common.userDeleteFailed"), { username, error: error.message }, currentUser?.username);
     }
-    toast.success(t("common.userDeletedSuccess", { username }));
-    addLogEntry(t("common.userDeleted"), { username }, currentUser?.username);
   };
 
   const changePasswordOnFirstLogin = async (username: string, newPassword: string): Promise<boolean> => {
@@ -246,16 +282,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     const updatedUser = { ...userToUpdate, password: hashedPassword, firstLogin: false };
 
-    setAllUsers((prev) =>
-      prev.map((u) => (u.username === username ? updatedUser : u))
-    );
-    if (currentUser?.username === username) {
-      setCurrentUser(updatedUser);
-      localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+    try {
+      const updatedUserFromApi = await apiUpdateUser(username, updatedUser);
+      if (updatedUserFromApi) {
+        await refreshUsers(); // Obnovení seznamu uživatelů
+        if (currentUser?.username === username) {
+          setCurrentUser(updatedUserFromApi as User);
+          localStorage.setItem("currentUser", JSON.stringify(updatedUserFromApi));
+        }
+        toast.success(t("common.passwordChangedSuccess"));
+        addLogEntry(t("common.passwordChangedSuccess"), { username }, username);
+        return true;
+      }
+      return false;
+    } catch (error: any) {
+      toast.error(error.message || t("common.passwordChangeFailed"));
+      addLogEntry(t("common.passwordChangeFailed"), { username, error: error.message }, username);
+      return false;
     }
-    toast.success(t("common.passwordChangedSuccess"));
-    addLogEntry(t("common.passwordChangedSuccess"), { username }, username);
-    return true;
   };
 
   const getStoreUsers = (storeId: string) => {
@@ -282,6 +326,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         hasPermission,
         getStoreUsers,
         changePasswordOnFirstLogin,
+        isLoading,
+        refreshUsers,
       }}
     >
       {children}
