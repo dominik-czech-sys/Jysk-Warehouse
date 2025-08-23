@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useArticles, Article } from "@/data/articles";
 import { Link } from "react-router-dom";
-import { ArrowLeft, PlusCircle, Edit, Trash2 } from "lucide-react";
+import { ArrowLeft, PlusCircle, Edit, Trash2, Scan } from "lucide-react";
 import { ArticleFormDialog } from "@/components/ArticleFormDialog";
 import { toast } from "sonner";
 import {
@@ -24,9 +24,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useAuth } from "@/hooks/useAuth";
 
 const ManageArticles = () => {
   const { articles, addArticle, updateArticle, deleteArticle } = useArticles();
+  const { isAdmin } = useAuth();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
@@ -35,16 +37,16 @@ const ManageArticles = () => {
 
   const handleAddArticle = (newArticle: Article) => {
     if (articles.some(article => article.id === newArticle.id)) {
-      toast.error(`Article with ID ${newArticle.id} already exists.`);
+      toast.error(`Článek s ID ${newArticle.id} již existuje.`);
       return;
     }
     addArticle(newArticle);
-    toast.success(`Article ${newArticle.id} added successfully!`);
+    toast.success(`Článek ${newArticle.id} byl úspěšně přidán!`);
   };
 
   const handleEditArticle = (updatedArticle: Article) => {
     updateArticle(updatedArticle);
-    toast.success(`Article ${updatedArticle.id} updated successfully!`);
+    toast.success(`Článek ${updatedArticle.id} byl úspěšně aktualizován!`);
   };
 
   const handleDeleteArticle = (id: string) => {
@@ -55,7 +57,7 @@ const ManageArticles = () => {
   const confirmDeleteArticle = () => {
     if (articleToDeleteId) {
       deleteArticle(articleToDeleteId);
-      toast.success(`Article ${articleToDeleteId} deleted successfully!`);
+      toast.success(`Článek ${articleToDeleteId} byl úspěšně smazán!`);
       setArticleToDeleteId(null);
     }
     setIsDeleteDialogOpen(false);
@@ -67,25 +69,33 @@ const ManageArticles = () => {
         <div className="flex justify-between items-center mb-6">
           <Link to="/">
             <Button variant="outline" className="flex items-center">
-              <ArrowLeft className="h-4 w-4 mr-2" /> Back to Home
+              <ArrowLeft className="h-4 w-4 mr-2" /> Zpět na hlavní stránku
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Manage Articles</h1>
-          <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center">
-            <PlusCircle className="h-4 w-4 mr-2" /> Add Article
-          </Button>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Správa článků</h1>
+          <div className="flex space-x-2">
+            <Link to="/skenovat-carkod">
+              <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+                <Scan className="h-4 w-4 mr-2" /> Skenovat
+              </Button>
+            </Link>
+            <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+              <PlusCircle className="h-4 w-4 mr-2" /> Přidat článek
+            </Button>
+          </div>
         </div>
 
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">ID</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Shelf</TableHead>
-              <TableHead>Shelf Number</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Floor</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>Název</TableHead>
+              <TableHead>Regál</TableHead>
+              <TableHead>Číslo regálu</TableHead>
+              <TableHead>Umístění</TableHead>
+              <TableHead>Patro</TableHead>
+              {isAdmin && <TableHead>ID Skladu</TableHead>} {/* Only show warehouse ID for admin */}
+              <TableHead className="text-right">Akce</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -97,6 +107,7 @@ const ManageArticles = () => {
                 <TableCell>{article.shelfNumber}</TableCell>
                 <TableCell>{article.location}</TableCell>
                 <TableCell>{article.floor}</TableCell>
+                {isAdmin && <TableCell>{article.warehouseId}</TableCell>}
                 <TableCell className="text-right">
                   <Button
                     variant="ghost"
@@ -123,7 +134,7 @@ const ManageArticles = () => {
         </Table>
 
         {articles.length === 0 && (
-          <p className="text-center text-muted-foreground mt-4">No articles found. Add a new one!</p>
+          <p className="text-center text-muted-foreground mt-4">Žádné články nebyly nalezeny. Přidejte nový!</p>
         )}
       </div>
 
@@ -147,15 +158,15 @@ const ManageArticles = () => {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>Jste si naprosto jisti?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete article{" "}
-              <span className="font-semibold">{articleToDeleteId}</span> from your inventory.
+              Tuto akci nelze vrátit zpět. Tímto trvale smažete článek{" "}
+              <span className="font-semibold">{articleToDeleteId}</span> z vašeho inventáře.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteArticle}>Continue</AlertDialogAction>
+            <AlertDialogCancel>Zrušit</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteArticle} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Pokračovat</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

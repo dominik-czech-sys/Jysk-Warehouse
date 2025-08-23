@@ -26,14 +26,14 @@ export const WarehouseSearch: React.FC<WarehouseSearchProps> = ({ onSearch }) =>
     <div className="flex w-full max-w-sm items-center space-x-2 p-4">
       <Input
         type="text"
-        placeholder="Enter Article ID (e.g., ART-001)"
+        placeholder="Zadejte ID článku (např. ART-001)"
         value={articleId}
         onChange={(e) => setArticleId(e.target.value)}
         onKeyPress={handleKeyPress}
         className="flex-grow"
       />
-      <Button type="submit" onClick={handleSearch}>
-        <Search className="h-4 w-4 mr-2" /> Search
+      <Button type="submit" onClick={handleSearch} className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+        <Search className="h-4 w-4 mr-2" /> Hledat
       </Button>
     </div>
   );

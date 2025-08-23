@@ -52,6 +52,12 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        jyskBlue: { // Custom JYSK blue color
+          DEFAULT: "hsl(210 90% 40%)", // A shade of blue
+          dark: "hsl(210 90% 30%)", // Darker for hover/active
+          light: "hsl(210 90% 50%)", // Lighter shade
+          foreground: "hsl(0 0% 100%)", // White text on blue
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

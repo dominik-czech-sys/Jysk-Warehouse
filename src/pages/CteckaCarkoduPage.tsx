@@ -1,0 +1,77 @@
+import React, { useState, useEffect } from "react";
+import { Html5QrcodeScanner } from "html5-qrcode";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, Scan } from "lucide-react";
+import { toast } from "sonner";
+
+const CteckaCarkoduPage: React.FC = () => {
+  const [scanResult, setScanResult] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const html5QrcodeScanner = new Html5QrcodeScanner(
+      "reader",
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      false
+    );
+
+    const onScanSuccess = (decodedText: string) => {
+      html5QrcodeScanner.clear();
+      setScanResult(decodedText);
+      toast.success(`Čárový kód naskenován: ${decodedText}`);
+      navigate(`/?articleId=${decodedText}`); // Redirect to home with article ID
+    };
+
+    const onScanError = (errorMessage: string) => {
+      // console.warn(`Chyba skenování: ${errorMessage}`);
+    };
+
+    html5QrcodeScanner.render(onScanSuccess, onScanError);
+
+    return () => {
+      html5QrcodeScanner.clear().catch((error) => {
+        console.error("Failed to clear html5QrcodeScanner", error);
+      });
+    };
+  }, [navigate]);
+
+  return (
+    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
+      <div className="w-full max-w-md bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-8">
+        <div className="flex justify-between items-center mb-6">
+          <Link to="/">
+            <Button variant="outline" className="flex items-center">
+              <ArrowLeft className="h-4 w-4 mr-2" /> Zpět na hlavní stránku
+            </Button>
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Skenování čárového kódu</h1>
+        </div>
+
+        <Card className="w-full text-center p-6">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-2xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light flex items-center justify-center">
+              <Scan className="h-6 w-6 mr-2" /> Naskenujte čárový kód
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div id="reader" className="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center text-muted-foreground">
+              {/* QR Code Scanner will render here */}
+            </div>
+            {scanResult && (
+              <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                Naskenováno: {scanResult}
+              </p>
+            )}
+            <p className="text-sm text-muted-foreground">
+              Ujistěte se, že čárový kód je dobře osvětlen a v záběru kamery.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default CteckaCarkoduPage;
