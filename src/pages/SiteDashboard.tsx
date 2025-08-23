@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Copy, Users as UsersIcon, Package, Warehouse as WarehouseIcon } from "lucide-react";
+import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Copy, Users as UsersIcon, Package, Warehouse as WarehouseIcon, Download } from "lucide-react"; // Added Download icon
 import { UserFormDialog } from "@/components/UserFormDialog";
 import { StoreFormDialog } from "@/components/StoreFormDialog";
 import { ArticleCopyDialog } from "@/components/ArticleCopyDialog";
@@ -64,12 +64,12 @@ const SiteDashboard: React.FC = () => {
   const totalArticles = allArticles.length;
   const totalRacks = allShelfRacks.length;
 
-  const handleAddUser = (newUser: User) => {
-    addUser(newUser);
+  const handleAddUser = async (newUser: User) => {
+    await addUser(newUser);
   };
 
-  const handleEditUser = (updatedUser: User) => {
-    updateUser(updatedUser);
+  const handleEditUser = async (updatedUser: User) => {
+    await updateUser(updatedUser);
   };
 
   const handleDeleteUser = (username: string) => {
@@ -325,6 +325,22 @@ const SiteDashboard: React.FC = () => {
               <Button onClick={() => setIsLogViewerOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
                 <ScrollText className="h-4 w-4 mr-2" /> {t("common.viewLog")}
               </Button>
+            </div>
+          </div>
+        )}
+
+        <Separator className="my-8" />
+
+        {/* Export Data Section */}
+        {hasPermission("log:view") && ( // Assuming export permission is tied to log:view for now
+          <div className="mb-8 w-full animate-fade-in">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.exportData")}</h2>
+              <Link to="/export-dat" className="w-full sm:w-auto">
+                <Button className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
+                  <Download className="h-4 w-4 mr-2" /> {t("common.exportData")}
+                </Button>
+              </Link>
             </div>
           </div>
         )}

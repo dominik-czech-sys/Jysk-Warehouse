@@ -2,21 +2,23 @@ import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { User, users as initialUsers, Permission, defaultPermissions } from "@/data/users";
 import { toast } from "sonner";
 import { useLog } from "@/contexts/LogContext";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
+import * as bcrypt from 'bcryptjs'; // Import bcryptjs
 
 interface AuthContextType {
   user: User | null;
-  login: (username: string, password: string) => boolean;
+  login: (username: string, password: string) => Promise<boolean>; // Changed to async
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
   userStoreId: string | undefined;
   allUsers: User[];
-  addUser: (newUser: User) => void;
-  updateUser: (updatedUser: User) => void;
+  addUser: (newUser: User) => Promise<void>; // Changed to async
+  updateUser: (updatedUser: User) => Promise<void>; // Changed to async
   deleteUser: (username: string) => void;
   hasPermission: (permission: Permission) => boolean;
   getStoreUsers: (storeId: string) => User[];
+  changePasswordOnFirstLogin: (username: string, newPassword: string) => Promise<boolean>; // New function
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,10 +31,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [allUsers, setAllUsers] = useState<User[]>(() => {
     const storedUsers = localStorage.getItem("allUsers");
-    return storedUsers ? JSON.parse(storedUsers) : initialUsers;
+    if (storedUsers) {
+      return JSON.parse(storedUsers);
+    }
+    // Hash initial passwords only once if not already stored
+    const hashedInitialUsers = initialUsers.map(u => {
+      // Only hash if it looks like a plain text password (simple check)
+      if (u.password.length < 60 || !u.password.startsWith('$2a$')) { // bcrypt hashes are usually 60 chars and start with $2a$
+        return { ...u, password: bcrypt.hashSync(u.password, 10) };
+      }
+      return u;
+    });
+    return hashedInitialUsers;
   });
   const { addLogEntry } = useLog();
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("currentUser");
@@ -47,20 +60,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const hasPermission = (permission: Permission): boolean => {
     if (!currentUser) return false;
-    if (currentUser.role === "admin") return true; // Admin has all permissions
+    if (currentUser.role === "admin") return true;
     return currentUser.permissions.includes(permission);
   };
 
-  const login = (username: string, password: string): boolean => {
-    const foundUser = allUsers.find(
-      (u) => u.username === username && u.password === password
-    );
+  const login = async (username: string, password: string): Promise<boolean> => {
+    const foundUser = allUsers.find((u) => u.username === username);
     if (foundUser) {
-      setCurrentUser(foundUser);
-      localStorage.setItem("currentUser", JSON.stringify(foundUser));
-      toast.success(t("common.welcomeUser", { username: foundUser.username }));
-      addLogEntry(t("common.userLoggedIn"), { username: foundUser.username, role: foundUser.role, storeId: foundUser.storeId }, foundUser.username);
-      return true;
+      const isPasswordCorrect = await bcrypt.compare(password, foundUser.password);
+      if (isPasswordCorrect) {
+        setCurrentUser(foundUser);
+        localStorage.setItem("currentUser", JSON.stringify(foundUser));
+        toast.success(t("common.welcomeUser", { username: foundUser.username }));
+        addLogEntry(t("common.userLoggedIn"), { username: foundUser.username, role: foundUser.role, storeId: foundUser.storeId }, foundUser.username);
+        return true;
+      }
     }
     toast.error(t("common.invalidCredentials"));
     addLogEntry(t("common.loginFailed"), { username }, username);
@@ -76,7 +90,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     toast.info(t("common.loggedOut"));
   };
 
-  const addUser = (newUser: User) => {
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 8) return t("common.passwordTooShort");
+    if (!/[0-9]/.test(password)) return t("common.passwordNoNumber");
+    if (!/[A-Z]/.test(password)) return t("common.passwordNoUppercase");
+    if (!/[a-z]/.test(password)) return t("common.passwordNoLowercase");
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) return t("common.passwordNoSpecialChar");
+    return null;
+  };
+
+  const addUser = async (newUser: User) => {
     if (!hasPermission("user:create")) {
       toast.error(t("common.noPermissionToAddUsers"));
       return;
@@ -87,7 +110,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
-    // Ensure storeId is set correctly based on current user's context
+    const passwordError = validatePassword(newUser.password);
+    if (passwordError) {
+      toast.error(passwordError);
+      return;
+    }
+
     const userToAdd = { ...newUser };
     if (!isAdmin && currentUser?.storeId) {
       userToAdd.storeId = currentUser.storeId;
@@ -99,23 +127,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
-    // Assign default permissions if not explicitly set
     if (!userToAdd.permissions || userToAdd.permissions.length === 0) {
       userToAdd.permissions = defaultPermissions[userToAdd.role] || [];
     }
+
+    userToAdd.password = await bcrypt.hash(userToAdd.password, 10);
+    userToAdd.firstLogin = true; // New users always have firstLogin true
 
     setAllUsers((prev) => [...prev, userToAdd]);
     toast.success(t("common.userAddedSuccess", { username: userToAdd.username }));
     addLogEntry(t("common.userAdded"), { username: userToAdd.username, role: userToAdd.role, storeId: userToAdd.storeId, permissions: userToAdd.permissions }, currentUser?.username);
   };
 
-  const updateUser = (updatedUser: User) => {
+  const updateUser = async (updatedUser: User) => {
     if (!hasPermission("user:update")) {
       toast.error(t("common.noPermissionToEditUsers"));
       return;
     }
 
-    // Prevent non-admins from changing storeId or editing users outside their store
     if (!isAdmin && currentUser?.storeId && updatedUser.storeId !== currentUser.storeId) {
       toast.error(t("common.noPermissionToChangeStoreId"));
       return;
@@ -125,15 +154,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
-    setAllUsers((prev) =>
-      prev.map((u) => (u.username === updatedUser.username ? updatedUser : u))
-    );
-    if (currentUser?.username === updatedUser.username) {
-      setCurrentUser(updatedUser);
-      localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+    const existingUser = allUsers.find(u => u.username === updatedUser.username);
+    if (!existingUser) {
+      toast.error(t("common.userNotFound"));
+      return;
     }
-    toast.success(t("common.userUpdatedSuccess", { username: updatedUser.username }));
-    addLogEntry(t("common.userUpdated"), { username: updatedUser.username, role: updatedUser.role, storeId: updatedUser.storeId, permissions: updatedUser.permissions }, currentUser?.username);
+
+    let finalPassword = existingUser.password;
+    if (updatedUser.password !== existingUser.password) { // Only hash if password has changed
+      const passwordError = validatePassword(updatedUser.password);
+      if (passwordError) {
+        toast.error(passwordError);
+        return;
+      }
+      finalPassword = await bcrypt.hash(updatedUser.password, 10);
+    }
+
+    const userToUpdate = { ...updatedUser, password: finalPassword };
+
+    setAllUsers((prev) =>
+      prev.map((u) => (u.username === userToUpdate.username ? userToUpdate : u))
+    );
+    if (currentUser?.username === userToUpdate.username) {
+      setCurrentUser(userToUpdate);
+      localStorage.setItem("currentUser", JSON.stringify(userToUpdate));
+    }
+    toast.success(t("common.userUpdatedSuccess", { username: userToUpdate.username }));
+    addLogEntry(t("common.userUpdated"), { username: userToUpdate.username, role: userToUpdate.role, storeId: userToUpdate.storeId, permissions: userToUpdate.permissions }, currentUser?.username);
   };
 
   const deleteUser = (username: string) => {
@@ -148,13 +195,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
-    // Prevent non-admins from deleting users outside their store
     if (!isAdmin && currentUser?.storeId && userToDelete.storeId !== currentUser.storeId) {
-      toast.error(t("common.noPermissionToDeleteUsers")); // Re-using message, could be more specific
+      toast.error(t("common.noPermissionToDeleteUsers"));
       return;
     }
     if (!isAdmin && !currentUser?.storeId) {
-      toast.error(t("common.userWithoutStoreCannotAddUsers")); // Re-using message
+      toast.error(t("common.userWithoutStoreCannotAddUsers"));
       return;
     }
 
@@ -164,6 +210,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
     toast.success(t("common.userDeletedSuccess", { username }));
     addLogEntry(t("common.userDeleted"), { username }, currentUser?.username);
+  };
+
+  const changePasswordOnFirstLogin = async (username: string, newPassword: string): Promise<boolean> => {
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      toast.error(passwordError);
+      return false;
+    }
+
+    const userToUpdate = allUsers.find(u => u.username === username);
+    if (!userToUpdate) {
+      toast.error(t("common.userNotFound"));
+      return false;
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const updatedUser = { ...userToUpdate, password: hashedPassword, firstLogin: false };
+
+    setAllUsers((prev) =>
+      prev.map((u) => (u.username === username ? updatedUser : u))
+    );
+    if (currentUser?.username === username) {
+      setCurrentUser(updatedUser);
+      localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+    }
+    toast.success(t("common.passwordChangedSuccess"));
+    addLogEntry(t("common.passwordChangedSuccess"), { username }, username);
+    return true;
   };
 
   const getStoreUsers = (storeId: string) => {
@@ -189,6 +263,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         deleteUser,
         hasPermission,
         getStoreUsers,
+        changePasswordOnFirstLogin,
       }}
     >
       {children}

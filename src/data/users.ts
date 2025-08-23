@@ -25,10 +25,11 @@ export type Permission =
 
 export interface User {
   username: string;
-  password: string; // In a real app, this would be hashed
+  password: string; // This will now store hashed passwords
   role: "admin" | "vedouci_skladu" | "store_manager" | "deputy_store_manager" | "ar_assistant_of_sale" | "skladnik"; // admin or store-specific roles
   storeId?: string; // Which store this user belongs to
   permissions: Permission[]; // Array of specific permissions
+  firstLogin: boolean; // New field to track if it's the user's first login
 }
 
 // Default permissions for each role
@@ -68,54 +69,62 @@ export const defaultPermissions: Record<User['role'], Permission[]> = {
   ],
 };
 
+// Initial users - passwords will be hashed on first run or when added/updated
 export const users: User[] = [
   {
     username: "Dczech",
-    password: "koplkoplko1A",
+    password: "koplkoplko1A", // This will be hashed
     role: "admin",
     permissions: defaultPermissions["admin"],
+    firstLogin: true,
   },
   {
     username: "vedouci_skladu1",
-    password: "password1",
+    password: "password1", // This will be hashed
     role: "vedouci_skladu",
     storeId: "Sklad 1",
     permissions: defaultPermissions["vedouci_skladu"],
+    firstLogin: true,
   },
   {
     username: "skladnik1",
-    password: "password1",
+    password: "password1", // This will be hashed
     role: "skladnik",
     storeId: "Sklad 1",
     permissions: defaultPermissions["skladnik"],
+    firstLogin: true,
   },
   {
     username: "vedouci_skladu2",
-    password: "password2",
+    password: "password2", // This will be hashed
     role: "vedouci_skladu",
     storeId: "Sklad 2",
     permissions: defaultPermissions["vedouci_skladu"],
+    firstLogin: true,
   },
   {
     username: "skladnik2",
-    password: "password2",
+    password: "password2", // This will be hashed
     role: "skladnik",
     storeId: "Sklad 2",
     permissions: defaultPermissions["skladnik"],
+    firstLogin: true,
   },
   {
     username: "vedouci_kozomin",
-    password: "password",
+    password: "password", // This will be hashed
     role: "vedouci_skladu",
     storeId: "Kozomín",
     permissions: defaultPermissions["vedouci_skladu"],
+    firstLogin: true,
   },
   {
     username: "vedouci_t508",
-    password: "password",
+    password: "password", // This will be hashed
     role: "vedouci_skladu",
     storeId: "T508",
     permissions: defaultPermissions["vedouci_skladu"],
+    firstLogin: true,
   },
 ];
 

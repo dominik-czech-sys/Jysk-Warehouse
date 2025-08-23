@@ -57,7 +57,7 @@ const permissionDescriptions: Record<Permission, string> = {
 interface UserFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (user: User) => void;
+  onSubmit: (user: User) => Promise<void>; // Changed to async
   user?: User | null; // Optional: if provided, it's for editing
 }
 
@@ -77,6 +77,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
     role: "skladnik",
     storeId: currentUserStoreId || "",
     permissions: defaultPermissions["skladnik"],
+    firstLogin: true, // New users always have firstLogin true
   });
 
   useEffect(() => {
@@ -89,6 +90,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
         role: "skladnik",
         storeId: currentUserStoreId || "",
         permissions: defaultPermissions["skladnik"],
+        firstLogin: true,
       });
     }
   }, [user, isOpen, currentUserStoreId]);
@@ -120,13 +122,13 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.username || !formData.password || !formData.role || (!formData.storeId && formData.role !== "admin")) {
       toast.error(t("common.fillAllRequiredFields"));
       return;
     }
-    onSubmit(formData);
+    await onSubmit(formData);
     onClose();
   };
 
@@ -165,6 +167,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
               value={formData.password}
               onChange={handleChange}
               className="col-span-3"
+              placeholder={user ? t("common.enterNewPasswordOptional") : t("common.enterPassword")}
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">

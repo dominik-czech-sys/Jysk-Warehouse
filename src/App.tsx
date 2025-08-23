@@ -12,6 +12,7 @@ import SiteDashboard from "./pages/SiteDashboard"; // New SiteDashboard
 import CteckaCarkoduPage from "./pages/CteckaCarkoduPage";
 import MassAddArticlesPage from "./pages/MassAddArticlesPage";
 import ManageShelfRacksPage from "./pages/ManageShelfRacksPage";
+import ExportDataPage from "./pages/ExportDataPage"; // Import ExportDataPage
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { useContext } from "react";
@@ -99,6 +100,14 @@ const AppContent = () => {
         element={
           <PrivateRoute requiredPermission="article:mass_add">
             <MassAddArticlesPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/export-dat" // New route for data export
+        element={
+          <PrivateRoute requiredPermission="log:view"> {/* Export is typically an admin/manager function */}
+            <ExportDataPage />
           </PrivateRoute>
         }
       />

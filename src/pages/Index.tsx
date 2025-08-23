@@ -13,11 +13,12 @@ import { ManagementMenu } from "@/components/ManagementMenu";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
+import FirstLoginTutorial from "@/components/FirstLoginTutorial"; // Import FirstLoginTutorial
 
 const Index = () => {
   const { getArticleById, articles } = useArticles();
   const [foundArticle, setFoundArticle] = useState<Article | null>(null);
-  const { logout, isAdmin, user, userStoreId, hasPermission } = useAuth();
+  const { logout, isAdmin, user, userStoreId, hasPermission, updateUser } = useAuth(); // Added updateUser
   const { addLogEntry } = useLog();
   const [searchParams] = useSearchParams();
   const [iframeSrc, setIframeSrc] = useState<string | null>(null);
@@ -50,6 +51,18 @@ const Index = () => {
   const handleCloseIframe = () => {
     setIframeSrc(null);
   };
+
+  const handleTutorialComplete = async () => {
+    if (user) {
+      // Mark firstLogin as false after tutorial completion
+      await updateUser({ ...user, firstLogin: false });
+    }
+  };
+
+  // If it's the first login, show the tutorial
+  if (user && user.firstLogin) {
+    return <FirstLoginTutorial onComplete={handleTutorialComplete} />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
@@ -124,7 +137,6 @@ const Index = () => {
       </footer>
 
       <IframeViewer src={iframeSrc} onClose={handleCloseIframe} />
-      {/* LogViewer je nyní v SiteDashboard */}
     </div>
   );
 };
