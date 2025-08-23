@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText } from "lucide-react"; // Přidáno ScrollText ikona
+import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Warehouse } from "lucide-react"; // Added Warehouse icon
 import { UserFormDialog } from "@/components/UserFormDialog";
 import { toast } from "sonner";
 import {
@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { User } from "@/data/users";
-import { LogViewer } from "@/components/LogViewer"; // Import LogViewer
+import { LogViewer } from "@/components/LogViewer";
 
 const AdminDashboard: React.FC = () => {
   const { allUsers, addUser, updateUser, deleteUser } = useAuth();
@@ -34,7 +34,7 @@ const AdminDashboard: React.FC = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [userToDeleteUsername, setUserToDeleteUsername] = useState<string | null>(null);
-  const [isLogViewerOpen, setIsLogViewerOpen] = useState(false); // Stav pro LogViewer
+  const [isLogViewerOpen, setIsLogViewerOpen] = useState(false);
 
   const handleAddUser = (newUser: User) => {
     addUser(newUser);
@@ -68,6 +68,11 @@ const AdminDashboard: React.FC = () => {
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Správa uživatelů</h1>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+            <Link to="/admin/regaly" className="w-full sm:w-auto">
+              <Button variant="outline" className="flex items-center bg-gray-600 hover:bg-gray-700 text-white w-full sm:w-auto">
+                <Warehouse className="h-4 w-4 mr-2" /> Správa regálů
+              </Button>
+            </Link>
             <Button onClick={() => setIsLogViewerOpen(true)} className="flex items-center bg-gray-600 hover:bg-gray-700 text-white w-full sm:w-auto">
               <ScrollText className="h-4 w-4 mr-2" /> Zobrazit Log
             </Button>

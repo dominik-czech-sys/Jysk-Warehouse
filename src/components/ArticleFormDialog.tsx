@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Article } from "@/data/articles";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useShelfRacks } from "@/data/shelfRacks";
 
 interface ArticleFormDialogProps {
   isOpen: boolean;
@@ -28,21 +30,35 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
   article,
 }) => {
   const { userWarehouseId } = useAuth();
+  const { shelfRacks } = useShelfRacks();
 
   const [formData, setFormData] = useState<Article>({
     id: "",
     name: "",
-    shelf: "",
-    shelfNumber: "",
+    shelf: "", // Will store rackId
+    shelfNumber: "", // Will store shelf index within rack
     location: "",
     floor: "",
     warehouseId: userWarehouseId || "",
     status: "",
   });
+  const [selectedRackId, setSelectedRackId] = useState<string>("");
+  const [selectedShelfIndex, setSelectedShelfIndex] = useState<string>("");
 
   useEffect(() => {
     if (article) {
       setFormData(article);
+      // Try to find the rack based on article's shelf (rackId) and warehouseId
+      const foundRack = shelfRacks.find(
+        (rack) => rack.rowId === article.shelf && rack.warehouseId === article.warehouseId
+      );
+      if (foundRack) {
+        setSelectedRackId(foundRack.id);
+        setSelectedShelfIndex(article.shelfNumber);
+      } else {
+        setSelectedRackId("");
+        setSelectedShelfIndex("");
+      }
     } else {
       setFormData({
         id: "",
@@ -54,23 +70,61 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
         warehouseId: userWarehouseId || "",
         status: "",
       });
+      setSelectedRackId("");
+      setSelectedShelfIndex("");
     }
-  }, [article, isOpen, userWarehouseId]);
+  }, [article, isOpen, userWarehouseId, shelfRacks]);
+
+  useEffect(() => {
+    const currentRack = shelfRacks.find(rack => rack.id === selectedRackId);
+    if (currentRack) {
+      setFormData(prev => ({
+        ...prev,
+        shelf: currentRack.rowId, // Store rowId as shelf
+        shelfNumber: selectedShelfIndex, // Store selected shelf index
+        location: currentRack.location,
+        floor: currentRack.floor,
+        warehouseId: currentRack.warehouseId,
+      }));
+    } else if (!article) { // Clear if no rack selected and not editing an existing article
+      setFormData(prev => ({
+        ...prev,
+        shelf: "",
+        shelfNumber: "",
+        location: "",
+        floor: "",
+        warehouseId: userWarehouseId || "",
+      }));
+    }
+  }, [selectedRackId, selectedShelfIndex, shelfRacks, userWarehouseId, article]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
+  const handleRackSelect = (value: string) => {
+    setSelectedRackId(value);
+    setSelectedShelfIndex(""); // Reset shelf index when rack changes
+  };
+
+  const handleShelfIndexSelect = (value: string) => {
+    setSelectedShelfIndex(value);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.id || !formData.name || !formData.shelf || !formData.shelfNumber || !formData.location || !formData.floor || !formData.warehouseId || !formData.status) {
-      toast.error("Prosím, vyplňte všechna pole.");
+    if (!formData.id || !formData.name || !selectedRackId || !selectedShelfIndex || !formData.status) {
+      toast.error("Prosím, vyplňte všechna povinná pole (ID článku, Název, Regál, Číslo police, Status).");
       return;
     }
     onSubmit(formData);
     onClose();
   };
+
+  const availableShelves = selectedRackId
+    ? Array.from({ length: shelfRacks.find(r => r.id === selectedRackId)?.numberOfShelves || 0 }, (_, i) => (i + 1).toString())
+    : [];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -105,62 +159,65 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               className="col-span-3"
             />
           </div>
+
+          {/* Shelf Rack Selection */}
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="shelf" className="sm:text-right">
-              Regál
+            <Label htmlFor="shelfRack" className="sm:text-right">
+              Regál (Řada-Regál)
             </Label>
-            <Input
-              id="shelf"
-              value={formData.shelf}
-              onChange={handleChange}
-              className="col-span-3"
-            />
+            <Select onValueChange={handleRackSelect} value={selectedRackId}>
+              <SelectTrigger className="col-span-3">
+                <SelectValue placeholder="Vyberte regál" />
+              </SelectTrigger>
+              <SelectContent>
+                {shelfRacks.filter(rack => !userWarehouseId || rack.warehouseId === userWarehouseId).map((rack) => (
+                  <SelectItem key={rack.id} value={rack.id}>
+                    {rack.rowId}-{rack.rackId} ({rack.description}) - {rack.warehouseId}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
+
+          {/* Shelf Number Selection */}
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="shelfNumber" className="sm:text-right">
-              Číslo regálu
+              Číslo police
             </Label>
-            <Input
-              id="shelfNumber"
-              value={formData.shelfNumber}
-              onChange={handleChange}
-              className="col-span-3"
-            />
+            <Select onValueChange={handleShelfIndexSelect} value={selectedShelfIndex} disabled={!selectedRackId}>
+              <SelectTrigger className="col-span-3">
+                <SelectValue placeholder="Vyberte číslo police" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableShelves.map((index) => (
+                  <SelectItem key={index} value={index}>
+                    Police {index}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
+
+          {/* Display derived fields as read-only */}
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="location" className="sm:text-right">
               Umístění
             </Label>
-            <Input
-              id="location"
-              value={formData.location}
-              onChange={handleChange}
-              className="col-span-3"
-            />
+            <Input id="location" value={formData.location} readOnly className="col-span-3 bg-gray-100 dark:bg-gray-700" />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="floor" className="sm:text-right">
               Patro
             </Label>
-            <Input
-              id="floor"
-              value={formData.floor}
-              onChange={handleChange}
-              className="col-span-3"
-            />
+            <Input id="floor" value={formData.floor} readOnly className="col-span-3 bg-gray-100 dark:bg-gray-700" />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="warehouseId" className="sm:text-right">
               ID Skladu
             </Label>
-            <Input
-              id="warehouseId"
-              value={formData.warehouseId}
-              onChange={handleChange}
-              className="col-span-3"
-              readOnly={!userWarehouseId}
-            />
+            <Input id="warehouseId" value={formData.warehouseId} readOnly className="col-span-3 bg-gray-100 dark:bg-gray-700" />
           </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="status" className="sm:text-right">
               Status zboží

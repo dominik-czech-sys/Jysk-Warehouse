@@ -12,10 +12,12 @@ import { useLog } from "@/contexts/LogContext";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useShelfRacks, ShelfRack } from "@/data/shelfRacks";
 
 interface ShelfDetails {
-  shelf: string;
-  shelfNumber: string;
+  shelf: string; // rowId
+  shelfNumber: string; // shelf index
   location: string;
   floor: string;
   warehouseId: string;
@@ -25,6 +27,7 @@ const MassAddArticlesPage: React.FC = () => {
   const { userWarehouseId, user } = useAuth();
   const { addArticle, updateArticle, getArticleById } = useArticles();
   const { addLogEntry } = useLog();
+  const { shelfRacks } = useShelfRacks();
   const navigate = useNavigate();
 
   const [shelfDetails, setShelfDetails] = useState<ShelfDetails>({
@@ -39,6 +42,9 @@ const MassAddArticlesPage: React.FC = () => {
   const [manualArticleId, setManualArticleId] = useState("");
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
   const [isScannerActive, setIsScannerActive] = useState(false);
+
+  const [selectedRackId, setSelectedRackId] = useState<string>("");
+  const [selectedShelfIndex, setSelectedShelfIndex] = useState<string>("");
 
   useEffect(() => {
     if (isScannerActive && !scannerRef.current) {
@@ -76,14 +82,39 @@ const MassAddArticlesPage: React.FC = () => {
     };
   }, [isScannerActive, shelfDetails, user?.username]);
 
-  const handleShelfDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setShelfDetails((prev) => ({ ...prev, [id]: value }));
+  useEffect(() => {
+    const currentRack = shelfRacks.find(rack => rack.id === selectedRackId);
+    if (currentRack) {
+      setShelfDetails({
+        shelf: currentRack.rowId,
+        shelfNumber: selectedShelfIndex,
+        location: currentRack.location,
+        floor: currentRack.floor,
+        warehouseId: currentRack.warehouseId,
+      });
+    } else {
+      setShelfDetails({
+        shelf: "",
+        shelfNumber: "",
+        location: "",
+        floor: "",
+        warehouseId: userWarehouseId || "",
+      });
+    }
+  }, [selectedRackId, selectedShelfIndex, shelfRacks, userWarehouseId]);
+
+  const handleRackSelect = (value: string) => {
+    setSelectedRackId(value);
+    setSelectedShelfIndex(""); // Reset shelf index when rack changes
+  };
+
+  const handleShelfIndexSelect = (value: string) => {
+    setSelectedShelfIndex(value);
   };
 
   const handleLockShelfDetails = () => {
-    if (!shelfDetails.shelf || !shelfDetails.shelfNumber || !shelfDetails.location || !shelfDetails.floor || !shelfDetails.warehouseId) {
-      toast.error("Prosím, vyplňte všechny detaily regálu před uzamčením.");
+    if (!selectedRackId || !selectedShelfIndex) {
+      toast.error("Prosím, vyberte regál a číslo police před uzamčením.");
       return;
     }
     setIsShelfDetailsLocked(true);
@@ -148,15 +179,14 @@ const MassAddArticlesPage: React.FC = () => {
     toast.success(`${articlesToProcess.length} článků bylo úspěšně uloženo.`);
     setArticlesToProcess([]);
     setIsShelfDetailsLocked(false);
-    setShelfDetails({
-      shelf: "",
-      shelfNumber: "",
-      location: "",
-      floor: "",
-      warehouseId: userWarehouseId || "",
-    });
+    setSelectedRackId("");
+    setSelectedShelfIndex("");
     navigate("/spravovat-clanky"); // Redirect to manage articles after saving
   };
+
+  const availableShelves = selectedRackId
+    ? Array.from({ length: shelfRacks.find(r => r.id === selectedRackId)?.numberOfShelves || 0 }, (_, i) => (i + 1).toString())
+    : [];
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
@@ -178,27 +208,49 @@ const MassAddArticlesPage: React.FC = () => {
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="shelf">Regál</Label>
-              <Input id="shelf" value={shelfDetails.shelf} onChange={handleShelfDetailsChange} readOnly={isShelfDetailsLocked} className="mt-1" />
+              <Label htmlFor="shelfRack">Regál (Řada-Regál)</Label>
+              <Select onValueChange={handleRackSelect} value={selectedRackId} disabled={isShelfDetailsLocked}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Vyberte regál" />
+                </SelectTrigger>
+                <SelectContent>
+                  {shelfRacks.filter(rack => !userWarehouseId || rack.warehouseId === userWarehouseId).map((rack) => (
+                    <SelectItem key={rack.id} value={rack.id}>
+                      {rack.rowId}-{rack.rackId} ({rack.description}) - {rack.warehouseId}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
-              <Label htmlFor="shelfNumber">Číslo regálu</Label>
-              <Input id="shelfNumber" value={shelfDetails.shelfNumber} onChange={handleShelfDetailsChange} readOnly={isShelfDetailsLocked} className="mt-1" />
+              <Label htmlFor="shelfNumber">Číslo police</Label>
+              <Select onValueChange={handleShelfIndexSelect} value={selectedShelfIndex} disabled={!selectedRackId || isShelfDetailsLocked}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Vyberte číslo police" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableShelves.map((index) => (
+                    <SelectItem key={index} value={index}>
+                      Police {index}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="location">Umístění</Label>
-              <Input id="location" value={shelfDetails.location} onChange={handleShelfDetailsChange} readOnly={isShelfDetailsLocked} className="mt-1" />
+              <Input id="location" value={shelfDetails.location} readOnly className="mt-1 bg-gray-100 dark:bg-gray-700" />
             </div>
             <div>
               <Label htmlFor="floor">Patro</Label>
-              <Input id="floor" value={shelfDetails.floor} onChange={handleShelfDetailsChange} readOnly={isShelfDetailsLocked} className="mt-1" />
+              <Input id="floor" value={shelfDetails.floor} readOnly className="mt-1 bg-gray-100 dark:bg-gray-700" />
             </div>
             <div>
               <Label htmlFor="warehouseId">ID Skladu</Label>
-              <Input id="warehouseId" value={shelfDetails.warehouseId} onChange={handleShelfDetailsChange} readOnly={isShelfDetailsLocked || !!userWarehouseId} className="mt-1" />
+              <Input id="warehouseId" value={shelfDetails.warehouseId} readOnly className="mt-1 bg-gray-100 dark:bg-gray-700" />
             </div>
             <div className="md:col-span-2 flex justify-end">
-              <Button onClick={handleLockShelfDetails} disabled={isShelfDetailsLocked} className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+              <Button onClick={handleLockShelfDetails} disabled={isShelfDetailsLocked || !selectedRackId || !selectedShelfIndex} className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
                 {isShelfDetailsLocked ? <><Lock className="h-4 w-4 mr-2" /> Detaily uzamčeny</> : <><Unlock className="h-4 w-4 mr-2" /> Uzamknout detaily regálu</>}
               </Button>
               {isShelfDetailsLocked && (

@@ -93,7 +93,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="flex-grow p-0 flex flex-col"> {/* Added flex flex-col here */}
+        <CardContent className="flex-grow p-0 flex flex-col min-h-0"> {/* Added min-h-0 here */}
           <ScrollArea className="h-full w-full rounded-md border p-4">
             {filteredAndGroupedLogs.length === 0 ? (
               <p className="text-center text-muted-foreground">Žádné záznamy pro vybraný filtr.</p>

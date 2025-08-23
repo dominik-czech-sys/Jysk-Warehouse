@@ -9,7 +9,8 @@ import ManageArticles from "./pages/ManageArticles";
 import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import CteckaCarkoduPage from "./pages/CteckaCarkoduPage";
-import MassAddArticlesPage from "./pages/MassAddArticlesPage"; // Import new page
+import MassAddArticlesPage from "./pages/MassAddArticlesPage";
+import ManageShelfRacksPage from "./pages/ManageShelfRacksPage"; // Import new page
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { useContext } from "react";
@@ -64,6 +65,14 @@ const AppContent = () => {
         }
       />
       <Route
+        path="/admin/regaly" // New route for managing shelf racks
+        element={
+          <PrivateRoute adminOnly>
+            <ManageShelfRacksPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
         path="/skenovat-carkod"
         element={
           <PrivateRoute>
@@ -72,7 +81,7 @@ const AppContent = () => {
         }
       />
       <Route
-        path="/mass-add-articles" // New route for mass article addition
+        path="/mass-add-articles"
         element={
           <PrivateRoute>
             <MassAddArticlesPage />
