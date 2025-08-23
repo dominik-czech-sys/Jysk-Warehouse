@@ -3,7 +3,7 @@ import React, { createContext, useState, useEffect, useContext, ReactNode } from
 
 export interface LogEntry {
   id: string;
-  timestamp: string;
+  timestamp: number; // Changed to number (milliseconds since epoch)
   user: string; // User's username
   action: string;
   details?: Record<string, any>;
@@ -35,7 +35,7 @@ export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
   const addLogEntry = (action: string, details?: Record<string, any>, username?: string) => {
     const newEntry: LogEntry = {
       id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
-      timestamp: new Date().toLocaleString(),
+      timestamp: Date.now(), // Store as a number
       user: username || "Neznámý", // Use provided username or "Neznámý"
       action,
       details,

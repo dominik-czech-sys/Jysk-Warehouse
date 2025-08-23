@@ -45,7 +45,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
     // Group by day
     const grouped: Record<string, LogEntry[]> = {};
     filteredLogs.forEach(entry => {
-      const date = new Date(entry.timestamp);
+      const date = new Date(entry.timestamp); // Create Date object from number
       const dayKey = format(date, "yyyy-MM-dd");
       if (!grouped[dayKey]) {
         grouped[dayKey] = [];
@@ -58,7 +58,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
 
     return sortedDays.map(day => ({
       date: day,
-      entries: grouped[day].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()), // Sort entries within each day
+      entries: grouped[day].sort((a, b) => b.timestamp - a.timestamp), // Sort entries within each day by timestamp number
     }));
   }, [logEntries, selectedFilter]);
 
