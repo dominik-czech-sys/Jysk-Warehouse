@@ -19,7 +19,7 @@ import { useTranslation } from "react-i18next"; // Import useTranslation
 interface ShelfRackFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (rack: ShelfRack) => boolean; // Returns boolean indicating success
+  onSubmit: (rack: ShelfRack) => Promise<boolean>; // Změněno na Promise<boolean>
   rack?: ShelfRack | null; // Optional: if provided, it's for editing
 }
 
@@ -84,7 +84,7 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
     setFormData((prev) => ({ ...prev, shelves: renumberedShelves }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => { // Změněno na async
     e.preventDefault();
     if (!formData.rowId || !formData.rackId || !formData.storeId || formData.shelves.length === 0 || formData.shelves.some(s => !s.description.trim())) {
       toast.error(t("common.fillAllRackFields"));
@@ -96,7 +96,7 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
       id: rack ? formData.id : `${formData.rowId}-${formData.rackId}`.toUpperCase(),
     };
 
-    if (onSubmit(finalFormData)) {
+    if (await onSubmit(finalFormData)) { // Použito await
       onClose();
     }
   };
