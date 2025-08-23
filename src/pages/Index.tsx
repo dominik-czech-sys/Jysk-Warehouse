@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { WarehouseSearch } from "@/components/WarehouseSearch";
 import { WarehouseLocationDisplay } from "@/components/WarehouseLocationDisplay";
 import { useArticles, Article } from "@/data/articles";
@@ -105,7 +104,6 @@ const Index = () => {
           StoreFront
         </Button>
       </div>
-      <MadeWithDyad />
       <IframeViewer src={iframeSrc} onClose={handleCloseIframe} />
     </div>
   );
