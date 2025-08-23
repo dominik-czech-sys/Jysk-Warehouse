@@ -9,7 +9,7 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  userStoreId: string | undefined; // Renamed from userWarehouseId
+  userStoreId: string | undefined;
   allUsers: User[];
   addUser: (newUser: User) => void;
   updateUser: (updatedUser: User) => void;
@@ -89,8 +89,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const userToAdd = { ...newUser };
     if (!isAdmin && currentUser?.storeId) {
       userToAdd.storeId = currentUser.storeId;
-    } else if (isAdmin && !userToAdd.storeId) {
-      toast.error("Admin musí při vytváření uživatele zadat ID skladu.");
+    } else if (isAdmin && !userToAdd.storeId && userToAdd.role !== "admin") {
+      toast.error("Admin musí při vytváření uživatele zadat ID skladu pro ne-admin role.");
       return;
     } else if (!isAdmin && !currentUser?.storeId) {
       toast.error("Uživatel bez přiřazeného skladu nemůže přidávat uživatele.");
@@ -170,7 +170,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const isAuthenticated = !!currentUser;
   const isAdmin = currentUser?.role === "admin";
-  const userStoreId = currentUser?.storeId; // Renamed from userWarehouseId
+  const userStoreId = currentUser?.storeId;
 
   return (
     <AuthContext.Provider

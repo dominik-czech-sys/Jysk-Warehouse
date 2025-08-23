@@ -12,6 +12,7 @@ export interface Article {
   floor: string;    // Derived from ShelfRack
   storeId: string; // Derived from ShelfRack (renamed from warehouseId)
   status: string; // Nové pole pro status zboží
+  quantity: number; // New field for article quantity
 }
 
 // Initial dummy data for Articles
@@ -233,11 +234,12 @@ export const useArticles = () => {
       const parsedArticles: Article[] = [];
       const lines = rawArticleData.trim().split('\n');
       lines.forEach(line => {
-        const match = line.match(/^(\d+) \((\d+)\)\s+(.+?)\s+\d+\s+KS\s+\d+\s+KS/);
+        const match = line.match(/^(\d+) \((\d+)\)\s+(.+?)\s+(\d+)\s+KS/); // Capture quantity
         if (match) {
           const id = match[1];
           const status = match[2];
           const name = match[3].trim();
+          const quantity = parseInt(match[4], 10);
 
           // Assign to a default rack (e.g., "A-1" in "Sklad 1")
           const defaultRack = shelfRacks.find(r => r.id === "A-1" && r.storeId === "Sklad 1");
@@ -247,6 +249,7 @@ export const useArticles = () => {
               id,
               name,
               status,
+              quantity,
               rackId: defaultRack.id,
               shelfNumber: randomShelf.shelfNumber,
               location: defaultRack.location,
@@ -259,6 +262,7 @@ export const useArticles = () => {
               id,
               name,
               status,
+              quantity,
               rackId: "N/A",
               shelfNumber: "N/A",
               location: "N/A",
@@ -280,18 +284,23 @@ export const useArticles = () => {
     ? articles
     : articles.filter((article) => article.storeId === userStoreId);
 
-  const getArticleById = (id: string) => filteredArticles.find((article) => article.id === id);
+  const getArticleById = (id: string, storeId?: string) => {
+    if (storeId) {
+      return articles.find((article) => article.id === id && article.storeId === storeId);
+    }
+    return filteredArticles.find((article) => article.id === id);
+  };
 
   const addArticle = (newArticle: Article) => {
     setArticles((prev) => [...prev, newArticle]);
-    addLogEntry("Článek přidán", { articleId: newArticle.id, name: newArticle.name, rackId: newArticle.rackId, shelfNumber: newArticle.shelfNumber, storeId: newArticle.storeId }, user?.username);
+    addLogEntry("Článek přidán", { articleId: newArticle.id, name: newArticle.name, rackId: newArticle.rackId, shelfNumber: newArticle.shelfNumber, storeId: newArticle.storeId, quantity: newArticle.quantity }, user?.username);
   };
 
   const updateArticle = (updatedArticle: Article) => {
     setArticles((prev) =>
       prev.map((article) => (article.id === updatedArticle.id && article.storeId === updatedArticle.storeId ? updatedArticle : article))
     );
-    addLogEntry("Článek aktualizován", { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, storeId: updatedArticle.storeId }, user?.username);
+    addLogEntry("Článek aktualizován", { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, storeId: updatedArticle.storeId, quantity: updatedArticle.quantity }, user?.username);
   };
 
   const deleteArticle = (id: string, storeId: string) => {
@@ -299,5 +308,9 @@ export const useArticles = () => {
     addLogEntry("Článek smazán", { articleId: id, storeId }, user?.username);
   };
 
-  return { articles: filteredArticles, getArticleById, addArticle, updateArticle, deleteArticle };
+  const getArticlesByStoreId = (storeId: string) => {
+    return articles.filter(article => article.storeId === storeId);
+  };
+
+  return { articles: filteredArticles, allArticles: articles, getArticleById, addArticle, updateArticle, deleteArticle, getArticlesByStoreId };
 };

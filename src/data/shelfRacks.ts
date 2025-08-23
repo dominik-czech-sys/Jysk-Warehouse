@@ -68,6 +68,30 @@ const initialShelfRacks: ShelfRack[] = [
     ],
     storeId: "Sklad 2",
   },
+  {
+    id: "K-1",
+    rowId: "K",
+    rackId: "1",
+    location: "Ulička K",
+    floor: "Přízemí",
+    shelves: [
+      { shelfNumber: "1", description: "Koberce" },
+      { shelfNumber: "2", description: "Zrcadla" },
+    ],
+    storeId: "Kozomín",
+  },
+  {
+    id: "T-1",
+    rowId: "T",
+    rackId: "1",
+    location: "Ulička T",
+    floor: "Přízemí",
+    shelves: [
+      { shelfNumber: "1", description: "Stoly" },
+      { shelfNumber: "2", description: "Židle" },
+    ],
+    storeId: "T508",
+  },
 ];
 
 export const useShelfRacks = () => {
@@ -86,7 +110,12 @@ export const useShelfRacks = () => {
     ? shelfRacks
     : shelfRacks.filter((rack) => rack.storeId === userStoreId);
 
-  const getShelfRackById = (id: string) => filteredShelfRacks.find((rack) => rack.id === id);
+  const getShelfRackById = (id: string, storeId?: string) => {
+    if (storeId) {
+      return shelfRacks.find((rack) => rack.id === id && rack.storeId === storeId);
+    }
+    return filteredShelfRacks.find((rack) => rack.id === id);
+  };
 
   const addShelfRack = (newRack: ShelfRack) => {
     if (shelfRacks.some(r => r.id === newRack.id && r.storeId === newRack.storeId)) {
@@ -114,5 +143,9 @@ export const useShelfRacks = () => {
     addLogEntry("Regál smazán", { rackId: id, storeId }, user?.username);
   };
 
-  return { shelfRacks: filteredShelfRacks, getShelfRackById, addShelfRack, updateShelfRack, deleteShelfRack };
+  const getShelfRacksByStoreId = (storeId: string) => {
+    return shelfRacks.filter(rack => rack.storeId === storeId);
+  };
+
+  return { shelfRacks: filteredShelfRacks, allShelfRacks: shelfRacks, getShelfRackById, addShelfRack, updateShelfRack, deleteShelfRack, getShelfRacksByStoreId };
 };

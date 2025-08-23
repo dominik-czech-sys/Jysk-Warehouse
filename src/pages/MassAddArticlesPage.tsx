@@ -40,6 +40,7 @@ const MassAddArticlesPage: React.FC = () => {
   const [isShelfDetailsLocked, setIsShelfDetailsLocked] = useState(false);
   const [articlesToProcess, setArticlesToProcess] = useState<Article[]>([]);
   const [manualArticleId, setManualArticleId] = useState("");
+  const [manualArticleQuantity, setManualArticleQuantity] = useState<number>(1);
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
   const [isScannerActive, setIsScannerActive] = useState(false);
 
@@ -56,8 +57,8 @@ const MassAddArticlesPage: React.FC = () => {
 
       const onScanSuccess = (decodedText: string) => {
         toast.success(`Čárový kód naskenován: ${decodedText}`);
-        addLogEntry("Čárový kód naskenován pro hromadné přidání", { scannedCode: decodedText, shelfDetails }, user?.username);
-        addArticleToProcess(decodedText);
+        addLogEntry("Čárový kód naskenován pro hromadné přidání", { scannedCode: decodedText, shelfDetails, quantity: manualArticleQuantity }, user?.username);
+        addArticleToProcess(decodedText, manualArticleQuantity);
       };
 
       const onScanError = (errorMessage: string) => {
@@ -80,7 +81,7 @@ const MassAddArticlesPage: React.FC = () => {
         scannerRef.current = null;
       }
     };
-  }, [isScannerActive, shelfDetails, user?.username]);
+  }, [isScannerActive, shelfDetails, user?.username, manualArticleQuantity]);
 
   useEffect(() => {
     const currentRack = shelfRacks.find(rack => rack.id === selectedRackId && rack.storeId === userStoreId);
@@ -122,7 +123,7 @@ const MassAddArticlesPage: React.FC = () => {
     toast.info("Detaily regálu uzamčeny. Nyní můžete přidávat články.");
   };
 
-  const addArticleToProcess = (articleId: string) => {
+  const addArticleToProcess = (articleId: string, quantity: number) => {
     if (!isShelfDetailsLocked) {
       toast.error("Nejprve uzamkněte detaily regálu.");
       return;
@@ -131,16 +132,21 @@ const MassAddArticlesPage: React.FC = () => {
       toast.error("ID článku nemůže být prázdné.");
       return;
     }
+    if (quantity <= 0) {
+      toast.error("Množství musí být kladné číslo.");
+      return;
+    }
 
-    const existingArticle = getArticleById(articleId.trim().toUpperCase());
+    const existingArticle = getArticleById(articleId.trim().toUpperCase(), userStoreId); // Check for article in current store
     const newArticleData: Article = {
       id: articleId.trim().toUpperCase(),
       name: existingArticle?.name || `Neznámý článek ${articleId.trim().toUpperCase()}`, // Default name if not found
       status: existingArticle?.status || "21", // Default status
+      quantity: quantity,
       ...shelfDetails, // Apply preset shelf details
     };
 
-    // Check if this article is already in the current session's list
+    // Check if this article is already in the current session's list for the same store
     if (articlesToProcess.some(a => a.id === newArticleData.id && a.storeId === newArticleData.storeId)) {
       toast.warning(`Článek ${newArticleData.id} je již v seznamu pro zpracování pro tento sklad.`);
       return;
@@ -148,11 +154,12 @@ const MassAddArticlesPage: React.FC = () => {
 
     setArticlesToProcess((prev) => [...prev, newArticleData]);
     setManualArticleId(""); // Clear manual input after adding
+    setManualArticleQuantity(1); // Reset quantity
     toast.success(`Článek ${newArticleData.id} přidán do seznamu.`);
   };
 
   const handleManualAddArticle = () => {
-    addArticleToProcess(manualArticleId);
+    addArticleToProcess(manualArticleId, manualArticleQuantity);
   };
 
   const handleRemoveArticleFromList = (idToRemove: string) => {
@@ -167,13 +174,13 @@ const MassAddArticlesPage: React.FC = () => {
     }
 
     articlesToProcess.forEach(article => {
-      const existing = getArticleById(article.id); // This will check only within the current user's store
-      if (existing && existing.storeId === article.storeId) {
-        updateArticle(article); // Update existing article with new location
-        addLogEntry("Článek aktualizován (hromadné přidání)", { articleId: article.id, newRackId: article.rackId, newShelfNumber: article.shelfNumber, storeId: article.storeId }, user?.username);
+      const existing = getArticleById(article.id, article.storeId); // Check for article in its specific store
+      if (existing) {
+        updateArticle(article); // Update existing article with new location and quantity
+        addLogEntry("Článek aktualizován (hromadné přidání)", { articleId: article.id, newRackId: article.rackId, newShelfNumber: article.shelfNumber, storeId: article.storeId, quantity: article.quantity }, user?.username);
       } else {
         addArticle(article); // Add new article
-        addLogEntry("Článek přidán (hromadné přidání)", { articleId: article.id, rackId: article.rackId, shelfNumber: article.shelfNumber, storeId: article.storeId }, user?.username);
+        addLogEntry("Článek přidán (hromadné přidání)", { articleId: article.id, rackId: article.rackId, shelfNumber: article.shelfNumber, storeId: article.storeId, quantity: article.quantity }, user?.username);
       }
     });
 
@@ -294,6 +301,14 @@ const MassAddArticlesPage: React.FC = () => {
                     onKeyPress={(e) => e.key === "Enter" && handleManualAddArticle()}
                     className="flex-grow"
                   />
+                  <Input
+                    type="number"
+                    placeholder="Množství"
+                    value={manualArticleQuantity}
+                    onChange={(e) => setManualArticleQuantity(parseInt(e.target.value, 10) || 1)}
+                    min="1"
+                    className="w-24"
+                  />
                   <Button onClick={handleManualAddArticle} className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
                     <PlusCircle className="h-4 w-4 mr-2" /> Přidat
                   </Button>
@@ -316,7 +331,7 @@ const MassAddArticlesPage: React.FC = () => {
                     <div className="space-y-2">
                       {articlesToProcess.map((article) => (
                         <div key={article.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                          <span className="font-medium">{article.id} - {article.name}</span>
+                          <span className="font-medium">{article.id} - {article.name} (Množství: {article.quantity})</span>
                           <Button variant="ghost" size="sm" onClick={() => handleRemoveArticleFromList(article.id)}>
                             <XCircle className="h-4 w-4 text-destructive" />
                           </Button>

@@ -12,7 +12,7 @@ const CteckaCarkoduPage: React.FC = () => {
   const [scanResult, setScanResult] = useState<string | null>(null);
   const navigate = useNavigate();
   const { addLogEntry } = useLog(); // Použití useLog
-  const { user } = useAuth(); // Get current user
+  const { user, userStoreId } = useAuth(); // Get current user and storeId
 
   useEffect(() => {
     const html5QrcodeScanner = new Html5QrcodeScanner(
@@ -25,7 +25,7 @@ const CteckaCarkoduPage: React.FC = () => {
       html5QrcodeScanner.clear();
       setScanResult(decodedText);
       toast.success(`Čárový kód naskenován: ${decodedText}`);
-      addLogEntry("Čárový kód naskenován", { scannedCode: decodedText }, user?.username); // Pass username
+      addLogEntry("Čárový kód naskenován", { scannedCode: decodedText, storeId: userStoreId }, user?.username); // Pass username and storeId
       navigate(`/?articleId=${decodedText}`);
     };
 
@@ -40,7 +40,7 @@ const CteckaCarkoduPage: React.FC = () => {
         console.error("Failed to clear html5QrcodeScanner", error);
       });
     };
-  }, [navigate, addLogEntry, user?.username]); // Add user.username to dependencies
+  }, [navigate, addLogEntry, user?.username, userStoreId]); // Add user.username and userStoreId to dependencies
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">

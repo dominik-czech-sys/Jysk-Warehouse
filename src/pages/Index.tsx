@@ -10,6 +10,7 @@ import { LogOut, Scan, Users } from "lucide-react";
 import { IframeViewer } from "@/components/IframeViewer";
 import { useLog } from "@/contexts/LogContext"; // Import useLog
 import { ManagementMenu } from "@/components/ManagementMenu"; // Import new ManagementMenu
+import { ThemeToggle } from "@/components/ThemeToggle"; // Import ThemeToggle
 
 const Index = () => {
   const { getArticleById, articles } = useArticles();
@@ -27,15 +28,15 @@ const Index = () => {
   }, [searchParams, articles, user?.username]); // Add user.username to dependencies
 
   const handleSearch = (articleId: string) => {
-    const article = getArticleById(articleId);
+    const article = getArticleById(articleId, userStoreId); // Pass userStoreId for store-specific search
     if (article) {
       setFoundArticle(article);
       toast.success(`Článek ${articleId} nalezen!`);
-      addLogEntry("Článek vyhledán", { articleId, found: true }, user?.username); // Pass username
+      addLogEntry("Článek vyhledán", { articleId, found: true, storeId: userStoreId }, user?.username); // Pass username and storeId
     } else {
       setFoundArticle(null);
       toast.error(`Článek ${articleId} nebyl nalezen.`);
-      addLogEntry("Článek vyhledán", { articleId, found: false }, user?.username); // Pass username
+      addLogEntry("Článek vyhledán", { articleId, found: false, storeId: userStoreId }, user?.username); // Pass username and storeId
     }
   };
 
@@ -60,13 +61,14 @@ const Index = () => {
         </div>
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full md:w-auto justify-center md:justify-end">
           {isAdmin && (
-            <Link to="/admin/uzivatele" className="w-full sm:w-auto">
+            <Link to="/admin/site-dashboard" className="w-full sm:w-auto">
               <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
-                <Users className="h-4 w-4 mr-2" /> Správa uživatelů
+                <Users className="h-4 w-4 mr-2" /> Site Dashboard
               </Button>
             </Link>
           )}
           {(hasPermission("article:view") || hasPermission("rack:view")) && <ManagementMenu />} {/* Use the new ManagementMenu component */}
+          <ThemeToggle /> {/* Theme toggle */}
           <Button onClick={logout} variant="outline" className="flex items-center w-full sm:w-auto">
             <LogOut className="h-4 w-4 mr-2" /> Odhlásit se
           </Button>

@@ -7,7 +7,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ManageArticles from "./pages/ManageArticles";
 import LoginPage from "./pages/LoginPage";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboard from "./pages/AdminDashboard"; // Old AdminDashboard, now redirects
+import SiteDashboard from "./pages/SiteDashboard"; // New SiteDashboard
 import CteckaCarkoduPage from "./pages/CteckaCarkoduPage";
 import MassAddArticlesPage from "./pages/MassAddArticlesPage";
 import ManageShelfRacksPage from "./pages/ManageShelfRacksPage";
@@ -15,6 +16,7 @@ import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { useContext } from "react";
 import { Permission } from "./data/users"; // Import Permission type
+import { ThemeProvider } from "./contexts/ThemeContext"; // Import ThemeProvider
 
 const queryClient = new QueryClient();
 
@@ -59,10 +61,18 @@ const AppContent = () => {
         }
       />
       <Route
-        path="/admin/uzivatele"
+        path="/admin/uzivatele" // This route now redirects to SiteDashboard
         element={
           <PrivateRoute requiredPermission="user:view">
             <AdminDashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/admin/site-dashboard" // New route for the comprehensive admin dashboard
+        element={
+          <PrivateRoute requiredPermission="store:view">
+            <SiteDashboard />
           </PrivateRoute>
         }
       />
@@ -104,7 +114,9 @@ const App = () => (
       <BrowserRouter>
         <LogProvider>
           <AuthProvider>
-            <AppContent />
+            <ThemeProvider> {/* Wrap AppContent with ThemeProvider */}
+              <AppContent />
+            </ThemeProvider>
           </AuthProvider>
         </LogProvider>
       </BrowserRouter>

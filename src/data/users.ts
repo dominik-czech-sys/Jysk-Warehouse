@@ -5,6 +5,10 @@ export type Permission =
   | "user:create"
   | "user:update"
   | "user:delete"
+  | "store:view" // New permission for viewing stores
+  | "store:create" // New permission for creating stores
+  | "store:update" // New permission for updating stores
+  | "store:delete" // New permission for deleting stores
   | "rack:view"
   | "rack:create"
   | "rack:update"
@@ -31,6 +35,7 @@ export interface User {
 export const defaultPermissions: Record<User['role'], Permission[]> = {
   "admin": [
     "user:view", "user:create", "user:update", "user:delete",
+    "store:view", "store:create", "store:update", "store:delete",
     "rack:view", "rack:create", "rack:update", "rack:delete",
     "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add",
     "log:view",
@@ -98,10 +103,25 @@ export const users: User[] = [
     storeId: "Sklad 2",
     permissions: defaultPermissions["skladnik"],
   },
+  {
+    username: "vedouci_kozomin",
+    password: "password",
+    role: "vedouci_skladu",
+    storeId: "Kozomín",
+    permissions: defaultPermissions["vedouci_skladu"],
+  },
+  {
+    username: "vedouci_t508",
+    password: "password",
+    role: "vedouci_skladu",
+    storeId: "T508",
+    permissions: defaultPermissions["vedouci_skladu"],
+  },
 ];
 
 // Default articles for new stores (if needed)
-export const defaultArticlesForNewStores: Omit<Article, 'rackId' | 'shelfNumber' | 'location' | 'floor' | 'storeId'>[] = [
+export const defaultArticlesForNewStores: Omit<Article, 'rackId' | 'shelfNumber' | 'location' | 'floor' | 'storeId' | 'quantity'>[] = [
   { id: "DEFAULT-001", name: "Výchozí produkt A", status: "21" },
   { id: "DEFAULT-002", name: "Výchozí produkt B", status: "11" },
+  { id: "DEFAULT-003", name: "Výchozí produkt C", status: "41" },
 ];

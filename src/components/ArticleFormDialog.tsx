@@ -41,6 +41,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
     floor: "",
     storeId: userStoreId || "",
     status: "",
+    quantity: 1, // Added missing quantity
   });
   const [selectedRackId, setSelectedRackId] = useState<string>("");
   const [selectedShelfNumber, setSelectedShelfNumber] = useState<string>("");
@@ -60,6 +61,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
         floor: "",
         storeId: userStoreId || "",
         status: "",
+        quantity: 1, // Added missing quantity
       });
       setSelectedRackId("");
       setSelectedShelfNumber("");
