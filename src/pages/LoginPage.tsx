@@ -35,7 +35,7 @@ const LoginPage: React.FC = () => {
               <Input
                 id="username"
                 type="text"
-                placeholder="Zadejte uživatelské jméno"
+                placeholder="Zadejte uživatelské jmého"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -57,6 +57,11 @@ const LoginPage: React.FC = () => {
             <Button type="submit" className="w-full bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
               Přihlásit se
             </Button>
+            <a href="https://myjysk.thinktime.com/ui/dashboards/177" target="_blank" rel="noopener noreferrer" className="block w-full">
+              <Button type="button" variant="outline" className="w-full mt-4 border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light">
+                Přejít na MyJysk
+              </Button>
+            </a>
           </form>
         </CardContent>
       </Card>

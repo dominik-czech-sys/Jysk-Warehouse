@@ -52,6 +52,11 @@ const Index = () => {
               </Button>
             </Link>
           )}
+          <a href="https://myjysk.thinktime.com/ui/dashboards/177" target="_blank" rel="noopener noreferrer">
+            <Button variant="outline" className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light">
+              MyJysk
+            </Button>
+          </a>
           <Button onClick={logout} variant="outline" className="flex items-center">
             <LogOut className="h-4 w-4 mr-2" /> Odhlásit se
           </Button>
