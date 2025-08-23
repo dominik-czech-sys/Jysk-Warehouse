@@ -62,20 +62,6 @@ const Index = () => {
               </Button>
             </Link>
           )}
-          <Button
-            variant="outline"
-            className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light w-full sm:w-auto"
-            onClick={() => handleOpenIframe("https://myjysk.thinktime.com/ui/dashboards/177")}
-          >
-            MyJysk
-          </Button>
-          <Button
-            variant="outline"
-            className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light w-full sm:w-auto"
-            onClick={() => handleOpenIframe("http://storefront.jysk.com/")}
-          >
-            StoreFront
-          </Button>
           <Button onClick={logout} variant="outline" className="flex items-center w-full sm:w-auto">
             <LogOut className="h-4 w-4 mr-2" /> Odhlásit se
           </Button>
@@ -100,6 +86,24 @@ const Index = () => {
             <Scan className="h-4 w-4 mr-2" /> Skenovat čárový kód
           </Button>
         </Link>
+      </div>
+
+      {/* Přesunutá tlačítka do patičky */}
+      <div className="mt-auto pt-8 w-full max-w-sm flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 justify-center">
+        <Button
+          variant="outline"
+          className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light w-full sm:w-auto"
+          onClick={() => handleOpenIframe("https://myjysk.thinktime.com/ui/dashboards/177")}
+        >
+          MyJysk
+        </Button>
+        <Button
+          variant="outline"
+          className="flex items-center border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light w-full sm:w-auto"
+          onClick={() => handleOpenIframe("http://storefront.jysk.com/")}
+        >
+          StoreFront
+        </Button>
       </div>
       <MadeWithDyad />
       <IframeViewer src={iframeSrc} onClose={handleCloseIframe} />
