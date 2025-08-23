@@ -62,6 +62,11 @@ const LoginPage: React.FC = () => {
                 Přejít na MyJysk
               </Button>
             </a>
+            <a href="http://storefront.jysk.com/" target="_blank" rel="noopener noreferrer" className="block w-full">
+              <Button type="button" variant="outline" className="w-full mt-4 border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light">
+                Přejít na StoreFront
+              </Button>
+            </a>
           </form>
         </CardContent>
       </Card>
