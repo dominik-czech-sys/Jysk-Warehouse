@@ -77,55 +77,7 @@ export const users: User[] = [
     role: "admin",
     permissions: defaultPermissions["admin"],
     firstLogin: true,
-  },
-  {
-    username: "vedouci_skladu1",
-    password: "password1", // This will be hashed
-    role: "vedouci_skladu",
-    storeId: "Sklad 1",
-    permissions: defaultPermissions["vedouci_skladu"],
-    firstLogin: true,
-  },
-  {
-    username: "skladnik1",
-    password: "password1", // This will be hashed
-    role: "skladnik",
-    storeId: "Sklad 1",
-    permissions: defaultPermissions["skladnik"],
-    firstLogin: true,
-  },
-  {
-    username: "vedouci_skladu2",
-    password: "password2", // This will be hashed
-    role: "vedouci_skladu",
-    storeId: "Sklad 2",
-    permissions: defaultPermissions["vedouci_skladu"],
-    firstLogin: true,
-  },
-  {
-    username: "skladnik2",
-    password: "password2", // This will be hashed
-    role: "skladnik",
-    storeId: "Sklad 2",
-    permissions: defaultPermissions["skladnik"],
-    firstLogin: true,
-  },
-  {
-    username: "vedouci_kozomin",
-    password: "password", // This will be hashed
-    role: "vedouci_skladu",
-    storeId: "Kozomín",
-    permissions: defaultPermissions["vedouci_skladu"],
-    firstLogin: true,
-  },
-  {
-    username: "vedouci_t508",
-    password: "password", // This will be hashed
-    role: "vedouci_skladu",
-    storeId: "T508",
-    permissions: defaultPermissions["vedouci_skladu"],
-    firstLogin: true,
-  },
+  }
 ];
 
 // Default articles for new stores (if needed)

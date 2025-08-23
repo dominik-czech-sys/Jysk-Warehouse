@@ -59,7 +59,7 @@ const rawArticleData = `
 3600984 (11)	Botník HALS 4 police černá	11 KS	12 KS	850,00 CZK	850,00 CZK		09-12-2021
 3600987 (11)	Regál TRAPPEDAL 5 polic barva teplého dubu/černá	2 KS	2 KS	1 999,00 CZK	1 999,00 CZK		06-03-2023
 3601018 (11)	Regál TRAPPEDAL 7 polic barva teplého dubu/černá	1 KS	2 KS	2 799,00 CZK	2 799,00 CZK		22-03-2023
-3601024 (11)	Komoda JENSLEV 4 zásuvky 1 dveře dub	2 KS	2 KS	2 799,00 CZK	2 799,00 CZK		20-12-2022
+3601024 (11)	Komoda 4 zásuvky 1 dveře dub	2 KS	2 KS	2 799,00 CZK	2 799,00 CZK		20-12-2022
 3601027 (11)	Skříňka SKALS 4 přihrádky barva divokého tmavého dubu	1 KS	2 KS	1 250,00 CZK	1 250,00 CZK	31-12-9998	14-02-2024
 3601029 (11)	Vitrína SKALS skleněné dveře bílá	3 KS	3 KS	1 850,00 CZK	1 850,00 CZK	31-12-9998	14-02-2024
 3601050 (11)	Herní židle TYPE Z RAZER ed.™ LEGEND	9 KS	10 KS	7 999,00 CZK	7 999,00 CZK		22-03-2023
@@ -225,10 +225,11 @@ export const useArticles = () => {
 
   const [articles, setArticles] = useState<Article[]>(() => {
     const storedArticles = localStorage.getItem("articles");
-    return storedArticles ? JSON.parse(storedArticles) : []; // Initialize with empty array if no stored data
+    // Pokud localStorage obsahuje artikly, použijeme je. Jinak začneme s prázdným polem.
+    return storedArticles ? JSON.parse(storedArticles) : [];
   });
 
-  // Effect to load initial articles if localStorage is empty
+  // Effect to load initial articles if localStorage is empty AND there are no articles in state
   useEffect(() => {
     if (articles.length === 0 && localStorage.getItem("articles") === null) {
       const parsedArticles: Article[] = [];
@@ -243,29 +244,32 @@ export const useArticles = () => {
 
           // Assign to a default rack (e.g., "A-1" in "Sklad 1")
           // Now `allShelfRacks` is available from the hook context
-          const defaultRack = allShelfRacks.find(r => r.id === "A-1" && r.storeId === "Sklad 1");
+          // If no racks exist, assign to "N/A"
+          const defaultRack = allShelfRacks.length > 0 ? allShelfRacks[0] : null; // Použijeme první dostupný regál, pokud existuje
+          let assignedRackId = "N/A";
+          let assignedShelfNumber = "N/A";
+          let assignedStoreId = "N/A";
+
           if (defaultRack && defaultRack.shelves.length > 0) {
-            const randomShelf = defaultRack.shelves[Math.floor(Math.random() * defaultRack.shelves.length)];
-            parsedArticles.push({
-              id,
-              name,
-              status,
-              quantity,
-              rackId: defaultRack.id,
-              shelfNumber: randomShelf.shelfNumber,
-              storeId: defaultRack.storeId,
-            });
+            assignedRackId = defaultRack.id;
+            assignedShelfNumber = defaultRack.shelves[0].shelfNumber; // Použijeme první polici
+            assignedStoreId = defaultRack.storeId;
           } else {
-            parsedArticles.push({
-              id,
-              name,
-              status,
-              quantity,
-              rackId: "N/A",
-              shelfNumber: "N/A",
-              storeId: "Sklad 1",
-            });
+            // Pokud nejsou žádné regály, přiřadíme k "N/A" a "N/A"
+            assignedRackId = "N/A";
+            assignedShelfNumber = "N/A";
+            assignedStoreId = "N/A"; // Nebo můžete zvolit nějaký výchozí storeId, např. "Default Store"
           }
+
+          parsedArticles.push({
+            id,
+            name,
+            status,
+            quantity,
+            rackId: assignedRackId,
+            shelfNumber: assignedShelfNumber,
+            storeId: assignedStoreId,
+          });
         }
       });
       setArticles(parsedArticles);

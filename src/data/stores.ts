@@ -11,12 +11,7 @@ export interface Store {
   name: string; // Display name of the store
 }
 
-const initialStores: Store[] = [
-  { id: "Sklad 1", name: "JYSK Sklad 1" },
-  { id: "Sklad 2", name: "JYSK Sklad 2" },
-  { id: "T508", name: "JYSK T508" },
-  { id: "Kozomín", name: "JYSK Kozomín" },
-];
+const initialStores: Store[] = []; // Nastaveno na prázdné pole
 
 export const useStores = () => {
   const { user, isAdmin } = useAuth();

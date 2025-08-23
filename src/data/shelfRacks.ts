@@ -18,70 +18,7 @@ export interface ShelfRack {
 }
 
 // Initial dummy data for Shelf Racks
-const initialShelfRacks: ShelfRack[] = [
-  {
-    id: "A-1",
-    rowId: "A",
-    rackId: "1",
-    shelves: [
-      { shelfNumber: "1", description: "Homeware" },
-      { shelfNumber: "2", description: "Decorations" },
-      { shelfNumber: "3", description: "Pillows" },
-      { shelfNumber: "4", description: "Textiles" },
-      { shelfNumber: "5", description: "Small Furniture" },
-    ],
-    storeId: "Sklad 1",
-  },
-  {
-    id: "A-2",
-    rowId: "A",
-    rackId: "2",
-    shelves: [
-      { shelfNumber: "1", description: "Electronics" },
-      { shelfNumber: "2", description: "Kitchenware" },
-      { shelfNumber: "3", description: "Books" },
-    ],
-    storeId: "Sklad 1",
-  },
-  {
-    id: "B-1",
-    rowId: "B",
-    rackId: "1",
-    shelves: [
-      { shelfNumber: "1", description: "Large Furniture" },
-      { shelfNumber: "2", description: "Mattresses" },
-      { shelfNumber: "3", description: "Outdoor Furniture" },
-      { shelfNumber: "4", description: "Garden Decor" },
-      { shelfNumber: "5", description: "Storage Boxes" },
-      { shelfNumber: "6", description: "Lamps" },
-      { shelfNumber: "7", description: "Mirrors" },
-      { shelfNumber: "8", description: "Rugs" },
-      { shelfNumber: "9", description: "Curtains" },
-      { shelfNumber: "10", description: "Bedding" },
-    ],
-    storeId: "Sklad 2",
-  },
-  {
-    id: "K-1",
-    rowId: "K",
-    rackId: "1",
-    shelves: [
-      { shelfNumber: "1", description: "Koberce" },
-      { shelfNumber: "2", description: "Zrcadla" },
-    ],
-    storeId: "Kozomín",
-  },
-  {
-    id: "T-1",
-    rowId: "T",
-    rackId: "1",
-    shelves: [
-      { shelfNumber: "1", description: "Stoly" },
-      { shelfNumber: "2", description: "Židle" },
-    ],
-    storeId: "T508",
-  },
-];
+const initialShelfRacks: ShelfRack[] = []; // Nastaveno na prázdné pole
 
 export const useShelfRacks = () => {
   const { userStoreId, isAdmin, user } = useAuth();
