@@ -53,7 +53,7 @@ export const WarehouseLocationDisplay: React.FC<WarehouseLocationDisplayProps> =
         <div className="flex items-center justify-center space-x-3 text-lg">
           <Layers className="h-6 w-6 text-purple-500" />
           <span className="font-semibold">Sklad:</span>
-          <span className="text-gray-700 dark:text-gray-300">{article.warehouseId}</span>
+          <span className="text-gray-700 dark:text-gray-300">{article.storeId}</span>
         </div>
         <div className="flex items-center justify-center space-x-3 text-lg">
           <Info className="h-6 w-6 text-blue-500" /> {/* Nová ikona pro status */}

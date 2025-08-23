@@ -28,37 +28,59 @@ import { useAuth } from "@/hooks/useAuth";
 
 const ManageArticles = () => {
   const { articles, addArticle, updateArticle, deleteArticle } = useArticles();
-  const { isAdmin } = useAuth();
+  const { isAdmin, userStoreId, hasPermission } = useAuth();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [articleToDeleteId, setArticleToDeleteId] = useState<string | null>(null);
+  const [articleToDeleteStoreId, setArticleToDeleteStoreId] = useState<string | null>(null);
+
 
   const handleAddArticle = (newArticle: Article) => {
-    if (articles.some(article => article.id === newArticle.id)) {
-      toast.error(`Článek s ID ${newArticle.id} již existuje.`);
+    if (!hasPermission("article:create")) {
+      toast.error("Nemáte oprávnění přidávat články.");
       return;
     }
-    addArticle(newArticle);
-    toast.success(`Článek ${newArticle.id} byl úspěšně přidán!`);
+    // Ensure the article is added to the user's store if not admin
+    const finalArticle = isAdmin ? newArticle : { ...newArticle, storeId: userStoreId || newArticle.storeId };
+
+    if (articles.some(article => article.id === finalArticle.id && article.storeId === finalArticle.storeId)) {
+      toast.error(`Článek s ID ${finalArticle.id} již existuje v tomto skladu.`);
+      return;
+    }
+    addArticle(finalArticle);
+    toast.success(`Článek ${finalArticle.id} byl úspěšně přidán!`);
   };
 
   const handleEditArticle = (updatedArticle: Article) => {
-    updateArticle(updatedArticle);
-    toast.success(`Článek ${updatedArticle.id} byl úspěšně aktualizován!`);
+    if (!hasPermission("article:update")) {
+      toast.error("Nemáte oprávnění upravovat články.");
+      return;
+    }
+    // Ensure the article is updated within the user's store if not admin
+    const finalArticle = isAdmin ? updatedArticle : { ...updatedArticle, storeId: userStoreId || updatedArticle.storeId };
+
+    updateArticle(finalArticle);
+    toast.success(`Článek ${finalArticle.id} byl úspěšně aktualizován!`);
   };
 
-  const handleDeleteArticle = (id: string) => {
+  const handleDeleteArticle = (id: string, storeId: string) => {
+    if (!hasPermission("article:delete")) {
+      toast.error("Nemáte oprávnění mazat články.");
+      return;
+    }
     setArticleToDeleteId(id);
+    setArticleToDeleteStoreId(storeId);
     setIsDeleteDialogOpen(true);
   };
 
   const confirmDeleteArticle = () => {
-    if (articleToDeleteId) {
-      deleteArticle(articleToDeleteId);
+    if (articleToDeleteId && articleToDeleteStoreId) {
+      deleteArticle(articleToDeleteId, articleToDeleteStoreId);
       toast.success(`Článek ${articleToDeleteId} byl úspěšně smazán!`);
       setArticleToDeleteId(null);
+      setArticleToDeleteStoreId(null);
     }
     setIsDeleteDialogOpen(false);
   };
@@ -74,23 +96,29 @@ const ManageArticles = () => {
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Správa článků</h1>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-            <Link to="/skenovat-carkod" className="w-full sm:w-auto">
-              <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
-                <Scan className="h-4 w-4 mr-2" /> Skenovat
+            {hasPermission("article:scan") && (
+              <Link to="/skenovat-carkod" className="w-full sm:w-auto">
+                <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
+                  <Scan className="h-4 w-4 mr-2" /> Skenovat
+                </Button>
+              </Link>
+            )}
+            {hasPermission("article:mass_add") && (
+              <Link to="/mass-add-articles" className="w-full sm:w-auto">
+                <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
+                  <Boxes className="h-4 w-4 mr-2" /> Hromadné přidání
+                </Button>
+              </Link>
+            )}
+            {hasPermission("article:create") && (
+              <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">
+                <PlusCircle className="h-4 w-4 mr-2" /> Přidat článek
               </Button>
-            </Link>
-            <Link to="/mass-add-articles" className="w-full sm:w-auto"> {/* New button for mass add */}
-              <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
-                <Boxes className="h-4 w-4 mr-2" /> Hromadné přidání
-              </Button>
-            </Link>
-            <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">
-              <PlusCircle className="h-4 w-4 mr-2" /> Přidat článek
-            </Button>
+            )}
           </div>
         </div>
 
-        <div className="overflow-x-auto"> {/* Obalení tabulky pro horizontální posouvání */}
+        <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -107,7 +135,7 @@ const ManageArticles = () => {
             </TableHeader>
             <TableBody>
               {articles.map((article) => (
-                <TableRow key={article.id}>
+                <TableRow key={`${article.id}-${article.storeId}`}>
                   <TableCell className="font-medium">{article.id}</TableCell>
                   <TableCell>{article.name}</TableCell>
                   <TableCell>{article.rackId}</TableCell>
@@ -115,26 +143,30 @@ const ManageArticles = () => {
                   <TableCell>{article.location}</TableCell>
                   <TableCell>{article.floor}</TableCell>
                   <TableCell>{article.status}</TableCell>
-                  {isAdmin && <TableCell>{article.warehouseId}</TableCell>}
+                  {isAdmin && <TableCell>{article.storeId}</TableCell>}
                   <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="mr-2"
-                      onClick={() => {
-                        setEditingArticle(article);
-                        setIsEditDialogOpen(true);
-                      }}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteArticle(article.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {hasPermission("article:update") && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mr-2"
+                        onClick={() => {
+                          setEditingArticle(article);
+                          setIsEditDialogOpen(true);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {hasPermission("article:delete") && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteArticle(article.id, article.storeId)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -170,7 +202,8 @@ const ManageArticles = () => {
             <AlertDialogTitle>Jste si naprosto jisti?</AlertDialogTitle>
             <AlertDialogDescription>
               Tuto akci nelze vrátit zpět. Tímto trvale smažete článek{" "}
-              <span className="font-semibold">{articleToDeleteId}</span> z vašeho inventáře.
+              <span className="font-semibold">{articleToDeleteId}</span> ze skladu{" "}
+              <span className="font-semibold">{articleToDeleteStoreId}</span> z vašeho inventáře.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

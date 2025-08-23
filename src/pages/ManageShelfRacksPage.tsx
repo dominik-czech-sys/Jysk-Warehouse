@@ -24,34 +24,54 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useShelfRacks, ShelfRack } from "@/data/shelfRacks";
+import { toast } from "sonner";
 
 const ManageShelfRacksPage: React.FC = () => {
   const { shelfRacks, addShelfRack, updateShelfRack, deleteShelfRack } = useShelfRacks();
-  const { isAdmin } = useAuth();
+  const { isAdmin, userStoreId, hasPermission } = useAuth();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingRack, setEditingRack] = useState<ShelfRack | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [rackToDeleteId, setRackToDeleteId] = useState<string | null>(null);
+  const [rackToDeleteStoreId, setRackToDeleteStoreId] = useState<string | null>(null);
 
   const handleAddShelfRack = (newRack: ShelfRack) => {
-    return addShelfRack(newRack);
+    if (!hasPermission("rack:create")) {
+      toast.error("Nemáte oprávnění přidávat regály.");
+      return false;
+    }
+    // Ensure the rack is added to the user's store if not admin
+    const finalRack = isAdmin ? newRack : { ...newRack, storeId: userStoreId || newRack.storeId };
+    return addShelfRack(finalRack);
   };
 
   const handleEditShelfRack = (updatedRack: ShelfRack) => {
-    updateShelfRack(updatedRack);
+    if (!hasPermission("rack:update")) {
+      toast.error("Nemáte oprávnění upravovat regály.");
+      return false;
+    }
+    // Ensure the rack is updated within the user's store if not admin
+    const finalRack = isAdmin ? updatedRack : { ...updatedRack, storeId: userStoreId || updatedRack.storeId };
+    updateShelfRack(finalRack);
     return true;
   };
 
-  const handleDeleteShelfRack = (id: string) => {
+  const handleDeleteShelfRack = (id: string, storeId: string) => {
+    if (!hasPermission("rack:delete")) {
+      toast.error("Nemáte oprávnění mazat regály.");
+      return;
+    }
     setRackToDeleteId(id);
+    setRackToDeleteStoreId(storeId);
     setIsDeleteDialogOpen(true);
   };
 
   const confirmDeleteShelfRack = () => {
-    if (rackToDeleteId) {
-      deleteShelfRack(rackToDeleteId);
+    if (rackToDeleteId && rackToDeleteStoreId) {
+      deleteShelfRack(rackToDeleteId, rackToDeleteStoreId);
       setRackToDeleteId(null);
+      setRackToDeleteStoreId(null);
     }
     setIsDeleteDialogOpen(false);
   };
@@ -60,15 +80,17 @@ const ManageShelfRacksPage: React.FC = () => {
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
       <div className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-8">
         <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-6 space-y-4 sm:space-y-0">
-          <Link to="/admin/uzivatele" className="w-full sm:w-auto">
+          <Link to="/" className="w-full sm:w-auto">
             <Button variant="outline" className="flex items-center w-full">
-              <ArrowLeft className="h-4 w-4 mr-2" /> Zpět na správu uživatelů
+              <ArrowLeft className="h-4 w-4 mr-2" /> Zpět na hlavní stránku
             </Button>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Správa regálů</h1>
-          <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">
-            <PlusCircle className="h-4 w-4 mr-2" /> Přidat regál
-          </Button>
+          {hasPermission("rack:create") && (
+            <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">
+              <PlusCircle className="h-4 w-4 mr-2" /> Přidat regál
+            </Button>
+          )}
         </div>
 
         <div className="overflow-x-auto">
@@ -80,42 +102,46 @@ const ManageShelfRacksPage: React.FC = () => {
                 <TableHead className="min-w-[80px]">Regál</TableHead>
                 <TableHead className="min-w-[120px]">Umístění</TableHead>
                 <TableHead className="min-w-[80px]">Patro</TableHead>
-                <TableHead className="min-w-[100px]">Počet polic</TableHead>
-                <TableHead className="min-w-[150px]">Popis</TableHead>
+                <TableHead className="min-w-[150px]">Police (Popis)</TableHead>
                 {isAdmin && <TableHead className="min-w-[100px]">ID Skladu</TableHead>}
                 <TableHead className="text-right min-w-[100px]">Akce</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {shelfRacks.map((rack) => (
-                <TableRow key={rack.id}>
+                <TableRow key={`${rack.id}-${rack.storeId}`}>
                   <TableCell className="font-medium">{rack.id}</TableCell>
                   <TableCell>{rack.rowId}</TableCell>
                   <TableCell>{rack.rackId}</TableCell>
                   <TableCell>{rack.location}</TableCell>
                   <TableCell>{rack.floor}</TableCell>
-                  <TableCell>{rack.numberOfShelves}</TableCell>
-                  <TableCell>{rack.description}</TableCell>
-                  {isAdmin && <TableCell>{rack.warehouseId}</TableCell>}
+                  <TableCell>
+                    {rack.shelves.map(s => `P${s.shelfNumber}: ${s.description}`).join('; ')}
+                  </TableCell>
+                  {isAdmin && <TableCell>{rack.storeId}</TableCell>}
                   <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="mr-2"
-                      onClick={() => {
-                        setEditingRack(rack);
-                        setIsEditDialogOpen(true);
-                      }}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteShelfRack(rack.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {hasPermission("rack:update") && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mr-2"
+                        onClick={() => {
+                          setEditingRack(rack);
+                          setIsEditDialogOpen(true);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {hasPermission("rack:delete") && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteShelfRack(rack.id, rack.storeId)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -151,7 +177,8 @@ const ManageShelfRacksPage: React.FC = () => {
             <AlertDialogTitle>Jste si naprosto jisti?</AlertDialogTitle>
             <AlertDialogDescription>
               Tuto akci nelze vrátit zpět. Tímto trvale smažete regál{" "}
-              <span className="font-semibold">{rackToDeleteId}</span> ze systému.
+              <span className="font-semibold">{rackToDeleteId}</span> ze skladu{" "}
+              <span className="font-semibold">{rackToDeleteStoreId}</span> ze systému.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

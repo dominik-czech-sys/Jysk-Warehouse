@@ -29,7 +29,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
   onSubmit,
   article,
 }) => {
-  const { userWarehouseId } = useAuth();
+  const { userStoreId } = useAuth();
   const { shelfRacks } = useShelfRacks();
 
   const [formData, setFormData] = useState<Article>({
@@ -39,7 +39,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
     shelfNumber: "",
     location: "",
     floor: "",
-    warehouseId: userWarehouseId || "",
+    storeId: userStoreId || "",
     status: "",
   });
   const [selectedRackId, setSelectedRackId] = useState<string>("");
@@ -58,25 +58,25 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
         shelfNumber: "",
         location: "",
         floor: "",
-        warehouseId: userWarehouseId || "",
+        storeId: userStoreId || "",
         status: "",
       });
       setSelectedRackId("");
       setSelectedShelfNumber("");
     }
-  }, [article, isOpen, userWarehouseId, shelfRacks]);
+  }, [article, isOpen, userStoreId, shelfRacks]);
 
   useEffect(() => {
-    const currentRack = shelfRacks.find(rack => rack.id === selectedRackId);
+    const currentRack = shelfRacks.find(rack => rack.id === selectedRackId && rack.storeId === formData.storeId);
     if (currentRack) {
-      const selectedShelf = currentRack.shelves.find(s => s.shelfNumber === selectedShelfNumber);
+      // Update location, floor, and storeId from the selected rack
       setFormData(prev => ({
         ...prev,
         rackId: currentRack.id,
         shelfNumber: selectedShelfNumber,
         location: currentRack.location,
         floor: currentRack.floor,
-        warehouseId: currentRack.warehouseId,
+        storeId: currentRack.storeId,
       }));
     } else if (!article) { // Clear if no rack selected and not editing an existing article
       setFormData(prev => ({
@@ -85,10 +85,10 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
         shelfNumber: "",
         location: "",
         floor: "",
-        warehouseId: userWarehouseId || "",
+        storeId: userStoreId || "",
       }));
     }
-  }, [selectedRackId, selectedShelfNumber, shelfRacks, userWarehouseId, article]);
+  }, [selectedRackId, selectedShelfNumber, shelfRacks, userStoreId, formData.storeId, article]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -115,7 +115,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
   };
 
   const availableShelves = selectedRackId
-    ? shelfRacks.find(r => r.id === selectedRackId)?.shelves || []
+    ? shelfRacks.find(r => r.id === selectedRackId && r.storeId === formData.storeId)?.shelves || []
     : [];
 
   return (
@@ -126,7 +126,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           <DialogDescription>
             {article ? "Zde můžete provést změny v článku." : "Přidejte nový článek do skladového inventáře."}
           </DialogDescription>
-        </DialogHeader>
+        </CardHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="id" className="sm:text-right">
@@ -162,9 +162,9 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
                 <SelectValue placeholder="Vyberte regál" />
               </SelectTrigger>
               <SelectContent>
-                {shelfRacks.filter(rack => !userWarehouseId || rack.warehouseId === userWarehouseId).map((rack) => (
+                {shelfRacks.filter(rack => !userStoreId || rack.storeId === userStoreId).map((rack) => (
                   <SelectItem key={rack.id} value={rack.id}>
-                    {rack.rowId}-{rack.rackId} ({rack.description}) - {rack.warehouseId}
+                    {rack.rowId}-{rack.rackId} ({rack.shelves.map(s => s.description).join(', ')}) - {rack.storeId}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -204,10 +204,10 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
             <Input id="floor" value={formData.floor} readOnly className="col-span-3 bg-gray-100 dark:bg-gray-700" />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="warehouseId" className="sm:text-right">
+            <Label htmlFor="storeId" className="sm:text-right">
               ID Skladu
             </Label>
-            <Input id="warehouseId" value={formData.warehouseId} readOnly className="col-span-3 bg-gray-100 dark:bg-gray-700" />
+            <Input id="storeId" value={formData.storeId} readOnly className="col-span-3 bg-gray-100 dark:bg-gray-700" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">

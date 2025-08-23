@@ -20,11 +20,11 @@ interface ShelfDetails {
   shelfNumber: string;
   location: string;
   floor: string;
-  warehouseId: string;
+  storeId: string; // Renamed from warehouseId
 }
 
 const MassAddArticlesPage: React.FC = () => {
-  const { userWarehouseId, user } = useAuth();
+  const { userStoreId, user } = useAuth();
   const { addArticle, updateArticle, getArticleById } = useArticles();
   const { addLogEntry } = useLog();
   const { shelfRacks } = useShelfRacks();
@@ -35,7 +35,7 @@ const MassAddArticlesPage: React.FC = () => {
     shelfNumber: "",
     location: "",
     floor: "",
-    warehouseId: userWarehouseId || "",
+    storeId: userStoreId || "",
   });
   const [isShelfDetailsLocked, setIsShelfDetailsLocked] = useState(false);
   const [articlesToProcess, setArticlesToProcess] = useState<Article[]>([]);
@@ -83,15 +83,15 @@ const MassAddArticlesPage: React.FC = () => {
   }, [isScannerActive, shelfDetails, user?.username]);
 
   useEffect(() => {
-    const currentRack = shelfRacks.find(rack => rack.id === selectedRackId);
+    const currentRack = shelfRacks.find(rack => rack.id === selectedRackId && rack.storeId === userStoreId);
     if (currentRack) {
-      const selectedShelf = currentRack.shelves.find(s => s.shelfNumber === selectedShelfNumber);
+      // Update location, floor, and storeId from the selected rack
       setShelfDetails({
         rackId: currentRack.id,
         shelfNumber: selectedShelfNumber,
         location: currentRack.location,
         floor: currentRack.floor,
-        warehouseId: currentRack.warehouseId,
+        storeId: currentRack.storeId,
       });
     } else {
       setShelfDetails({
@@ -99,10 +99,10 @@ const MassAddArticlesPage: React.FC = () => {
         shelfNumber: "",
         location: "",
         floor: "",
-        warehouseId: userWarehouseId || "",
+        storeId: userStoreId || "",
       });
     }
-  }, [selectedRackId, selectedShelfNumber, shelfRacks, userWarehouseId]);
+  }, [selectedRackId, selectedShelfNumber, shelfRacks, userStoreId]);
 
   const handleRackSelect = (value: string) => {
     setSelectedRackId(value);
@@ -141,8 +141,8 @@ const MassAddArticlesPage: React.FC = () => {
     };
 
     // Check if this article is already in the current session's list
-    if (articlesToProcess.some(a => a.id === newArticleData.id)) {
-      toast.warning(`Článek ${newArticleData.id} je již v seznamu pro zpracování.`);
+    if (articlesToProcess.some(a => a.id === newArticleData.id && a.storeId === newArticleData.storeId)) {
+      toast.warning(`Článek ${newArticleData.id} je již v seznamu pro zpracování pro tento sklad.`);
       return;
     }
 
@@ -167,13 +167,13 @@ const MassAddArticlesPage: React.FC = () => {
     }
 
     articlesToProcess.forEach(article => {
-      const existing = getArticleById(article.id);
-      if (existing) {
+      const existing = getArticleById(article.id); // This will check only within the current user's store
+      if (existing && existing.storeId === article.storeId) {
         updateArticle(article); // Update existing article with new location
-        addLogEntry("Článek aktualizován (hromadné přidání)", { articleId: article.id, newRackId: article.rackId, newShelfNumber: article.shelfNumber }, user?.username);
+        addLogEntry("Článek aktualizován (hromadné přidání)", { articleId: article.id, newRackId: article.rackId, newShelfNumber: article.shelfNumber, storeId: article.storeId }, user?.username);
       } else {
         addArticle(article); // Add new article
-        addLogEntry("Článek přidán (hromadné přidání)", { articleId: article.id, rackId: article.rackId, shelfNumber: article.shelfNumber }, user?.username);
+        addLogEntry("Článek přidán (hromadné přidání)", { articleId: article.id, rackId: article.rackId, shelfNumber: article.shelfNumber, storeId: article.storeId }, user?.username);
       }
     });
 
@@ -186,7 +186,7 @@ const MassAddArticlesPage: React.FC = () => {
   };
 
   const availableShelves = selectedRackId
-    ? shelfRacks.find(r => r.id === selectedRackId)?.shelves || []
+    ? shelfRacks.find(r => r.id === selectedRackId && r.storeId === userStoreId)?.shelves || []
     : [];
 
   return (
@@ -215,9 +215,9 @@ const MassAddArticlesPage: React.FC = () => {
                   <SelectValue placeholder="Vyberte regál" />
                 </SelectTrigger>
                 <SelectContent>
-                  {shelfRacks.filter(rack => !userWarehouseId || rack.warehouseId === userWarehouseId).map((rack) => (
+                  {shelfRacks.filter(rack => !userStoreId || rack.storeId === userStoreId).map((rack) => (
                     <SelectItem key={rack.id} value={rack.id}>
-                      {rack.rowId}-{rack.rackId} ({rack.description}) - {rack.warehouseId}
+                      {rack.rowId}-{rack.rackId} ({rack.shelves.map(s => s.description).join(', ')}) - {rack.storeId}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -247,8 +247,8 @@ const MassAddArticlesPage: React.FC = () => {
               <Input id="floor" value={shelfDetails.floor} readOnly className="mt-1 bg-gray-100 dark:bg-gray-700" />
             </div>
             <div>
-              <Label htmlFor="warehouseId">ID Skladu</Label>
-              <Input id="warehouseId" value={shelfDetails.warehouseId} readOnly className="mt-1 bg-gray-100 dark:bg-gray-700" />
+              <Label htmlFor="storeId">ID Skladu</Label>
+              <Input id="storeId" value={shelfDetails.storeId} readOnly className="mt-1 bg-gray-100 dark:bg-gray-700" />
             </div>
             <div className="md:col-span-2 flex justify-end">
               <Button onClick={handleLockShelfDetails} disabled={isShelfDetailsLocked || !selectedRackId || !selectedShelfNumber} className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">

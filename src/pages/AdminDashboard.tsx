@@ -28,7 +28,7 @@ import { User } from "@/data/users";
 import { LogViewer } from "@/components/LogViewer";
 
 const AdminDashboard: React.FC = () => {
-  const { allUsers, addUser, updateUser, deleteUser } = useAuth();
+  const { allUsers, addUser, updateUser, deleteUser, isAdmin, userStoreId, hasPermission } = useAuth();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -37,14 +37,30 @@ const AdminDashboard: React.FC = () => {
   const [isLogViewerOpen, setIsLogViewerOpen] = useState(false);
 
   const handleAddUser = (newUser: User) => {
-    addUser(newUser);
+    if (!hasPermission("user:create")) {
+      toast.error("Nemáte oprávnění přidávat uživatele.");
+      return;
+    }
+    // If not admin, ensure the user is created for the current store
+    const finalUser = isAdmin ? newUser : { ...newUser, storeId: userStoreId || newUser.storeId };
+    addUser(finalUser);
   };
 
   const handleEditUser = (updatedUser: User) => {
-    updateUser(updatedUser);
+    if (!hasPermission("user:update")) {
+      toast.error("Nemáte oprávnění upravovat uživatele.");
+      return;
+    }
+    // If not admin, ensure the user is updated within the current store
+    const finalUser = isAdmin ? updatedUser : { ...updatedUser, storeId: userStoreId || updatedUser.storeId };
+    updateUser(finalUser);
   };
 
   const handleDeleteUser = (username: string) => {
+    if (!hasPermission("user:delete")) {
+      toast.error("Nemáte oprávnění mazat uživatele.");
+      return;
+    }
     setUserToDeleteUsername(username);
     setIsDeleteDialogOpen(true);
   };
@@ -57,6 +73,11 @@ const AdminDashboard: React.FC = () => {
     setIsDeleteDialogOpen(false);
   };
 
+  // Filter users based on current user's storeId if not admin
+  const usersToDisplay = isAdmin
+    ? allUsers
+    : allUsers.filter(u => u.storeId === userStoreId);
+
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
       <div className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-8">
@@ -68,13 +89,16 @@ const AdminDashboard: React.FC = () => {
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Správa uživatelů</h1>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-            {/* Removed direct link to /admin/regaly as it's now in ManagementMenu on Index.tsx */}
-            <Button onClick={() => setIsLogViewerOpen(true)} className="flex items-center bg-gray-600 hover:bg-gray-700 text-white w-full sm:w-auto">
-              <ScrollText className="h-4 w-4 mr-2" /> Zobrazit Log
-            </Button>
-            <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">
-              <PlusCircle className="h-4 w-4 mr-2" /> Přidat uživatele
-            </Button>
+            {hasPermission("log:view") && (
+              <Button onClick={() => setIsLogViewerOpen(true)} className="flex items-center bg-gray-600 hover:bg-gray-700 text-white w-full sm:w-auto">
+                <ScrollText className="h-4 w-4 mr-2" /> Zobrazit Log
+              </Button>
+            )}
+            {hasPermission("user:create") && (
+              <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">
+                <PlusCircle className="h-4 w-4 mr-2" /> Přidat uživatele
+              </Button>
+            )}
           </div>
         </div>
 
@@ -89,30 +113,34 @@ const AdminDashboard: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {allUsers.map((user) => (
+              {usersToDisplay.map((user) => (
                 <TableRow key={user.username}>
                   <TableCell className="font-medium">{user.username}</TableCell>
-                  <TableCell>{user.role === "admin" ? "Admin" : "Skladník"}</TableCell>
-                  <TableCell>{user.warehouseId || "N/A"}</TableCell>
+                  <TableCell>{user.role === "admin" ? "Admin" : user.role}</TableCell>
+                  <TableCell>{user.storeId || "N/A"}</TableCell>
                   <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="mr-2"
-                      onClick={() => {
-                        setEditingUser(user);
-                        setIsEditDialogOpen(true);
-                      }}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteUser(user.username)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {hasPermission("user:update") && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mr-2"
+                        onClick={() => {
+                          setEditingUser(user);
+                          setIsEditDialogOpen(true);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {hasPermission("user:delete") && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteUser(user.username)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -120,7 +148,7 @@ const AdminDashboard: React.FC = () => {
           </Table>
         </div>
 
-        {allUsers.length === 0 && (
+        {usersToDisplay.length === 0 && (
           <p className="text-center text-muted-foreground mt-4">Žádní uživatelé nebyli nalezeni. Přidejte nového!</p>
         )}
       </div>

@@ -14,7 +14,7 @@ import { ManagementMenu } from "@/components/ManagementMenu"; // Import new Mana
 const Index = () => {
   const { getArticleById, articles } = useArticles();
   const [foundArticle, setFoundArticle] = useState<Article | null>(null);
-  const { logout, isAdmin, user, userWarehouseId } = useAuth();
+  const { logout, isAdmin, user, userStoreId, hasPermission } = useAuth();
   const { addLogEntry } = useLog(); // Použití useLog
   const [searchParams] = useSearchParams();
   const [iframeSrc, setIframeSrc] = useState<string | null>(null);
@@ -54,7 +54,7 @@ const Index = () => {
           <h1 className="text-4xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light text-center md:text-left">JYSK Sklad</h1>
           {user && (
             <span className="text-lg text-gray-700 dark:text-gray-300 text-center md:text-left">
-              Přihlášen jako: <span className="font-semibold">{user.username}</span> ({user.role === "admin" ? "Admin" : `Skladník - ${userWarehouseId}`})
+              Přihlášen jako: <span className="font-semibold">{user.username}</span> ({user.role === "admin" ? "Admin" : `Skladník - ${userStoreId}`})
             </span>
           )}
         </div>
@@ -66,7 +66,7 @@ const Index = () => {
               </Button>
             </Link>
           )}
-          <ManagementMenu /> {/* Use the new ManagementMenu component */}
+          {(hasPermission("article:view") || hasPermission("rack:view")) && <ManagementMenu />} {/* Use the new ManagementMenu component */}
           <Button onClick={logout} variant="outline" className="flex items-center w-full sm:w-auto">
             <LogOut className="h-4 w-4 mr-2" /> Odhlásit se
           </Button>
@@ -83,11 +83,13 @@ const Index = () => {
         <WarehouseLocationDisplay article={foundArticle} />
       </div>
       <div className="mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full max-w-sm">
-        <Link to="/skenovat-carkod" className="w-full">
-          <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
-            <Scan className="h-4 w-4 mr-2" /> Skenovat čárový kód
-          </Button>
-        </Link>
+        {hasPermission("article:scan") && (
+          <Link to="/skenovat-carkod" className="w-full">
+            <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
+              <Scan className="h-4 w-4 mr-2" /> Skenovat čárový kód
+            </Button>
+          </Link>
+        )}
       </div>
 
       {/* Přesunutá tlačítka do patičky */}

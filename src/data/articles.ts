@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLog } from "@/contexts/LogContext"; // Import useLog
+import { useShelfRacks } from "./shelfRacks"; // Import useShelfRacks to get rack details
 
 export interface Article {
   id: string; // Číslo článku (Article Number)
@@ -9,10 +10,12 @@ export interface Article {
   shelfNumber: string; // The specific shelf number within the rack (e.g., "1", "2")
   location: string; // Derived from ShelfRack
   floor: string;    // Derived from ShelfRack
-  warehouseId: string; // Derived from ShelfRack
+  storeId: string; // Derived from ShelfRack (renamed from warehouseId)
   status: string; // Nové pole pro status zboží
 }
 
+// Initial dummy data for Articles
+// This data will be assigned to a default store and racks for demonstration
 const rawArticleData = `
 3600118 (21)	Lavice BADSTED s úložným prostorem sv. šedý potah/barva dubu	1 KS	2 KS	2 299,00 CZK	2 299,00 CZK	31-12-9998	07-05-2025
 3600181 (11)	Botník BORNHOLM 4 police černá	39 KS	40 KS	200,00 CZK	200,00 CZK		28-01-2022
@@ -216,49 +219,57 @@ const rawArticleData = `
 3650097 (11)	Nástěnná police ALLESTED 2 police bílá/divoký přírodní dub	2 KS	3 KS	699,00 CZK
 `;
 
-const parseArticleData = (data: string): Article[] => {
-  const lines = data.trim().split('\n');
-  const parsedArticles: Article[] = [];
-
-  lines.forEach(line => {
-    const match = line.match(/^(\d+) \((\d+)\)\s+(.+?)\s+\d+\s+KS\s+\d+\s+KS/);
-    if (match) {
-      const id = match[1];
-      const status = match[2];
-      const name = match[3].trim();
-
-      // Assign dummy rackId, shelfNumber, location, floor, warehouseId for initial data
-      // In a real scenario, this would be more sophisticated or left empty
-      const dummyRackId = Math.random() > 0.5 ? "A-1" : "B-1";
-      const dummyShelfNumber = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3
-      const dummyLocation = dummyRackId.startsWith("A") ? "Ulička A" : "Ulička B";
-      const dummyFloor = dummyRackId.startsWith("A") ? "Patro 1" : "Patro 2";
-      const dummyWarehouseId = dummyRackId.startsWith("A") ? "Sklad 1" : "Sklad 2";
-
-
-      parsedArticles.push({
-        id,
-        name,
-        status,
-        rackId: dummyRackId,
-        shelfNumber: dummyShelfNumber.toString(),
-        location: dummyLocation,
-        floor: dummyFloor,
-        warehouseId: dummyWarehouseId,
-      });
-    }
-  });
-  return parsedArticles;
-};
-
-const initialArticles: Article[] = parseArticleData(rawArticleData);
-
 export const useArticles = () => {
-  const { userWarehouseId, isAdmin, user } = useAuth(); // Get user from useAuth
-  const { addLogEntry } = useLog(); // Použití useLog
+  const { userStoreId, isAdmin, user } = useAuth();
+  const { addLogEntry } = useLog();
+  const { shelfRacks } = useShelfRacks(); // Use the shelfRacks hook
+
   const [articles, setArticles] = useState<Article[]>(() => {
     const storedArticles = localStorage.getItem("articles");
-    return storedArticles ? JSON.parse(storedArticles) : initialArticles;
+    if (storedArticles) {
+      return JSON.parse(storedArticles);
+    } else {
+      // Assign initial articles to a default store and rack for demonstration
+      const parsedArticles: Article[] = [];
+      const lines = rawArticleData.trim().split('\n');
+      lines.forEach(line => {
+        const match = line.match(/^(\d+) \((\d+)\)\s+(.+?)\s+\d+\s+KS\s+\d+\s+KS/);
+        if (match) {
+          const id = match[1];
+          const status = match[2];
+          const name = match[3].trim();
+
+          // Assign to a default rack (e.g., "A-1" in "Sklad 1")
+          const defaultRack = shelfRacks.find(r => r.id === "A-1" && r.storeId === "Sklad 1");
+          if (defaultRack && defaultRack.shelves.length > 0) {
+            const randomShelf = defaultRack.shelves[Math.floor(Math.random() * defaultRack.shelves.length)];
+            parsedArticles.push({
+              id,
+              name,
+              status,
+              rackId: defaultRack.id,
+              shelfNumber: randomShelf.shelfNumber,
+              location: defaultRack.location,
+              floor: defaultRack.floor,
+              storeId: defaultRack.storeId,
+            });
+          } else {
+            // Fallback if default rack not found or has no shelves
+            parsedArticles.push({
+              id,
+              name,
+              status,
+              rackId: "N/A",
+              shelfNumber: "N/A",
+              location: "N/A",
+              floor: "N/A",
+              storeId: "Sklad 1", // Assign to a default store
+            });
+          }
+        }
+      });
+      return parsedArticles;
+    }
   });
 
   useEffect(() => {
@@ -267,25 +278,25 @@ export const useArticles = () => {
 
   const filteredArticles = isAdmin
     ? articles
-    : articles.filter((article) => article.warehouseId === userWarehouseId);
+    : articles.filter((article) => article.storeId === userStoreId);
 
   const getArticleById = (id: string) => filteredArticles.find((article) => article.id === id);
 
   const addArticle = (newArticle: Article) => {
     setArticles((prev) => [...prev, newArticle]);
-    addLogEntry("Článek přidán", { articleId: newArticle.id, name: newArticle.name, rackId: newArticle.rackId, shelfNumber: newArticle.shelfNumber, warehouseId: newArticle.warehouseId }, user?.username); // Pass username
+    addLogEntry("Článek přidán", { articleId: newArticle.id, name: newArticle.name, rackId: newArticle.rackId, shelfNumber: newArticle.shelfNumber, storeId: newArticle.storeId }, user?.username);
   };
 
   const updateArticle = (updatedArticle: Article) => {
     setArticles((prev) =>
-      prev.map((article) => (article.id === updatedArticle.id ? updatedArticle : article))
+      prev.map((article) => (article.id === updatedArticle.id && article.storeId === updatedArticle.storeId ? updatedArticle : article))
     );
-    addLogEntry("Článek aktualizován", { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, warehouseId: updatedArticle.warehouseId }, user?.username); // Pass username
+    addLogEntry("Článek aktualizován", { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, storeId: updatedArticle.storeId }, user?.username);
   };
 
-  const deleteArticle = (id: string) => {
-    setArticles((prev) => prev.filter((article) => article.id !== id));
-    addLogEntry("Článek smazán", { articleId: id }, user?.username); // Pass username
+  const deleteArticle = (id: string, storeId: string) => {
+    setArticles((prev) => prev.filter((article) => !(article.id === id && article.storeId === storeId)));
+    addLogEntry("Článek smazán", { articleId: id, storeId }, user?.username);
   };
 
   return { articles: filteredArticles, getArticleById, addArticle, updateArticle, deleteArticle };

@@ -10,9 +10,26 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { User } from "@/data/users";
+import { User, Permission, defaultPermissions } from "@/data/users";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuth } from "@/hooks/useAuth";
+import { Checkbox } from "@/components/ui/checkbox";
+
+// Define all possible permissions for display
+const allPermissions: Permission[] = [
+  "user:view", "user:create", "user:update", "user:delete",
+  "rack:view", "rack:create", "rack:update", "rack:delete",
+  "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add",
+  "log:view",
+  "default_articles:manage",
+  "article:copy_from_store",
+];
+
+// Helper to format permission names for display
+const formatPermissionName = (permission: Permission) => {
+  return permission.replace(/([A-Z])/g, ' $1').replace(':', ': ').toUpperCase();
+};
 
 interface UserFormDialogProps {
   isOpen: boolean;
@@ -27,11 +44,13 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
   onSubmit,
   user,
 }) => {
+  const { isAdmin, userStoreId: currentUserStoreId } = useAuth();
   const [formData, setFormData] = useState<User>({
     username: "",
     password: "",
     role: "skladnik",
-    warehouseId: "",
+    storeId: currentUserStoreId || "",
+    permissions: defaultPermissions["skladnik"],
   });
 
   useEffect(() => {
@@ -42,24 +61,39 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
         username: "",
         password: "",
         role: "skladnik",
-        warehouseId: "",
+        storeId: currentUserStoreId || "",
+        permissions: defaultPermissions["skladnik"],
       });
     }
-  }, [user, isOpen]);
+  }, [user, isOpen, currentUserStoreId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleRoleChange = (value: "admin" | "skladnik") => {
-    setFormData((prev) => ({ ...prev, role: value, warehouseId: value === "admin" ? undefined : prev.warehouseId }));
+  const handleRoleChange = (value: User['role']) => {
+    setFormData((prev) => ({
+      ...prev,
+      role: value,
+      storeId: value === "admin" ? undefined : (prev.storeId || currentUserStoreId || ""), // Admin doesn't need storeId
+      permissions: defaultPermissions[value] || [], // Set default permissions for the role
+    }));
+  };
+
+  const handlePermissionChange = (permission: Permission, checked: boolean) => {
+    setFormData((prev) => {
+      const newPermissions = checked
+        ? [...prev.permissions, permission]
+        : prev.permissions.filter((p) => p !== permission);
+      return { ...prev, permissions: newPermissions };
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.username || !formData.password || !formData.role || (formData.role === "skladnik" && !formData.warehouseId)) {
-      toast.error("Prosím, vyplňte všechna pole.");
+    if (!formData.username || !formData.password || !formData.role || (!formData.storeId && formData.role !== "admin")) {
+      toast.error("Prosím, vyplňte všechna povinná pole.");
       return;
     }
     onSubmit(formData);
@@ -68,7 +102,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{user ? "Upravit uživatele" : "Přidat nového uživatele"}</DialogTitle>
           <DialogDescription>
@@ -109,26 +143,52 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
                 <SelectValue placeholder="Vyberte roli" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="admin">Admin</SelectItem>
+                {isAdmin && <SelectItem value="admin">Admin</SelectItem>}
+                <SelectItem value="vedouci_skladu">Vedoucí Skladu (LR)</SelectItem>
+                <SelectItem value="store_manager">Store Manager (SM)</SelectItem>
+                <SelectItem value="deputy_store_manager">Deputy Store Manager (DSM)</SelectItem>
+                <SelectItem value="ar_assistant_of_sale">AR Assistant Of Sale</SelectItem>
                 <SelectItem value="skladnik">Skladník</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          {formData.role === "skladnik" && (
+          {formData.role !== "admin" && (
             <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-              <Label htmlFor="warehouseId" className="sm:text-right">
+              <Label htmlFor="storeId" className="sm:text-right">
                 ID Skladu
               </Label>
               <Input
-                id="warehouseId"
-                value={formData.warehouseId || ""}
+                id="storeId"
+                value={formData.storeId || ""}
                 onChange={handleChange}
                 className="col-span-3"
+                readOnly={!isAdmin && !!currentUserStoreId} // Non-admin can't change storeId if they have one
                 placeholder="Např. Sklad 1"
               />
             </div>
           )}
-          <DialogFooter>
+
+          {/* Permissions Management */}
+          <div className="col-span-full mt-4">
+            <Label className="text-base font-semibold mb-2 block">Oprávnění</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {allPermissions.map((permission) => (
+                <div key={permission} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={permission}
+                    checked={formData.permissions.includes(permission)}
+                    onCheckedChange={(checked) => handlePermissionChange(permission, !!checked)}
+                    disabled={!isAdmin && formData.role === "admin"} // Only admin can change admin permissions
+                  />
+                  <Label htmlFor={permission} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    {formatPermissionName(permission)}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <DialogFooter className="col-span-full mt-4">
             <Button type="submit" className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
               {user ? "Uložit změny" : "Přidat uživatele"}
             </Button>

@@ -28,15 +28,15 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
   onSubmit,
   rack,
 }) => {
-  const { userWarehouseId } = useAuth();
+  const { userStoreId } = useAuth();
   const [formData, setFormData] = useState<ShelfRack>({
     id: "",
     rowId: "",
     rackId: "",
-    location: "",
-    floor: "",
+    location: "", // Will be derived/set by store layout, not directly input here
+    floor: "",    // Will be derived/set by store layout, not directly input here
     shelves: [{ shelfNumber: "1", description: "" }], // Initialize with one shelf
-    warehouseId: userWarehouseId || "",
+    storeId: userStoreId || "",
   });
 
   useEffect(() => {
@@ -50,10 +50,10 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
         location: "",
         floor: "",
         shelves: [{ shelfNumber: "1", description: "" }],
-        warehouseId: userWarehouseId || "",
+        storeId: userStoreId || "",
       });
     }
-  }, [rack, isOpen, userWarehouseId]);
+  }, [rack, isOpen, userStoreId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -87,7 +87,7 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.rowId || !formData.rackId || !formData.location || !formData.floor || !formData.warehouseId || formData.shelves.length === 0 || formData.shelves.some(s => !s.description.trim())) {
+    if (!formData.rowId || !formData.rackId || !formData.storeId || formData.shelves.length === 0 || formData.shelves.some(s => !s.description.trim())) {
       toast.error("Prosím, vyplňte všechna pole, včetně popisu pro každou polici.");
       return;
     }
@@ -95,6 +95,10 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
     const finalFormData = {
       ...formData,
       id: rack ? formData.id : `${formData.rowId}-${formData.rackId}`.toUpperCase(),
+      // For now, location and floor are hardcoded or left empty as they are not input directly
+      // In a real app, these would be derived from a store's layout configuration
+      location: formData.location || "Neznámé umístění",
+      floor: formData.floor || "Neznámé patro",
     };
 
     if (onSubmit(finalFormData)) {
@@ -138,40 +142,17 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
               placeholder="Např. 1"
             />
           </div>
+          {/* Removed Location and Floor inputs as per user request */}
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="location" className="sm:text-right">
-              Umístění
-            </Label>
-            <Input
-              id="location"
-              value={formData.location}
-              onChange={handleChange}
-              className="col-span-3"
-              placeholder="Např. Ulička A"
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="floor" className="sm:text-right">
-              Patro
-            </Label>
-            <Input
-              id="floor"
-              value={formData.floor}
-              onChange={handleChange}
-              className="col-span-3"
-              placeholder="Např. Patro 1"
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="warehouseId" className="sm:text-right">
+            <Label htmlFor="storeId" className="sm:text-right">
               ID Skladu
             </Label>
             <Input
-              id="warehouseId"
-              value={formData.warehouseId}
+              id="storeId"
+              value={formData.storeId}
               onChange={handleChange}
               className="col-span-3"
-              readOnly={!!userWarehouseId} // Warehouse ID is read-only if user has one
+              readOnly={!!userStoreId} // Store ID is read-only if user has one
               placeholder="Např. Sklad 1"
             />
           </div>

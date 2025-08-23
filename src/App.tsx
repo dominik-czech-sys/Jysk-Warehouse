@@ -10,27 +10,29 @@ import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import CteckaCarkoduPage from "./pages/CteckaCarkoduPage";
 import MassAddArticlesPage from "./pages/MassAddArticlesPage";
-import ManageShelfRacksPage from "./pages/ManageShelfRacksPage"; // Import new page
+import ManageShelfRacksPage from "./pages/ManageShelfRacksPage";
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { useContext } from "react";
+import { Permission } from "./data/users"; // Import Permission type
 
 const queryClient = new QueryClient();
 
-// PrivateRoute component to protect routes
-const PrivateRoute: React.FC<{ children: JSX.Element; adminOnly?: boolean }> = ({
+// PrivateRoute component to protect routes based on permissions
+const PrivateRoute: React.FC<{ children: JSX.Element; requiredPermission?: Permission }> = ({
   children,
-  adminOnly = false,
+  requiredPermission,
 }) => {
   const auth = useContext(AuthContext);
-  if (!auth) return <Navigate to="/prihlaseni" replace />; // Should not happen if wrapped in AuthProvider
+  if (!auth) return <Navigate to="/prihlaseni" replace />;
 
   if (!auth.isAuthenticated) {
     return <Navigate to="/prihlaseni" replace />;
   }
 
-  if (adminOnly && !auth.isAdmin) {
-    return <Navigate to="/" replace />; // Redirect non-admins from admin-only routes
+  if (requiredPermission && !auth.hasPermission(requiredPermission)) {
+    // Redirect to home or show an unauthorized message
+    return <Navigate to="/" replace />;
   }
 
   return children;
@@ -51,7 +53,7 @@ const AppContent = () => {
       <Route
         path="/spravovat-clanky"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredPermission="article:view">
             <ManageArticles />
           </PrivateRoute>
         }
@@ -59,15 +61,15 @@ const AppContent = () => {
       <Route
         path="/admin/uzivatele"
         element={
-          <PrivateRoute adminOnly>
+          <PrivateRoute requiredPermission="user:view">
             <AdminDashboard />
           </PrivateRoute>
         }
       />
       <Route
-        path="/admin/regaly" // Route for managing shelf racks, now accessible to all authenticated users
+        path="/admin/regaly"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredPermission="rack:view">
             <ManageShelfRacksPage />
           </PrivateRoute>
         }
@@ -75,7 +77,7 @@ const AppContent = () => {
       <Route
         path="/skenovat-carkod"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredPermission="article:scan">
             <CteckaCarkoduPage />
           </PrivateRoute>
         }
@@ -83,7 +85,7 @@ const AppContent = () => {
       <Route
         path="/mass-add-articles"
         element={
-          <PrivateRoute>
+          <PrivateRoute requiredPermission="article:mass_add">
             <MassAddArticlesPage />
           </PrivateRoute>
         }

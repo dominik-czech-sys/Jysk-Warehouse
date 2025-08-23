@@ -12,10 +12,10 @@ export interface ShelfRack {
   id: string; // Unique ID for the rack (e.g., "A-1")
   rowId: string; // e.g., "A"
   rackId: string; // e.g., "1"
-  location: string; // e.g., "Ulička A"
-  floor: string;    // e.g., "Patro 1"
+  location: string; // e.g., "Ulička A" - derived from store layout, but stored for article context
+  floor: string;    // e.g., "Patro 1" - derived from store layout, but stored for article context
   shelves: Shelf[]; // Array of individual shelves with descriptions
-  warehouseId: string; // ID of the warehouse this rack belongs to
+  storeId: string; // ID of the store this rack belongs to
 }
 
 // Initial dummy data for Shelf Racks
@@ -33,7 +33,7 @@ const initialShelfRacks: ShelfRack[] = [
       { shelfNumber: "4", description: "Textiles" },
       { shelfNumber: "5", description: "Small Furniture" },
     ],
-    warehouseId: "Sklad 1",
+    storeId: "Sklad 1",
   },
   {
     id: "A-2",
@@ -46,7 +46,7 @@ const initialShelfRacks: ShelfRack[] = [
       { shelfNumber: "2", description: "Kitchenware" },
       { shelfNumber: "3", description: "Books" },
     ],
-    warehouseId: "Sklad 1",
+    storeId: "Sklad 1",
   },
   {
     id: "B-1",
@@ -66,12 +66,12 @@ const initialShelfRacks: ShelfRack[] = [
       { shelfNumber: "9", description: "Curtains" },
       { shelfNumber: "10", description: "Bedding" },
     ],
-    warehouseId: "Sklad 2",
+    storeId: "Sklad 2",
   },
 ];
 
 export const useShelfRacks = () => {
-  const { userWarehouseId, isAdmin, user } = useAuth();
+  const { userStoreId, isAdmin, user } = useAuth();
   const { addLogEntry } = useLog();
   const [shelfRacks, setShelfRacks] = useState<ShelfRack[]>(() => {
     const storedRacks = localStorage.getItem("shelfRacks");
@@ -84,34 +84,34 @@ export const useShelfRacks = () => {
 
   const filteredShelfRacks = isAdmin
     ? shelfRacks
-    : shelfRacks.filter((rack) => rack.warehouseId === userWarehouseId);
+    : shelfRacks.filter((rack) => rack.storeId === userStoreId);
 
   const getShelfRackById = (id: string) => filteredShelfRacks.find((rack) => rack.id === id);
 
   const addShelfRack = (newRack: ShelfRack) => {
-    if (shelfRacks.some(r => r.id === newRack.id)) {
-      toast.error(`Regál s ID ${newRack.id} již existuje.`);
-      addLogEntry("Pokus o přidání existujícího regálu", { rackId: newRack.id }, user?.username);
+    if (shelfRacks.some(r => r.id === newRack.id && r.storeId === newRack.storeId)) {
+      toast.error(`Regál s ID ${newRack.id} již existuje v tomto skladu.`);
+      addLogEntry("Pokus o přidání existujícího regálu", { rackId: newRack.id, storeId: newRack.storeId }, user?.username);
       return false;
     }
     setShelfRacks((prev) => [...prev, newRack]);
     toast.success(`Regál ${newRack.id} byl přidán.`);
-    addLogEntry("Regál přidán", { rackId: newRack.id, warehouseId: newRack.warehouseId, shelves: newRack.shelves.map(s => s.description) }, user?.username);
+    addLogEntry("Regál přidán", { rackId: newRack.id, storeId: newRack.storeId, shelves: newRack.shelves.map(s => s.description) }, user?.username);
     return true;
   };
 
   const updateShelfRack = (updatedRack: ShelfRack) => {
     setShelfRacks((prev) =>
-      prev.map((r) => (r.id === updatedRack.id ? updatedRack : r))
+      prev.map((r) => (r.id === updatedRack.id && r.storeId === updatedRack.storeId ? updatedRack : r))
     );
     toast.success(`Regál ${updatedRack.id} byl aktualizován.`);
-    addLogEntry("Regál aktualizován", { rackId: updatedRack.id, warehouseId: updatedRack.warehouseId, shelves: updatedRack.shelves.map(s => s.description) }, user?.username);
+    addLogEntry("Regál aktualizován", { rackId: updatedRack.id, storeId: updatedRack.storeId, shelves: updatedRack.shelves.map(s => s.description) }, user?.username);
   };
 
-  const deleteShelfRack = (id: string) => {
-    setShelfRacks((prev) => prev.filter((r) => r.id !== id));
+  const deleteShelfRack = (id: string, storeId: string) => {
+    setShelfRacks((prev) => prev.filter((r) => !(r.id === id && r.storeId === storeId)));
     toast.success(`Regál ${id} byl smazán.`);
-    addLogEntry("Regál smazán", { rackId: id }, user?.username);
+    addLogEntry("Regál smazán", { rackId: id, storeId }, user?.username);
   };
 
   return { shelfRacks: filteredShelfRacks, getShelfRackById, addShelfRack, updateShelfRack, deleteShelfRack };
