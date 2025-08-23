@@ -16,8 +16,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useShelfRacks, ShelfRack } from "@/data/shelfRacks";
 
 interface ShelfDetails {
-  shelf: string; // rowId
-  shelfNumber: string; // shelf index
+  rackId: string;
+  shelfNumber: string;
   location: string;
   floor: string;
   warehouseId: string;
@@ -31,7 +31,7 @@ const MassAddArticlesPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [shelfDetails, setShelfDetails] = useState<ShelfDetails>({
-    shelf: "",
+    rackId: "",
     shelfNumber: "",
     location: "",
     floor: "",
@@ -44,7 +44,7 @@ const MassAddArticlesPage: React.FC = () => {
   const [isScannerActive, setIsScannerActive] = useState(false);
 
   const [selectedRackId, setSelectedRackId] = useState<string>("");
-  const [selectedShelfIndex, setSelectedShelfIndex] = useState<string>("");
+  const [selectedShelfNumber, setSelectedShelfNumber] = useState<string>("");
 
   useEffect(() => {
     if (isScannerActive && !scannerRef.current) {
@@ -85,35 +85,36 @@ const MassAddArticlesPage: React.FC = () => {
   useEffect(() => {
     const currentRack = shelfRacks.find(rack => rack.id === selectedRackId);
     if (currentRack) {
+      const selectedShelf = currentRack.shelves.find(s => s.shelfNumber === selectedShelfNumber);
       setShelfDetails({
-        shelf: currentRack.rowId,
-        shelfNumber: selectedShelfIndex,
+        rackId: currentRack.id,
+        shelfNumber: selectedShelfNumber,
         location: currentRack.location,
         floor: currentRack.floor,
         warehouseId: currentRack.warehouseId,
       });
     } else {
       setShelfDetails({
-        shelf: "",
+        rackId: "",
         shelfNumber: "",
         location: "",
         floor: "",
         warehouseId: userWarehouseId || "",
       });
     }
-  }, [selectedRackId, selectedShelfIndex, shelfRacks, userWarehouseId]);
+  }, [selectedRackId, selectedShelfNumber, shelfRacks, userWarehouseId]);
 
   const handleRackSelect = (value: string) => {
     setSelectedRackId(value);
-    setSelectedShelfIndex(""); // Reset shelf index when rack changes
+    setSelectedShelfNumber(""); // Reset shelf number when rack changes
   };
 
-  const handleShelfIndexSelect = (value: string) => {
-    setSelectedShelfIndex(value);
+  const handleShelfNumberSelect = (value: string) => {
+    setSelectedShelfNumber(value);
   };
 
   const handleLockShelfDetails = () => {
-    if (!selectedRackId || !selectedShelfIndex) {
+    if (!selectedRackId || !selectedShelfNumber) {
       toast.error("Prosím, vyberte regál a číslo police před uzamčením.");
       return;
     }
@@ -169,10 +170,10 @@ const MassAddArticlesPage: React.FC = () => {
       const existing = getArticleById(article.id);
       if (existing) {
         updateArticle(article); // Update existing article with new location
-        addLogEntry("Článek aktualizován (hromadné přidání)", { articleId: article.id, newLocation: article.location, newShelf: article.shelf }, user?.username);
+        addLogEntry("Článek aktualizován (hromadné přidání)", { articleId: article.id, newRackId: article.rackId, newShelfNumber: article.shelfNumber }, user?.username);
       } else {
         addArticle(article); // Add new article
-        addLogEntry("Článek přidán (hromadné přidání)", { articleId: article.id, location: article.location, shelf: article.shelf }, user?.username);
+        addLogEntry("Článek přidán (hromadné přidání)", { articleId: article.id, rackId: article.rackId, shelfNumber: article.shelfNumber }, user?.username);
       }
     });
 
@@ -180,12 +181,12 @@ const MassAddArticlesPage: React.FC = () => {
     setArticlesToProcess([]);
     setIsShelfDetailsLocked(false);
     setSelectedRackId("");
-    setSelectedShelfIndex("");
+    setSelectedShelfNumber("");
     navigate("/spravovat-clanky"); // Redirect to manage articles after saving
   };
 
   const availableShelves = selectedRackId
-    ? Array.from({ length: shelfRacks.find(r => r.id === selectedRackId)?.numberOfShelves || 0 }, (_, i) => (i + 1).toString())
+    ? shelfRacks.find(r => r.id === selectedRackId)?.shelves || []
     : [];
 
   return (
@@ -224,14 +225,14 @@ const MassAddArticlesPage: React.FC = () => {
             </div>
             <div>
               <Label htmlFor="shelfNumber">Číslo police</Label>
-              <Select onValueChange={handleShelfIndexSelect} value={selectedShelfIndex} disabled={!selectedRackId || isShelfDetailsLocked}>
+              <Select onValueChange={handleShelfNumberSelect} value={selectedShelfNumber} disabled={!selectedRackId || isShelfDetailsLocked}>
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Vyberte číslo police" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableShelves.map((index) => (
-                    <SelectItem key={index} value={index}>
-                      Police {index}
+                  {availableShelves.map((shelf) => (
+                    <SelectItem key={shelf.shelfNumber} value={shelf.shelfNumber}>
+                      Police {shelf.shelfNumber} ({shelf.description})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -250,7 +251,7 @@ const MassAddArticlesPage: React.FC = () => {
               <Input id="warehouseId" value={shelfDetails.warehouseId} readOnly className="mt-1 bg-gray-100 dark:bg-gray-700" />
             </div>
             <div className="md:col-span-2 flex justify-end">
-              <Button onClick={handleLockShelfDetails} disabled={isShelfDetailsLocked || !selectedRackId || !selectedShelfIndex} className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+              <Button onClick={handleLockShelfDetails} disabled={isShelfDetailsLocked || !selectedRackId || !selectedShelfNumber} className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
                 {isShelfDetailsLocked ? <><Lock className="h-4 w-4 mr-2" /> Detaily uzamčeny</> : <><Unlock className="h-4 w-4 mr-2" /> Uzamknout detaily regálu</>}
               </Button>
               {isShelfDetailsLocked && (

@@ -65,9 +65,9 @@ const AppContent = () => {
         }
       />
       <Route
-        path="/admin/regaly" // New route for managing shelf racks
+        path="/admin/regaly" // Route for managing shelf racks, now accessible to all authenticated users
         element={
-          <PrivateRoute adminOnly>
+          <PrivateRoute>
             <ManageShelfRacksPage />
           </PrivateRoute>
         }

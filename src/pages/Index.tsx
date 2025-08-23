@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { LogOut, Scan, Users } from "lucide-react";
 import { IframeViewer } from "@/components/IframeViewer";
 import { useLog } from "@/contexts/LogContext"; // Import useLog
+import { ManagementMenu } from "@/components/ManagementMenu"; // Import new ManagementMenu
 
 const Index = () => {
   const { getArticleById, articles } = useArticles();
@@ -65,6 +66,7 @@ const Index = () => {
               </Button>
             </Link>
           )}
+          <ManagementMenu /> {/* Use the new ManagementMenu component */}
           <Button onClick={logout} variant="outline" className="flex items-center w-full sm:w-auto">
             <LogOut className="h-4 w-4 mr-2" /> Odhlásit se
           </Button>
@@ -81,9 +83,6 @@ const Index = () => {
         <WarehouseLocationDisplay article={foundArticle} />
       </div>
       <div className="mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full max-w-sm">
-        <Link to="/spravovat-clanky" className="w-full">
-          <Button variant="outline" className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">Spravovat články</Button>
-        </Link>
         <Link to="/skenovat-carkod" className="w-full">
           <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
             <Scan className="h-4 w-4 mr-2" /> Skenovat čárový kód

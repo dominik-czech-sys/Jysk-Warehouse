@@ -5,11 +5,11 @@ import { useLog } from "@/contexts/LogContext"; // Import useLog
 export interface Article {
   id: string; // Číslo článku (Article Number)
   name: string; // Název
-  shelf: string; // Regál
-  shelfNumber: string; // Číslo regálu
-  location: string; // Např. "Ulička A, Regál 12"
-  floor: string;    // Např. "Patro 3"
-  warehouseId: string; // ID skladu, ke kterému článek patří
+  rackId: string; // ID of the selected ShelfRack (e.g., "A-1")
+  shelfNumber: string; // The specific shelf number within the rack (e.g., "1", "2")
+  location: string; // Derived from ShelfRack
+  floor: string;    // Derived from ShelfRack
+  warehouseId: string; // Derived from ShelfRack
   status: string; // Nové pole pro status zboží
 }
 
@@ -227,18 +227,24 @@ const parseArticleData = (data: string): Article[] => {
       const status = match[2];
       const name = match[3].trim();
 
-      // Assign a random warehouseId for demonstration, or you can implement logic to assign based on criteria
-      const warehouseId = Math.random() > 0.5 ? "Sklad 1" : "Sklad 2";
+      // Assign dummy rackId, shelfNumber, location, floor, warehouseId for initial data
+      // In a real scenario, this would be more sophisticated or left empty
+      const dummyRackId = Math.random() > 0.5 ? "A-1" : "B-1";
+      const dummyShelfNumber = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3
+      const dummyLocation = dummyRackId.startsWith("A") ? "Ulička A" : "Ulička B";
+      const dummyFloor = dummyRackId.startsWith("A") ? "Patro 1" : "Patro 2";
+      const dummyWarehouseId = dummyRackId.startsWith("A") ? "Sklad 1" : "Sklad 2";
+
 
       parsedArticles.push({
         id,
         name,
         status,
-        shelf: "N/A",
-        shelfNumber: "N/A",
-        location: "N/A",
-        floor: "N/A",
-        warehouseId,
+        rackId: dummyRackId,
+        shelfNumber: dummyShelfNumber.toString(),
+        location: dummyLocation,
+        floor: dummyFloor,
+        warehouseId: dummyWarehouseId,
       });
     }
   });
@@ -267,14 +273,14 @@ export const useArticles = () => {
 
   const addArticle = (newArticle: Article) => {
     setArticles((prev) => [...prev, newArticle]);
-    addLogEntry("Článek přidán", { articleId: newArticle.id, name: newArticle.name, warehouseId: newArticle.warehouseId }, user?.username); // Pass username
+    addLogEntry("Článek přidán", { articleId: newArticle.id, name: newArticle.name, rackId: newArticle.rackId, shelfNumber: newArticle.shelfNumber, warehouseId: newArticle.warehouseId }, user?.username); // Pass username
   };
 
   const updateArticle = (updatedArticle: Article) => {
     setArticles((prev) =>
       prev.map((article) => (article.id === updatedArticle.id ? updatedArticle : article))
     );
-    addLogEntry("Článek aktualizován", { articleId: updatedArticle.id, name: updatedArticle.name, warehouseId: updatedArticle.warehouseId }, user?.username); // Pass username
+    addLogEntry("Článek aktualizován", { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, warehouseId: updatedArticle.warehouseId }, user?.username); // Pass username
   };
 
   const deleteArticle = (id: string) => {

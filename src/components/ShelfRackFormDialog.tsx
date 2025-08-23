@@ -10,9 +10,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ShelfRack } from "@/data/shelfRacks";
+import { ShelfRack, Shelf } from "@/data/shelfRacks";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { Plus, Minus } from "lucide-react";
 
 interface ShelfRackFormDialogProps {
   isOpen: boolean;
@@ -34,8 +35,7 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
     rackId: "",
     location: "",
     floor: "",
-    numberOfShelves: 1,
-    description: "",
+    shelves: [{ shelfNumber: "1", description: "" }], // Initialize with one shelf
     warehouseId: userWarehouseId || "",
   });
 
@@ -49,8 +49,7 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
         rackId: "",
         location: "",
         floor: "",
-        numberOfShelves: 1,
-        description: "",
+        shelves: [{ shelfNumber: "1", description: "" }],
         warehouseId: userWarehouseId || "",
       });
     }
@@ -61,20 +60,35 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    const numValue = parseInt(value, 10);
-    if (!isNaN(numValue) && numValue > 0) {
-      setFormData((prev) => ({ ...prev, [id]: numValue }));
-    } else if (value === "") {
-      setFormData((prev) => ({ ...prev, [id]: "" as any })); // Allow empty string temporarily for user input
-    }
+  const handleShelfDescriptionChange = (index: number, value: string) => {
+    const updatedShelves = formData.shelves.map((s, i) =>
+      i === index ? { ...s, description: value } : s
+    );
+    setFormData((prev) => ({ ...prev, shelves: updatedShelves }));
+  };
+
+  const handleAddShelf = () => {
+    const newShelfNumber = (formData.shelves.length + 1).toString();
+    setFormData((prev) => ({
+      ...prev,
+      shelves: [...prev.shelves, { shelfNumber: newShelfNumber, description: "" }],
+    }));
+  };
+
+  const handleRemoveShelf = (index: number) => {
+    const updatedShelves = formData.shelves.filter((_, i) => i !== index);
+    // Re-number shelves after removal
+    const renumberedShelves = updatedShelves.map((s, i) => ({
+      ...s,
+      shelfNumber: (i + 1).toString(),
+    }));
+    setFormData((prev) => ({ ...prev, shelves: renumberedShelves }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.rowId || !formData.rackId || !formData.location || !formData.floor || !formData.description || !formData.warehouseId || formData.numberOfShelves <= 0) {
-      toast.error("Prosím, vyplňte všechna pole a ujistěte se, že počet polic je kladné číslo.");
+    if (!formData.rowId || !formData.rackId || !formData.location || !formData.floor || !formData.warehouseId || formData.shelves.length === 0 || formData.shelves.some(s => !s.description.trim())) {
+      toast.error("Prosím, vyplňte všechna pole, včetně popisu pro každou polici.");
       return;
     }
     // Generate ID if adding new rack
@@ -90,7 +104,7 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{rack ? "Upravit regál" : "Přidat nový regál"}</DialogTitle>
           <DialogDescription>
@@ -149,31 +163,6 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="numberOfShelves" className="sm:text-right">
-              Počet polic
-            </Label>
-            <Input
-              id="numberOfShelves"
-              type="number"
-              value={formData.numberOfShelves}
-              onChange={handleNumberChange}
-              className="col-span-3"
-              min="1"
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="description" className="sm:text-right">
-              Popis obsahu
-            </Label>
-            <Input
-              id="description"
-              value={formData.description}
-              onChange={handleChange}
-              className="col-span-3"
-              placeholder="Např. Malé předměty"
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="warehouseId" className="sm:text-right">
               ID Skladu
             </Label>
@@ -186,7 +175,37 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
               placeholder="Např. Sklad 1"
             />
           </div>
-          <DialogFooter>
+
+          {/* Shelves Management */}
+          <div className="col-span-full">
+            <Label className="text-base font-semibold mb-2 block">Police a jejich popis</Label>
+            {formData.shelves.map((shelf, index) => (
+              <div key={index} className="flex items-center gap-2 mb-2">
+                <Label className="w-16 text-right">Police {shelf.shelfNumber}:</Label>
+                <Input
+                  value={shelf.description}
+                  onChange={(e) => handleShelfDescriptionChange(index, e.target.value)}
+                  placeholder={`Popis pro polici ${shelf.shelfNumber}`}
+                  className="flex-grow"
+                />
+                {formData.shelves.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    onClick={() => handleRemoveShelf(index)}
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+            <Button type="button" variant="outline" onClick={handleAddShelf} className="w-full mt-2">
+              <Plus className="h-4 w-4 mr-2" /> Přidat polici
+            </Button>
+          </div>
+
+          <DialogFooter className="col-span-full mt-4">
             <Button type="submit" className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
               {rack ? "Uložit změny" : "Přidat regál"}
             </Button>

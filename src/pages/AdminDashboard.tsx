@@ -68,11 +68,7 @@ const AdminDashboard: React.FC = () => {
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Správa uživatelů</h1>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-            <Link to="/admin/regaly" className="w-full sm:w-auto">
-              <Button variant="outline" className="flex items-center bg-gray-600 hover:bg-gray-700 text-white w-full sm:w-auto">
-                <Warehouse className="h-4 w-4 mr-2" /> Správa regálů
-              </Button>
-            </Link>
+            {/* Removed direct link to /admin/regaly as it's now in ManagementMenu on Index.tsx */}
             <Button onClick={() => setIsLogViewerOpen(true)} className="flex items-center bg-gray-600 hover:bg-gray-700 text-white w-full sm:w-auto">
               <ScrollText className="h-4 w-4 mr-2" /> Zobrazit Log
             </Button>

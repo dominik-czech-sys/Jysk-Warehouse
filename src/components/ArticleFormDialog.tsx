@@ -35,35 +35,26 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
   const [formData, setFormData] = useState<Article>({
     id: "",
     name: "",
-    shelf: "", // Will store rackId
-    shelfNumber: "", // Will store shelf index within rack
+    rackId: "",
+    shelfNumber: "",
     location: "",
     floor: "",
     warehouseId: userWarehouseId || "",
     status: "",
   });
   const [selectedRackId, setSelectedRackId] = useState<string>("");
-  const [selectedShelfIndex, setSelectedShelfIndex] = useState<string>("");
+  const [selectedShelfNumber, setSelectedShelfNumber] = useState<string>("");
 
   useEffect(() => {
     if (article) {
       setFormData(article);
-      // Try to find the rack based on article's shelf (rackId) and warehouseId
-      const foundRack = shelfRacks.find(
-        (rack) => rack.rowId === article.shelf && rack.warehouseId === article.warehouseId
-      );
-      if (foundRack) {
-        setSelectedRackId(foundRack.id);
-        setSelectedShelfIndex(article.shelfNumber);
-      } else {
-        setSelectedRackId("");
-        setSelectedShelfIndex("");
-      }
+      setSelectedRackId(article.rackId);
+      setSelectedShelfNumber(article.shelfNumber);
     } else {
       setFormData({
         id: "",
         name: "",
-        shelf: "",
+        rackId: "",
         shelfNumber: "",
         location: "",
         floor: "",
@@ -71,17 +62,18 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
         status: "",
       });
       setSelectedRackId("");
-      setSelectedShelfIndex("");
+      setSelectedShelfNumber("");
     }
   }, [article, isOpen, userWarehouseId, shelfRacks]);
 
   useEffect(() => {
     const currentRack = shelfRacks.find(rack => rack.id === selectedRackId);
     if (currentRack) {
+      const selectedShelf = currentRack.shelves.find(s => s.shelfNumber === selectedShelfNumber);
       setFormData(prev => ({
         ...prev,
-        shelf: currentRack.rowId, // Store rowId as shelf
-        shelfNumber: selectedShelfIndex, // Store selected shelf index
+        rackId: currentRack.id,
+        shelfNumber: selectedShelfNumber,
         location: currentRack.location,
         floor: currentRack.floor,
         warehouseId: currentRack.warehouseId,
@@ -89,14 +81,14 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
     } else if (!article) { // Clear if no rack selected and not editing an existing article
       setFormData(prev => ({
         ...prev,
-        shelf: "",
+        rackId: "",
         shelfNumber: "",
         location: "",
         floor: "",
         warehouseId: userWarehouseId || "",
       }));
     }
-  }, [selectedRackId, selectedShelfIndex, shelfRacks, userWarehouseId, article]);
+  }, [selectedRackId, selectedShelfNumber, shelfRacks, userWarehouseId, article]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -105,16 +97,16 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
 
   const handleRackSelect = (value: string) => {
     setSelectedRackId(value);
-    setSelectedShelfIndex(""); // Reset shelf index when rack changes
+    setSelectedShelfNumber(""); // Reset shelf number when rack changes
   };
 
-  const handleShelfIndexSelect = (value: string) => {
-    setSelectedShelfIndex(value);
+  const handleShelfNumberSelect = (value: string) => {
+    setSelectedShelfNumber(value);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.id || !formData.name || !selectedRackId || !selectedShelfIndex || !formData.status) {
+    if (!formData.id || !formData.name || !selectedRackId || !selectedShelfNumber || !formData.status) {
       toast.error("Prosím, vyplňte všechna povinná pole (ID článku, Název, Regál, Číslo police, Status).");
       return;
     }
@@ -123,7 +115,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
   };
 
   const availableShelves = selectedRackId
-    ? Array.from({ length: shelfRacks.find(r => r.id === selectedRackId)?.numberOfShelves || 0 }, (_, i) => (i + 1).toString())
+    ? shelfRacks.find(r => r.id === selectedRackId)?.shelves || []
     : [];
 
   return (
@@ -162,7 +154,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
 
           {/* Shelf Rack Selection */}
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="shelfRack" className="sm:text-right">
+            <Label htmlFor="rackId" className="sm:text-right">
               Regál (Řada-Regál)
             </Label>
             <Select onValueChange={handleRackSelect} value={selectedRackId}>
@@ -184,14 +176,14 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
             <Label htmlFor="shelfNumber" className="sm:text-right">
               Číslo police
             </Label>
-            <Select onValueChange={handleShelfIndexSelect} value={selectedShelfIndex} disabled={!selectedRackId}>
+            <Select onValueChange={handleShelfNumberSelect} value={selectedShelfNumber} disabled={!selectedRackId}>
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder="Vyberte číslo police" />
               </SelectTrigger>
               <SelectContent>
-                {availableShelves.map((index) => (
-                  <SelectItem key={index} value={index}>
-                    Police {index}
+                {availableShelves.map((shelf) => (
+                  <SelectItem key={shelf.shelfNumber} value={shelf.shelfNumber}>
+                    Police {shelf.shelfNumber} ({shelf.description})
                   </SelectItem>
                 ))}
               </SelectContent>
