@@ -270,7 +270,19 @@
     "userAddFailed": "Přidání uživatele selhalo.",
     "userUpdateFailed": "Aktualizace uživatele selhala.",
     "userDeleteFailed": "Smazání uživatele selhalo.",
-    "usersFetchFailed": "Načtení uživatelů selhalo."
+    "usersFetchFailed": "Načtení uživatelů selhalo.",
+    "storesFetchFailed": "Načtení obchodů selhalo.",
+    "storeAddFailed": "Přidání obchodu selhalo.",
+    "storeUpdateFailed": "Aktualizace obchodu selhala.",
+    "storeDeleteFailed": "Smazání obchodu selhalo.",
+    "racksFetchFailed": "Načtení regálů selhalo.",
+    "rackAddFailed": "Přidání regálu selhalo.",
+    "rackUpdateFailed": "Aktualizace regálu selhala.",
+    "rackDeleteFailed": "Smazání regálu selhalo.",
+    "articlesFetchFailed": "Načtení artiklů selhalo.",
+    "articleAddFailed": "Přidání artiklu selhalo.",
+    "articleUpdateFailed": "Aktualizace artiklu selhala.",
+    "articleDeleteFailed": "Smazání artiklu selhalo."
   },
   "logCategory": {
     "fullLog": "Celý log",

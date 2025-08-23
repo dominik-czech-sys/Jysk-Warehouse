@@ -272,7 +272,19 @@
     "userAddFailed": "User addition failed.",
     "userUpdateFailed": "User update failed.",
     "userDeleteFailed": "User deletion failed.",
-    "usersFetchFailed": "Failed to fetch users."
+    "usersFetchFailed": "Failed to fetch users.",
+    "storesFetchFailed": "Failed to fetch stores.",
+    "storeAddFailed": "Store addition failed.",
+    "storeUpdateFailed": "Store update failed.",
+    "storeDeleteFailed": "Store deletion failed.",
+    "racksFetchFailed": "Failed to fetch racks.",
+    "rackAddFailed": "Rack addition failed.",
+    "rackUpdateFailed": "Rack update failed.",
+    "rackDeleteFailed": "Rack deletion failed.",
+    "articlesFetchFailed": "Failed to fetch articles.",
+    "articleAddFailed": "Article addition failed.",
+    "articleUpdateFailed": "Article update failed.",
+    "articleDeleteFailed": "Article deletion failed."
   },
   "logCategory": {
     "fullLog": "Full Log",

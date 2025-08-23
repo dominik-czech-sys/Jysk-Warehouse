@@ -69,16 +69,8 @@ export const defaultPermissions: Record<User['role'], Permission[]> = {
   ],
 };
 
-// Initial users - passwords will be hashed on first run or when added/updated
-export const users: User[] = [
-  {
-    username: "Dczech",
-    password: "koplkoplko1A", // This will be hashed
-    role: "admin",
-    permissions: defaultPermissions["admin"],
-    firstLogin: true,
-  }
-];
+// Initial users - toto pole již nebude použito, uživatelé se načítají z DB
+export const users: User[] = [];
 
 // Default articles for new stores (if needed)
 export const defaultArticlesForNewStores: Omit<Article, 'rackId' | 'shelfNumber' | 'storeId' | 'quantity'>[] = [

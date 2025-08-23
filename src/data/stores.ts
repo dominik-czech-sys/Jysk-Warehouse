@@ -5,13 +5,12 @@ import { useLog } from "@/contexts/LogContext";
 import { useArticles, Article } from "./articles"; // Import useArticles and Article
 import { defaultArticlesForNewStores } from "./users"; // Import default articles
 import { useTranslation } from "react-i18next"; // Import useTranslation
+import { getAllStores, createStore, updateStore as apiUpdateStore, deleteStore as apiDeleteStore, StoreApiData } from "@/api"; // Import API functions
 
 export interface Store {
   id: string; // Unique ID for the store (e.g., "Sklad 1", "T508", "Kozomín")
   name: string; // Display name of the store
 }
-
-const initialStores: Store[] = []; // Nastaveno na prázdné pole
 
 export const useStores = () => {
   const { user, isAdmin } = useAuth();
@@ -19,19 +18,26 @@ export const useStores = () => {
   const { addArticle } = useArticles(); // Use addArticle from useArticles hook
   const { t } = useTranslation(); // Initialize useTranslation
 
-  const [stores, setStores] = useState<Store[]>(() => {
-    const storedStores = localStorage.getItem("stores");
-    return storedStores ? JSON.parse(storedStores) : initialStores;
-  });
+  const [stores, setStores] = useState<Store[]>([]); // Nyní se načítá z API
 
+  // Načtení obchodů z API při startu a při změnách
   useEffect(() => {
-    localStorage.setItem("stores", JSON.stringify(stores));
-    console.log("Stores updated in localStorage:", stores); // Debugging log
-  }, [stores]);
+    const fetchStores = async () => {
+      try {
+        const storesFromApi = await getAllStores();
+        setStores(storesFromApi);
+      } catch (error) {
+        console.error("Failed to fetch stores from API:", error);
+        toast.error(t("common.storesFetchFailed"));
+        setStores([]);
+      }
+    };
+    fetchStores();
+  }, [t]); // Závislost na t pro překlady chybových zpráv
 
   const getStoreById = (id: string) => stores.find((store) => store.id === id);
 
-  const addStore = (newStore: Store, addDefaultArticles: boolean = false) => {
+  const addStore = async (newStore: Store, addDefaultArticles: boolean = false) => {
     if (!isAdmin) {
       toast.error(t("common.noPermissionToAddStores"));
       return false;
@@ -41,60 +47,81 @@ export const useStores = () => {
       addLogEntry(t("common.attemptToAddExistingStore"), { storeId: newStore.id }, user?.username);
       return false;
     }
-    setStores((prev) => {
-      const updatedStores = [...prev, newStore];
-      console.log("Adding store, new state:", updatedStores); // Debugging log
-      return updatedStores;
-    });
-    toast.success(t("common.storeAddedSuccess", { storeName: newStore.name, storeId: newStore.id }));
-    addLogEntry(t("common.storeAdded"), { storeId: newStore.id, storeName: newStore.name }, user?.username);
 
-    if (addDefaultArticles) {
-      defaultArticlesForNewStores.forEach(defaultArticle => {
-        const newArticle: Article = {
-          ...defaultArticle,
-          rackId: "N/A", // Placeholder
-          shelfNumber: "N/A", // Placeholder
-          storeId: newStore.id,
-          quantity: 1, // Default quantity for default articles
-        };
-        addArticle(newArticle);
-      });
-      toast.info(t("common.defaultArticlesAddedToStore", { storeId: newStore.id }));
-      addLogEntry(t("common.defaultArticlesAddedToStore"), { storeId: newStore.id, articlesCount: defaultArticlesForNewStores.length }, user?.username);
+    try {
+      const createdStore = await createStore(newStore);
+      if (createdStore) {
+        setStores((prev) => [...prev, createdStore]);
+        toast.success(t("common.storeAddedSuccess", { storeName: createdStore.name, storeId: createdStore.id }));
+        addLogEntry(t("common.storeAdded"), { storeId: createdStore.id, storeName: createdStore.name }, user?.username);
+
+        if (addDefaultArticles) {
+          for (const defaultArticle of defaultArticlesForNewStores) {
+            const newArticle: Article = {
+              ...defaultArticle,
+              rackId: "N/A", // Placeholder
+              shelfNumber: "N/A", // Placeholder
+              storeId: createdStore.id,
+              quantity: 1, // Default quantity for default articles
+            };
+            await addArticle(newArticle); // Použijeme await, aby se artikly přidaly postupně
+          }
+          toast.info(t("common.defaultArticlesAddedToStore", { storeId: createdStore.id }));
+          addLogEntry(t("common.defaultArticlesAddedToStore"), { storeId: createdStore.id, articlesCount: defaultArticlesForNewStores.length }, user?.username);
+        }
+        return true;
+      }
+      return false;
+    } catch (error: any) {
+      console.error("Add Store Error:", error);
+      toast.error(error.message || t("common.storeAddFailed"));
+      addLogEntry(t("common.storeAddFailed"), { storeId: newStore.id, storeName: newStore.name, error: error.message }, user?.username);
+      return false;
     }
-    return true;
   };
 
-  const updateStore = (updatedStore: Store) => {
+  const updateStore = async (updatedStore: Store) => {
     if (!isAdmin) {
       toast.error(t("common.noPermissionToEditStores"));
       return false;
     }
-    setStores((prev) => {
-      const updatedStores = prev.map((s) => (s.id === updatedStore.id ? updatedStore : s));
-      console.log("Updating store, new state:", updatedStores); // Debugging log
-      return updatedStores;
-    });
-    toast.success(t("common.storeUpdatedSuccess", { storeName: updatedStore.name, storeId: updatedStore.id }));
-    addLogEntry(t("common.storeUpdated"), { storeId: updatedStore.id, storeName: updatedStore.name }, user?.username);
-    return true;
+    try {
+      const result = await apiUpdateStore(updatedStore.id, updatedStore);
+      if (result) {
+        setStores((prev) => prev.map((s) => (s.id === updatedStore.id ? updatedStore : s)));
+        toast.success(t("common.storeUpdatedSuccess", { storeName: updatedStore.name, storeId: updatedStore.id }));
+        addLogEntry(t("common.storeUpdated"), { storeId: updatedStore.id, storeName: updatedStore.name }, user?.username);
+        return true;
+      }
+      return false;
+    } catch (error: any) {
+      console.error("Update Store Error:", error);
+      toast.error(error.message || t("common.storeUpdateFailed"));
+      addLogEntry(t("common.storeUpdateFailed"), { storeId: updatedStore.id, storeName: updatedStore.name, error: error.message }, user?.username);
+      return false;
+    }
   };
 
-  const deleteStore = (id: string) => {
+  const deleteStore = async (id: string) => {
     if (!isAdmin) {
       toast.error(t("common.noPermissionToDeleteStores"));
       return false;
     }
-    setStores((prev) => {
-      const updatedStores = prev.filter((s) => s.id !== id);
-      console.log("Deleting store, new state:", updatedStores); // Debugging log
-      return updatedStores;
-    });
-    toast.success(t("common.storeDeletedSuccess", { storeId: id }));
-    addLogEntry("Obchod smazán", { storeId: id }, user?.username);
-    // TODO: Also delete all articles and racks associated with this store
-    return true;
+    try {
+      const success = await apiDeleteStore(id);
+      if (success) {
+        setStores((prev) => prev.filter((s) => s.id !== id));
+        toast.success(t("common.storeDeletedSuccess", { storeId: id }));
+        addLogEntry(t("common.storeDeleted"), { storeId: id }, user?.username);
+        return true;
+      }
+      return false;
+    } catch (error: any) {
+      console.error("Delete Store Error:", error);
+      toast.error(error.message || t("common.storeDeleteFailed"));
+      addLogEntry(t("common.storeDeleteFailed"), { storeId: id, error: error.message }, user?.username);
+      return false;
+    }
   };
 
   return { stores, getStoreById, addStore, updateStore, deleteStore };

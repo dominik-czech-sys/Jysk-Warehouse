@@ -272,7 +272,19 @@
     "userAddFailed": "Pridanie používateľa zlyhalo.",
     "userUpdateFailed": "Aktualizácia používateľa zlyhala.",
     "userDeleteFailed": "Vymazanie používateľa zlyhalo.",
-    "usersFetchFailed": "Načítanie používateľov zlyhalo."
+    "usersFetchFailed": "Načítanie používateľov zlyhalo.",
+    "storesFetchFailed": "Načítanie obchodov zlyhalo.",
+    "storeAddFailed": "Pridanie obchodu zlyhalo.",
+    "storeUpdateFailed": "Aktualizácia obchodu zlyhala.",
+    "storeDeleteFailed": "Vymazanie obchodu zlyhalo.",
+    "racksFetchFailed": "Načítanie regálov zlyhalo.",
+    "rackAddFailed": "Pridanie regálu zlyhalo.",
+    "rackUpdateFailed": "Aktualizácia regálu zlyhala.",
+    "rackDeleteFailed": "Vymazanie regálu zlyhalo.",
+    "articlesFetchFailed": "Načítanie artiklov zlyhalo.",
+    "articleAddFailed": "Pridanie artiklu zlyhalo.",
+    "articleUpdateFailed": "Aktualizácia artiklu zlyhala.",
+    "articleDeleteFailed": "Vymazanie artiklu zlyhalo."
   },
   "logCategory": {
     "fullLog": "Celý log",
@@ -320,7 +332,7 @@
       "delete": "Vymazať artikle",
       "scan": "Skenovať čiarové kódy pre artikle",
       "massAdd": "Hromadne pridávať artikly",
-      "copyFromStore": "Kopírovať artikly z iných obchodov"
+      "copyFromStore": "Kopírovať artikle z iných obchodov"
     },
     "log": {
       "view": "Zobraziť logy aplikácie"

@@ -57,6 +57,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const usersFromApi = await getAllUsers();
       // Hashování hesel pro initialUsers, pokud ještě nejsou hashovaná (pouze pro první spuštění)
       const processedUsers = usersFromApi.map((u: any) => {
+        // Předpokládáme, že hesla z API jsou již hashovaná.
+        // Tato logika je zde spíše pro kompatibilitu s původním `initialUsers` polem.
         if (u.password && (u.password.length < 60 || !u.password.startsWith('$2a$'))) {
           return { ...u, password: bcrypt.hashSync(u.password, 10) };
         }
