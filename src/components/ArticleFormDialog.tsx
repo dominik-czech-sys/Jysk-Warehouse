@@ -126,7 +126,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           <DialogDescription>
             {article ? "Zde můžete provést změny v článku." : "Přidejte nový článek do skladového inventáře."}
           </DialogDescription>
-        </CardHeader>
+        </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="id" className="sm:text-right">

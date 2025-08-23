@@ -1,3 +1,5 @@
+import { Article } from "@/data/articles"; // Import Article type
+
 export type Permission =
   | "user:view"
   | "user:create"
