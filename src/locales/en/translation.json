@@ -253,7 +253,9 @@
     "noPermissionToChangeRoleToAdmin": "You do not have permission to change role to administrator.",
     "noPermissionToChangeAdminRole": "You do not have permission to change an administrator's role.",
     "noPermissionToDeleteAdmins": "You do not have permission to delete administrators.",
-    "cannotDeleteSelf": "You cannot delete your own account."
+    "cannotDeleteSelf": "You cannot delete your own account.",
+    "confirmDeleteStoreTitle": "Confirm Store Deletion",
+    "confirmDeleteStoreDescription": "Are you sure you want to delete store <strong>{{storeId}}</strong>? This action is irreversible and will delete all articles and racks associated with this store."
   },
   "logCategory": {
     "fullLog": "Full Log",

@@ -253,7 +253,9 @@
     "noPermissionToChangeRoleToAdmin": "Nemáte povolenie zmeniť rolu na administrátora.",
     "noPermissionToChangeAdminRole": "Nemáte povolenie zmeniť rolu administrátora.",
     "noPermissionToDeleteAdmins": "Nemáte povolenie odstraňovať administrátorov.",
-    "cannotDeleteSelf": "Nemôžete odstrániť svoj vlastný účet."
+    "cannotDeleteSelf": "Nemôžete odstrániť svoj vlastný účet.",
+    "confirmDeleteStoreTitle": "Potvrdiť vymazanie obchodu",
+    "confirmDeleteStoreDescription": "Naozaj chcete vymazať obchod <strong>{{storeId}}</strong>? Táto akcia je nezvratná a vymaže všetky artikle a regály spojené s týmto obchodom."
   },
   "logCategory": {
     "fullLog": "Celý log",
