@@ -103,10 +103,11 @@ const AppContent = () => {
           </PrivateRoute>
         }
       />
+      {/* Export is typically an admin/manager function */}
       <Route
-        path="/export-dat" // New route for data export
+        path="/export-dat"
         element={
-          <PrivateRoute requiredPermission="log:view"> {/* Export is typically an admin/manager function */}
+          <PrivateRoute requiredPermission="log:view">
             <ExportDataPage />
           </PrivateRoute>
         }
