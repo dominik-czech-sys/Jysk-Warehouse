@@ -82,11 +82,11 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AuthProvider>
-          <LogProvider> {/* Obalení AppContent LogProviderem */}
+        <LogProvider> {/* LogProvider nyní obaluje AuthProvider */}
+          <AuthProvider>
             <AppContent />
-          </LogProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </LogProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
