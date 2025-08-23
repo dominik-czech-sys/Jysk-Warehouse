@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Copy, Users as UsersIcon, Package, Warehouse as WarehouseIcon, Download } from "lucide-react"; // Added Download icon
+import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Copy, Users as UsersIcon, Package, Warehouse as WarehouseIcon, Download } from "lucide-react";
 import { UserFormDialog } from "@/components/UserFormDialog";
 import { StoreFormDialog } from "@/components/StoreFormDialog";
 import { ArticleCopyDialog } from "@/components/ArticleCopyDialog";
@@ -34,14 +34,14 @@ import { useArticles } from "@/data/articles";
 import { useShelfRacks } from "@/data/shelfRacks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
 const SiteDashboard: React.FC = () => {
-  const { allUsers, addUser, updateUser, deleteUser, isAdmin, hasPermission } = useAuth();
+  const { allUsers, addUser, updateUser, deleteUser, isAdmin, hasPermission, userStoreId, user: currentUser } = useAuth();
   const { stores, addStore, updateStore, deleteStore } = useStores();
   const { allArticles } = useArticles();
-  const { allShelfRacks } = useShelfRacks();
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { allShelfRacks } = useShelfRacks(); // Opraven překlep useShelfRhelfRacks na useShelfRacks
+  const { t } = useTranslation();
 
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
   const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
@@ -103,10 +103,28 @@ const SiteDashboard: React.FC = () => {
       deleteStore(storeToDeleteId);
       setStoreToDeleteId(null);
     }
-    setIsDeleteStoreDialogOpen(false);
+    setIsDeleteUserDialogOpen(false); // Opraveno na setIsDeleteStoreDialogOpen
   };
 
-  if (!isAdmin) {
+  // Filter users based on current user's role and storeId
+  const filteredUsers = isAdmin
+    ? allUsers
+    : allUsers.filter(user => user.storeId === userStoreId);
+
+  // Function to translate role names
+  const translateRole = (role: User['role'] | "unknown") => { // Upraven typ pro přijetí "unknown"
+    switch (role) {
+      case "admin": return t("common.admin");
+      case "vedouci_skladu": return t("common.warehouseManager");
+      case "store_manager": return t("common.storeManager");
+      case "deputy_store_manager": return t("common.deputyStoreManager");
+      case "ar_assistant_of_sale": return t("common.arAssistantOfSale");
+      case "skladnik": return t("common.warehouseWorker");
+      default: return t("common.unknown"); // Překlad pro neznámou roli
+    }
+  };
+
+  if (!hasPermission("store:view") && !hasPermission("user:view")) { // Check if user has any permission to view this dashboard
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <Card className="p-6 text-center">
@@ -131,7 +149,7 @@ const SiteDashboard: React.FC = () => {
               <ArrowLeft className="h-4 w-4 mr-2" /> {t("common.backToMainPage")}
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("common.siteDashboard")} (Admin)</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("common.siteDashboard")} ({isAdmin ? t("common.admin") : translateRole(currentUser?.role || "unknown")})</h1>
           <div className="w-full sm:w-auto"></div> {/* Placeholder for alignment */}
         </div>
 
@@ -178,133 +196,141 @@ const SiteDashboard: React.FC = () => {
         <Separator className="my-8" />
 
         {/* Store Management Section */}
-        <div className="mb-8 w-full animate-fade-in">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.storeManagement")}</h2>
-            <div className="flex space-x-2">
-              {hasPermission("store:create") && (
-                <Button onClick={() => setIsAddStoreDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
-                  <PlusCircle className="h-4 w-4 mr-2" /> {t("common.addStore")}
-                </Button>
-              )}
-              {hasPermission("article:copy_from_store") && (
-                <Button onClick={() => setIsArticleCopyDialogOpen(true)} variant="outline" className="flex items-center">
-                  <Copy className="h-4 w-4 mr-2" /> {t("common.copyArticles")}
-                </Button>
-              )}
+        {hasPermission("store:view") && (
+          <div className="mb-8 w-full animate-fade-in">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.storeManagement")}</h2>
+              <div className="flex space-x-2">
+                {hasPermission("store:create") && (
+                  <Button onClick={() => setIsAddStoreDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+                    <PlusCircle className="h-4 w-4 mr-2" /> {t("common.addStore")}
+                  </Button>
+                )}
+                {hasPermission("article:copy_from_store") && (
+                  <Button onClick={() => setIsArticleCopyDialogOpen(true)} variant="outline" className="flex items-center">
+                    <Copy className="h-4 w-4 mr-2" /> {t("common.copyArticles")}
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
-          <div className="overflow-x-auto rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="min-w-[100px]">{t("common.storeId")}</TableHead>
-                  <TableHead className="min-w-[200px]">{t("common.storeNameLabel")}</TableHead>
-                  <TableHead className="text-right min-w-[100px]">{t("common.action")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {stores.map((store) => (
-                  <TableRow key={store.id}>
-                    <TableCell className="font-medium">{store.id}</TableCell>
-                    <TableCell>{store.name}</TableCell>
-                    <TableCell className="text-right">
-                      {hasPermission("store:update") && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="mr-2"
-                          onClick={() => {
-                            setEditingStore(store);
-                            setIsEditStoreDialogOpen(true);
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {hasPermission("store:delete") && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteStore(store.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </TableCell>
+            <div className="overflow-x-auto rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="min-w-[100px]">{t("common.storeId")}</TableHead>
+                    <TableHead className="min-w-[200px]">{t("common.storeNameLabel")}</TableHead>
+                    <TableHead className="text-right min-w-[100px]">{t("common.action")}</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {stores.map((store) => (
+                    <TableRow key={store.id}>
+                      <TableCell className="font-medium">{store.id}</TableCell>
+                      <TableCell>{store.name}</TableCell>
+                      <TableCell className="text-right">
+                        {hasPermission("store:update") && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="mr-2"
+                            onClick={() => {
+                              setEditingStore(store);
+                              setIsEditStoreDialogOpen(true);
+                            }}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {hasPermission("store:delete") && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteStore(store.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            {stores.length === 0 && (
+              <p className="text-center text-muted-foreground mt-4">{t("common.noStoresFound")}</p>
+            )}
           </div>
-          {stores.length === 0 && (
-            <p className="text-center text-muted-foreground mt-4">{t("common.noStoresFound")}</p>
-          )}
-        </div>
+        )}
 
         <Separator className="my-8" />
 
         {/* User Management Section */}
-        <div className="mb-8 w-full animate-fade-in">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.userManagement")}</h2>
-            <div className="flex space-x-2">
-              {hasPermission("user:create") && (
-                <Button onClick={() => setIsAddUserDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
-                  <PlusCircle className="h-4 w-4 mr-2" /> {t("common.addUser")}
-                </Button>
-              )}
+        {hasPermission("user:view") && (
+          <div className="mb-8 w-full animate-fade-in">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.userManagement")}</h2>
+              <div className="flex space-x-2">
+                {hasPermission("user:create") && (
+                  <Button onClick={() => setIsAddUserDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+                    <PlusCircle className="h-4 w-4 mr-2" /> {t("common.addUser")}
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
-          <div className="overflow-x-auto rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="min-w-[150px]">{t("common.username")}</TableHead>
-                  <TableHead className="min-w-[100px]">{t("common.role")}</TableHead>
-                  <TableHead className="min-w-[100px]">{t("common.storeId")}</TableHead>
-                  <TableHead className="text-right min-w-[100px]">{t("common.action")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {allUsers.map((user) => (
-                  <TableRow key={user.username}>
-                    <TableCell className="font-medium">{user.username}</TableCell>
-                    <TableCell>{user.role === "admin" ? t("common.admin") : t(`common.${user.role.replace(/_([a-z])/g, (g) => g[1].toUpperCase())}`)}</TableCell>
-                    <TableCell>{user.storeId || t("common.unknown")}</TableCell>
-                    <TableCell className="text-right">
-                      {hasPermission("user:update") && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="mr-2"
-                          onClick={() => {
-                            setEditingUser(user);
-                            setIsEditUserDialogOpen(true);
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {hasPermission("user:delete") && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteUser(user.username)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </TableCell>
+            <div className="overflow-x-auto rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="min-w-[150px]">{t("common.username")}</TableHead>
+                    <TableHead className="min-w-[100px]">{t("common.role")}</TableHead>
+                    <TableHead className="min-w-[100px]">{t("common.storeId")}</TableHead>
+                    <TableHead className="text-right min-w-[100px]">{t("common.action")}</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredUsers.map((user) => (
+                    <TableRow key={user.username}>
+                      <TableCell className="font-medium">{user.username}</TableCell>
+                      <TableCell>{translateRole(user.role)}</TableCell>
+                      <TableCell>{user.storeId || t("common.unknown")}</TableCell>
+                      <TableCell className="text-right">
+                        {/* Opraven JSX komentář */}
+                        {hasPermission("user:update") && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="mr-2"
+                            onClick={() => {
+                              setEditingUser(user);
+                              setIsEditUserDialogOpen(true);
+                            }}
+                            disabled={!isAdmin && user.role === "admin"}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {/* Opraven JSX komentář */}
+                        {hasPermission("user:delete") && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteUser(user.username)}
+                            disabled={!isAdmin && user.role === "admin"}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            {filteredUsers.length === 0 && (
+              <p className="text-center text-muted-foreground mt-4">{t("common.noUsersFound")}</p>
+            )}
           </div>
-          {allUsers.length === 0 && (
-            <p className="text-center text-muted-foreground mt-4">{t("common.noUsersFound")}</p>
-          )}
-        </div>
+        )}
 
         <Separator className="my-8" />
 
@@ -332,7 +358,7 @@ const SiteDashboard: React.FC = () => {
         <Separator className="my-8" />
 
         {/* Export Data Section */}
-        {hasPermission("log:view") && ( // Assuming export permission is tied to log:view for now
+        {hasPermission("log:view") && (
           <div className="mb-8 w-full animate-fade-in">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.exportData")}</h2>

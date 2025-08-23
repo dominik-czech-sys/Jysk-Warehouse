@@ -145,20 +145,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
-    if (!isAdmin && currentUser?.storeId && updatedUser.storeId !== currentUser.storeId) {
-      toast.error(t("common.noPermissionToChangeStoreId"));
-      return;
-    }
-    if (!isAdmin && !currentUser?.storeId) {
-      toast.error(t("common.userWithoutStoreCannotAddUsers"));
-      return;
-    }
-
     const existingUser = allUsers.find(u => u.username === updatedUser.username);
     if (!existingUser) {
       toast.error(t("common.userNotFound"));
       return;
     }
+
+    // Non-admin users can only update users within their own store
+    if (!isAdmin && currentUser?.storeId && updatedUser.storeId !== currentUser.storeId) {
+      toast.error(t("common.noPermissionToChangeStoreId"));
+      return;
+    }
+    // Non-admin users cannot change the storeId of other users
+    if (!isAdmin && currentUser?.storeId && existingUser.storeId !== updatedUser.storeId) {
+      toast.error(t("common.noPermissionToChangeStoreId"));
+      return;
+    }
+    // Non-admin users cannot edit admin users
+    if (!isAdmin && existingUser.role === "admin") {
+      toast.error(t("common.noPermissionToEditAdmins"));
+      return;
+    }
+    // Non-admin users cannot change their own role to admin or change other admin's roles
+    if (!isAdmin && currentUser?.username === updatedUser.username && updatedUser.role === "admin") {
+      toast.error(t("common.noPermissionToChangeRoleToAdmin"));
+      return;
+    }
+    if (!isAdmin && existingUser.role === "admin" && updatedUser.role !== "admin") {
+      toast.error(t("common.noPermissionToChangeAdminRole"));
+      return;
+    }
+
 
     let finalPassword = existingUser.password;
     if (updatedUser.password !== existingUser.password) { // Only hash if password has changed
@@ -195,12 +212,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
+    // Non-admin users can only delete users within their own store
     if (!isAdmin && currentUser?.storeId && userToDelete.storeId !== currentUser.storeId) {
       toast.error(t("common.noPermissionToDeleteUsers"));
       return;
     }
-    if (!isAdmin && !currentUser?.storeId) {
-      toast.error(t("common.userWithoutStoreCannotAddUsers"));
+    // Non-admin users cannot delete admin users
+    if (!isAdmin && userToDelete.role === "admin") {
+      toast.error(t("common.noPermissionToDeleteAdmins"));
+      return;
+    }
+    // Prevent user from deleting themselves
+    if (currentUser?.username === username) {
+      toast.error(t("common.cannotDeleteSelf"));
       return;
     }
 

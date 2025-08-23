@@ -81,6 +81,7 @@
     "articleUpdatedSuccess": "Article {{articleId}} successfully updated.",
     "noPermissionToDeleteArticles": "You do not have permission to delete articles.",
     "articleDeletedSuccess": "Article {{articleId}} successfully deleted.",
+    "articleDeleted": "Article deleted",
     "noArticlesFound": "No articles found.",
     "rackManagement": "Rack Management",
     "addRack": "Add Rack",
@@ -244,7 +245,12 @@
     "passwordNoNumber": "Password must contain at least one number.",
     "passwordNoUppercase": "Password must contain at least one uppercase letter.",
     "passwordNoLowercase": "Password must contain at least one lowercase letter.",
-    "passwordNoSpecialChar": "Password must contain at least one special character."
+    "passwordNoSpecialChar": "Password must contain at least one special character.",
+    "noPermissionToEditAdmins": "You do not have permission to edit administrators.",
+    "noPermissionToChangeRoleToAdmin": "You do not have permission to change role to administrator.",
+    "noPermissionToChangeAdminRole": "You do not have permission to change an administrator's role.",
+    "noPermissionToDeleteAdmins": "You do not have permission to delete administrators.",
+    "cannotDeleteSelf": "You cannot delete your own account."
   },
   "logCategory": {
     "fullLog": "Full Log",

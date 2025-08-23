@@ -81,6 +81,7 @@
     "articleUpdatedSuccess": "Artikl {{articleId}} byl úspěšně aktualizován.",
     "noPermissionToDeleteArticles": "Nemáte oprávnění mazat artikly.",
     "articleDeletedSuccess": "Artikl {{articleId}} byl úspěšně smazán.",
+    "articleDeleted": "Artikl smazán",
     "noArticlesFound": "Žádné artikly nebyly nalezeny.",
     "rackManagement": "Správa regálů",
     "addRack": "Přidat regál",
@@ -244,7 +245,12 @@
     "passwordNoNumber": "Heslo musí obsahovat alespoň jedno číslo.",
     "passwordNoUppercase": "Heslo musí obsahovat alespoň jedno velké písmeno.",
     "passwordNoLowercase": "Heslo musí obsahovat alespoň jedno malé písmeno.",
-    "passwordNoSpecialChar": "Heslo musí obsahovat alespoň jeden speciální znak."
+    "passwordNoSpecialChar": "Heslo musí obsahovat alespoň jeden speciální znak.",
+    "noPermissionToEditAdmins": "Nemáte oprávnění upravovat administrátory.",
+    "noPermissionToChangeRoleToAdmin": "Nemáte oprávnění změnit roli na administrátora.",
+    "noPermissionToChangeAdminRole": "Nemáte oprávnění měnit roli administrátora.",
+    "noPermissionToDeleteAdmins": "Nemáte oprávnění mazat administrátory.",
+    "cannotDeleteSelf": "Nemůžete smazat svůj vlastní účet."
   },
   "logCategory": {
     "fullLog": "Celý log",

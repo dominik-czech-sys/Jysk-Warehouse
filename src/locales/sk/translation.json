@@ -245,7 +245,12 @@
     "passwordNoNumber": "Heslo musí obsahovať aspoň jedno číslo.",
     "passwordNoUppercase": "Heslo musí obsahovať aspoň jedno veľké písmeno.",
     "passwordNoLowercase": "Heslo musí obsahovať aspoň jedno malé písmeno.",
-    "passwordNoSpecialChar": "Heslo musí obsahovať aspoň jeden špeciálny znak."
+    "passwordNoSpecialChar": "Heslo musí obsahovať aspoň jeden špeciálny znak.",
+    "noPermissionToEditAdmins": "Nemáte povolenie upravovať administrátorov.",
+    "noPermissionToChangeRoleToAdmin": "Nemáte povolenie zmeniť rolu na administrátora.",
+    "noPermissionToChangeAdminRole": "Nemáte povolenie zmeniť rolu administrátora.",
+    "noPermissionToDeleteAdmins": "Nemáte povolenie odstraňovať administrátorov.",
+    "cannotDeleteSelf": "Nemôžete odstrániť svoj vlastný účet."
   },
   "logCategory": {
     "fullLog": "Celý log",
@@ -292,7 +297,7 @@
       "update": "Upraviť existujúce artikle",
       "delete": "Vymazať artikle",
       "scan": "Skenovať čiarové kódy pre artikle",
-      "massAdd": "Hromadne pridávať artikle",
+      "massAdd": "Hromadne pridávať artikly",
       "copyFromStore": "Kopírovať artikle z iných obchodov"
     },
     "log": {
