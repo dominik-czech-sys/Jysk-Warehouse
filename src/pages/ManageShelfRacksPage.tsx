@@ -39,25 +39,24 @@ const ManageShelfRacksPage: React.FC = () => {
   const [rackToDeleteId, setRackToDeleteId] = useState<string | null>(null);
   const [rackToDeleteStoreId, setRackToDeleteStoreId] = useState<string | null>(null);
 
-  const handleAddShelfRack = (newRack: ShelfRack) => {
+  const handleAddShelfRack = async (newRack: ShelfRack): Promise<boolean> => {
     if (!hasPermission("rack:create")) {
       toast.error(t("common.noPermissionToAddRacks"));
       return false;
     }
     // Ensure the rack is added to the user's store if not admin
     const finalRack = isAdmin ? newRack : { ...newRack, storeId: userStoreId || newRack.storeId };
-    return addShelfRack(finalRack);
+    return await addShelfRack(finalRack);
   };
 
-  const handleEditShelfRack = (updatedRack: ShelfRack) => {
+  const handleEditShelfRack = async (updatedRack: ShelfRack): Promise<boolean> => {
     if (!hasPermission("rack:update")) {
       toast.error(t("common.noPermissionToEditRacks"));
       return false;
     }
     // Ensure the rack is updated within the user's store if not admin
     const finalRack = isAdmin ? updatedRack : { ...updatedRack, storeId: userStoreId || updatedRack.storeId };
-    updateShelfRack(finalRack);
-    return true;
+    return await updateShelfRack(finalRack);
   };
 
   const handleDeleteShelfRack = (id: string, storeId: string) => {
