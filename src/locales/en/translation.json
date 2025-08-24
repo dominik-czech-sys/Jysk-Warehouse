@@ -264,7 +264,12 @@
     "globalArticleDeletedSuccess": "Global article {{articleId}} successfully deleted.",
     "globalArticleDeleted": "Global article deleted",
     "confirmDeleteGlobalArticleTitle": "Confirm Global Article Deletion",
-    "confirmDeleteGlobalArticleDescription": "Are you sure you want to delete global article <strong>{{articleId}}</strong>? This action cannot be undone and will affect all stores that use this article."
+    "confirmDeleteGlobalArticleDescription": "Are you sure you want to delete global article <strong>{{articleId}}</strong>? This action cannot be undone and will affect all stores that use this article.",
+    "viewExternalContent": "View external content",
+    "changeLanguage": "Change language",
+    "shelfNumberLabel": "Shelf Number",
+    "itemStatus": "Item Status",
+    "rackRowRack": "Row-Rack"
   },
   "permission": {
     "user": {

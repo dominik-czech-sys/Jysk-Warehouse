@@ -264,7 +264,12 @@
     "globalArticleDeletedSuccess": "Globálny článok {{articleId}} bol úspešne vymazaný.",
     "globalArticleDeleted": "Globálny článok vymazaný",
     "confirmDeleteGlobalArticleTitle": "Potvrdiť vymazanie globálneho článku",
-    "confirmDeleteGlobalArticleDescription": "Naozaj chcete vymazať globálny článok <strong>{{articleId}}</strong>? Táto akcia je nevratná a ovplyvní všetky obchody, ktoré tento článok používajú."
+    "confirmDeleteGlobalArticleDescription": "Naozaj chcete vymazať globálny článok <strong>{{articleId}}</strong>? Táto akcia je nevratná a ovplyvní všetky obchody, ktoré tento článok používajú.",
+    "viewExternalContent": "Zobraziť externý obsah",
+    "changeLanguage": "Zmeniť jazyk",
+    "shelfNumberLabel": "Číslo police",
+    "itemStatus": "Status položky",
+    "rackRowRack": "Rad-Regál"
   },
   "permission": {
     "user": {

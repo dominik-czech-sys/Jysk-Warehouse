@@ -264,7 +264,12 @@
     "globalArticleDeletedSuccess": "Globální artikl {{articleId}} byl úspěšně smazán.",
     "globalArticleDeleted": "Globální artikl smazán",
     "confirmDeleteGlobalArticleTitle": "Potvrdit smazání globálního artiklu",
-    "confirmDeleteGlobalArticleDescription": "Opravdu chcete smazat globální artikl <strong>{{articleId}}</strong>? Tato akce je nevratná a ovlivní všechny obchody, které tento artikl používají."
+    "confirmDeleteGlobalArticleDescription": "Opravdu chcete smazat globální artikl <strong>{{articleId}}</strong>? Tato akce je nevratná a ovlivní všechny obchody, které tento artikl používají.",
+    "viewExternalContent": "Zobrazit externí obsah",
+    "changeLanguage": "Změnit jazyk",
+    "shelfNumberLabel": "Číslo police",
+    "itemStatus": "Status položky",
+    "rackRowRack": "Řada-Regál"
   },
   "permission": {
     "user": {
