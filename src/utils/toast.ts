@@ -1,16 +1,15 @@
 import { toast } from "sonner";
-import i18n from "@/i18n"; // Import i18n instance
 
 export const showSuccess = (message: string) => {
-  toast.success(i18n.t(message));
+  toast.success(message);
 };
 
 export const showError = (message: string) => {
-  toast.error(i18n.t(message));
+  toast.error(message);
 };
 
 export const showLoading = (message: string) => {
-  return toast.loading(i18n.t(message));
+  return toast.loading(message);
 };
 
 export const dismissToast = (toastId: string) => {

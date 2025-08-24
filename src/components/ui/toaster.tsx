@@ -1,5 +1,4 @@
-"use client";
-
+import { useToast } from "@/hooks/use-toast";
 import {
   Toast,
   ToastClose,
@@ -7,9 +6,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-  ToastAction, // Import ToastAction
 } from "@/components/ui/toast";
-import { useToast } from "@/hooks/use-toast";
 
 export function Toaster() {
   const { toasts } = useToast();
@@ -25,7 +22,7 @@ export function Toaster() {
                 <ToastDescription>{description}</ToastDescription>
               )}
             </div>
-            {action} {/* Nyní by action mělo být správně renderovatelné */}
+            {action}
             <ToastClose />
           </Toast>
         );

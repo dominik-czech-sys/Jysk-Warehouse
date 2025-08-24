@@ -52,12 +52,6 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        jyskBlue: { // Custom JYSK blue color
-          DEFAULT: "hsl(210 90% 40%)", // A shade of blue
-          dark: "hsl(210 90% 30%)", // Darker for hover/active
-          light: "hsl(210 90% 50%)", // Lighter shade
-          foreground: "hsl(0 0% 100%)", // White text on blue
-        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -91,20 +85,10 @@ export default {
             height: "0",
           },
         },
-        "fade-in": {
-          "0%": { opacity: "0" },
-          "100%": { opacity: "1" },
-        },
-        "slide-in-up": {
-          "0%": { transform: "translateY(20px)", opacity: "0" },
-          "100%": { transform: "translateY(0)", opacity: "1" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.5s ease-out forwards",
-        "slide-in-up": "slide-in-up 0.5s ease-out forwards",
       },
     },
   },
