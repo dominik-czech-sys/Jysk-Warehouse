@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/use-auth"; // Předpokládáme, že useAuth je hook pro AuthContext
+import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +28,7 @@ const Login = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <p className="text-lg text-gray-700 dark:text-gray-300">Loading...</p>
