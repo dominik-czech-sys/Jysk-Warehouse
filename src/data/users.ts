@@ -1,14 +1,15 @@
 import { Article } from "@/data/articles"; // Import Article type
+import * as bcrypt from 'bcryptjs'; // Import bcryptjs for hashing passwords
 
 export type Permission =
   | "user:view"
   | "user:create"
   | "user:update"
   | "user:delete"
-  | "store:view" // New permission for viewing stores
-  | "store:create" // New permission for creating stores
-  | "store:update" // New permission for updating stores
-  | "store:delete" // New permission for deleting stores
+  | "store:view"
+  | "store:create"
+  | "store:update"
+  | "store:delete"
   | "rack:view"
   | "rack:create"
   | "rack:update"
@@ -20,8 +21,8 @@ export type Permission =
   | "article:scan"
   | "article:mass_add"
   | "log:view"
-  | "default_articles:manage" // New permission for managing default articles
-  | "article:copy_from_store"; // New permission for copying articles from other stores
+  | "default_articles:manage"
+  | "article:copy_from_store";
 
 export interface User {
   username: string;
@@ -69,8 +70,64 @@ export const defaultPermissions: Record<User['role'], Permission[]> = {
   ],
 };
 
-// Initial users - toto pole již nebude použito, uživatelé se načítají z DB
-export const users: User[] = [];
+// Initial users - now with hashed passwords
+export const initialUsers: User[] = [
+  {
+    username: "admin",
+    password: bcrypt.hashSync("adminpassword", 10), // Hashed password for 'adminpassword'
+    role: "admin",
+    permissions: defaultPermissions["admin"],
+    firstLogin: false,
+  },
+  {
+    username: "vedouci1",
+    password: bcrypt.hashSync("vedouci1pass", 10),
+    role: "vedouci_skladu",
+    storeId: "T508",
+    permissions: defaultPermissions["vedouci_skladu"],
+    firstLogin: false,
+  },
+  {
+    username: "skladnik1",
+    password: bcrypt.hashSync("skladnik1pass", 10),
+    role: "skladnik",
+    storeId: "T508",
+    permissions: defaultPermissions["skladnik"],
+    firstLogin: false,
+  },
+  {
+    username: "skladnik2",
+    password: bcrypt.hashSync("skladnik2pass", 10),
+    role: "skladnik",
+    storeId: "Kozomín",
+    permissions: defaultPermissions["skladnik"],
+    firstLogin: false,
+  },
+  {
+    username: "manager1",
+    password: bcrypt.hashSync("manager1pass", 10),
+    role: "store_manager",
+    storeId: "T508",
+    permissions: defaultPermissions["store_manager"],
+    firstLogin: false,
+  },
+  {
+    username: "deputy1",
+    password: bcrypt.hashSync("deputy1pass", 10),
+    role: "deputy_store_manager",
+    storeId: "T508",
+    permissions: defaultPermissions["deputy_store_manager"],
+    firstLogin: false,
+  },
+  {
+    username: "ar_assistant1",
+    password: bcrypt.hashSync("ar_assistant1pass", 10),
+    role: "ar_assistant_of_sale",
+    storeId: "T508",
+    permissions: defaultPermissions["ar_assistant_of_sale"],
+    firstLogin: false,
+  },
+];
 
 // Default articles for new stores (if needed)
 export const defaultArticlesForNewStores: Omit<Article, 'rackId' | 'shelfNumber' | 'storeId' | 'quantity'>[] = [

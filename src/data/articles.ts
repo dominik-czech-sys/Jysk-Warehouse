@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useLog } from "@/contexts/LogContext"; // Import useLog
+import { useLog } from "@/contexts/LogContext";
 import { useShelfRacks } from "./shelfRacks"; // Import useShelfRacks to get rack details
-import { getAllArticles, createArticle, updateArticle as apiUpdateArticle, deleteArticle as apiDeleteArticle, ArticleApiData } from "@/api"; // Import API functions
 
 export interface Article {
   id: string; // Číslo artiklu (Article Number)
@@ -14,27 +13,27 @@ export interface Article {
   quantity: number; // New field for article quantity
 }
 
+const initialArticles: Article[] = [
+  { id: "100001", name: "Židle JYSK", rackId: "A-1", shelfNumber: "1", storeId: "T508", status: "21", quantity: 10 },
+  { id: "100002", name: "Stůl JYSK", rackId: "A-1", shelfNumber: "2", storeId: "T508", status: "21", quantity: 5 },
+  { id: "100003", name: "Skříň JYSK", rackId: "B-2", shelfNumber: "1", storeId: "T508", status: "11", quantity: 3 },
+  { id: "200001", name: "Postel JYSK", rackId: "C-3", shelfNumber: "1", storeId: "Kozomín", status: "21", quantity: 7 },
+  { id: "200002", name: "Matrace JYSK", rackId: "C-3", shelfNumber: "2", storeId: "Kozomín", status: "41", quantity: 12 },
+];
+
 export const useArticles = () => {
   const { userStoreId, isAdmin, user } = useAuth();
   const { addLogEntry } = useLog();
-  const { allShelfRacks } = useShelfRacks(); // Use allShelfRacks here
+  const { allShelfRacks } = useShelfRacks();
 
-  const [articles, setArticles] = useState<Article[]>([]); // Nyní se načítá z API
+  const [articles, setArticles] = useState<Article[]>(() => {
+    const storedArticles = localStorage.getItem("articles");
+    return storedArticles ? JSON.parse(storedArticles) : initialArticles;
+  });
 
-  // Načtení artiklů z API při startu a při změnách
   useEffect(() => {
-    const fetchArticles = async () => {
-      try {
-        const articlesFromApi = await getAllArticles();
-        setArticles(articlesFromApi);
-      } catch (error) {
-        console.error("Failed to fetch articles from API:", error);
-        // toast.error(t("common.articlesFetchFailed")); // Překladová chyba, pokud existuje
-        setArticles([]);
-      }
-    };
-    fetchArticles();
-  }, []); // Bez závislostí, aby se načetlo jen jednou při mountu
+    localStorage.setItem("articles", JSON.stringify(articles));
+  }, [articles]);
 
   const filteredArticles = isAdmin
     ? articles
@@ -48,56 +47,28 @@ export const useArticles = () => {
   };
 
   const addArticle = async (newArticle: Article) => {
-    try {
-      const createdArticle = await createArticle(newArticle);
-      if (createdArticle) {
-        setArticles((prev) => [...prev, createdArticle]);
-        addLogEntry("Artikl přidán", { articleId: createdArticle.id, name: createdArticle.name, rackId: createdArticle.rackId, shelfNumber: createdArticle.shelfNumber, storeId: createdArticle.storeId, quantity: createdArticle.quantity }, user?.username);
-        return true;
-      }
-      return false;
-    } catch (error: any) {
-      console.error("Add Article Error:", error);
-      // toast.error(error.message || t("common.articleAddFailed"));
-      addLogEntry("Přidání artiklu selhalo", { articleId: newArticle.id, error: error.message }, user?.username);
+    if (articles.some(article => article.id === newArticle.id && article.storeId === newArticle.storeId)) {
+      // toast.error(t("common.articleExistsInStore", { articleId: newArticle.id }));
+      addLogEntry("Pokus o přidání existujícího artiklu", { articleId: newArticle.id, storeId: newArticle.storeId }, user?.username);
       return false;
     }
+    setArticles((prev) => [...prev, newArticle]);
+    addLogEntry("Artikl přidán", { articleId: newArticle.id, name: newArticle.name, rackId: newArticle.rackId, shelfNumber: newArticle.shelfNumber, storeId: newArticle.storeId, quantity: newArticle.quantity }, user?.username);
+    return true;
   };
 
   const updateArticle = async (updatedArticle: Article) => {
-    try {
-      const result = await apiUpdateArticle(updatedArticle.id, updatedArticle.storeId, updatedArticle);
-      if (result) {
-        setArticles((prev) =>
-          prev.map((article) => (article.id === updatedArticle.id && article.storeId === updatedArticle.storeId ? updatedArticle : article))
-        );
-        addLogEntry("Artikl aktualizován", { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, storeId: updatedArticle.storeId, quantity: updatedArticle.quantity }, user?.username);
-        return true;
-      }
-      return false;
-    } catch (error: any) {
-      console.error("Update Article Error:", error);
-      // toast.error(error.message || t("common.articleUpdateFailed"));
-      addLogEntry("Aktualizace artiklu selhala", { articleId: updatedArticle.id, error: error.message }, user?.username);
-      return false;
-    }
+    setArticles((prev) =>
+      prev.map((article) => (article.id === updatedArticle.id && article.storeId === updatedArticle.storeId ? updatedArticle : article))
+    );
+    addLogEntry("Artikl aktualizován", { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, storeId: updatedArticle.storeId, quantity: updatedArticle.quantity }, user?.username);
+    return true;
   };
 
   const deleteArticle = async (id: string, storeId: string) => {
-    try {
-      const success = await apiDeleteArticle(id, storeId);
-      if (success) {
-        setArticles((prev) => prev.filter((article) => !(article.id === id && article.storeId === storeId)));
-        addLogEntry("Artikl smazán", { articleId: id, storeId }, user?.username);
-        return true;
-      }
-      return false;
-    } catch (error: any) {
-      console.error("Delete Article Error:", error);
-      // toast.error(error.message || t("common.articleDeleteFailed"));
-      addLogEntry("Smazání artiklu selhalo", { articleId: id, storeId, error: error.message }, user?.username);
-      return false;
-    }
+    setArticles((prev) => prev.filter((article) => !(article.id === id && article.storeId === storeId)));
+    addLogEntry("Artikl smazán", { articleId: id, storeId }, user?.username);
+    return true;
   };
 
   const getArticlesByStoreId = (storeId: string) => {

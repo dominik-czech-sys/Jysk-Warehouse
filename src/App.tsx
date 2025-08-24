@@ -1,7 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -22,7 +21,7 @@ import { I18nextProvider } from "react-i18next"; // Import I18nextProvider
 import i18n from "./i18n"; // Import i18n instance
 import { useTranslation } from "react-i18next"; // Import useTranslation for loading message
 
-const queryClient = new QueryClient();
+// const queryClient = new QueryClient(); // Removed QueryClient
 
 // PrivateRoute component to protect routes based on permissions
 const PrivateRoute: React.FC<{ children: JSX.Element; requiredPermission?: Permission }> = ({
@@ -133,23 +132,21 @@ const AppContent = () => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <LogProvider>
-          <AuthProvider>
-            <ThemeProvider>
-              <I18nextProvider i18n={i18n}> {/* Wrap AppContent with I18nextProvider */}
-                <AppContent />
-              </I18nextProvider>
-            </ThemeProvider>
-          </AuthProvider>
-        </LogProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <TooltipProvider>
+    <Toaster />
+    <Sonner />
+    <BrowserRouter>
+      <LogProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <I18nextProvider i18n={i18n}>
+              <AppContent />
+            </I18nextProvider>
+          </ThemeProvider>
+        </AuthProvider>
+      </LogProvider>
+    </BrowserRouter>
+  </TooltipProvider>
 );
 
 export default App;
