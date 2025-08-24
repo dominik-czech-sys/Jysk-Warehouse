@@ -274,7 +274,7 @@ app.put('/api/stores/:id', authenticateToken, async (req, res) => {
     res.status(200).json({ id, name });
   } catch (error) {
     console.error('Update store error:', error);
-    res.status(500).json({ message: 'Failed to update store' });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
@@ -288,7 +288,7 @@ app.delete('/api/stores/:id', authenticateToken, async (req, res) => {
     res.status(200).json({ message: 'Store deleted successfully' });
   } catch (error) {
     console.error('Delete store error:', error);
-    res.status(500).json({ message: 'Failed to delete store' });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
