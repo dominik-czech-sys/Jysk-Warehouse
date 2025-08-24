@@ -2,7 +2,7 @@ const express = require('express');
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const cors = require('cors');
+const cors = require('cors'); // <-- Přidáno
 const fs = require('fs'); // Pro čtení SQL souborů
 const path = require('path'); // Pro práci s cestami k souborům
 
@@ -340,7 +340,7 @@ app.put('/api/racks/:id', authenticateToken, async (req, res) => {
     res.status(200).json({ id, rowId, rackId, shelves, storeId });
   } catch (error) {
     console.error('Update rack error:', error);
-    res.status(500).json({ message: 'Failed to update rack' });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
@@ -354,7 +354,7 @@ app.delete('/api/racks/:id', authenticateToken, async (req, res) => {
     res.status(200).json({ message: 'Rack deleted successfully' });
   } catch (error) {
     console.error('Delete rack error:', error);
-    res.status(500).json({ message: 'Failed to delete rack' });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
@@ -402,7 +402,7 @@ app.put('/api/articles/:id/:storeId', authenticateToken, async (req, res) => {
     res.status(200).json({ id, name, rackId, shelfNumber, storeId, status, quantity });
   } catch (error) {
     console.error('Update article error:', error);
-    res.status(500).json({ message: 'Failed to update article' });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
