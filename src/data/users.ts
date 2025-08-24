@@ -1,56 +1,88 @@
-import { Permission } from "@/types/auth"; // Předpokládáme, že typy jsou definovány jinde nebo inline
+import { Article } from "@/data/articles"; // Import Article type
+
+export type Permission =
+  | "user:view"
+  | "user:create"
+  | "user:update"
+  | "user:delete"
+  | "store:view" // New permission for viewing stores
+  | "store:create" // New permission for creating stores
+  | "store:update" // New permission for updating stores
+  | "store:delete" // New permission for deleting stores
+  | "rack:view"
+  | "rack:create"
+  | "rack:update"
+  | "rack:delete"
+  | "article:view"
+  | "article:create"
+  | "article:update"
+  | "article:delete"
+  | "article:scan"
+  | "article:mass_add"
+  | "log:view"
+  | "default_articles:manage" // New permission for managing default articles
+  | "article:copy_from_store"; // New permission for copying articles from other stores
 
 export interface User {
   username: string;
-  password?: string; // Heslo může být volitelné pro zobrazení, ale vyžadováno pro vytvoření/přihlášení
-  role: "admin" | "store_manager" | "employee";
-  storeId?: string;
-  permissions: Permission[];
-  firstLogin: boolean;
+  password: string; // This will now store hashed passwords
+  role: "admin" | "vedouci_skladu" | "store_manager" | "deputy_store_manager" | "ar_assistant_of_sale" | "skladnik"; // admin or store-specific roles
+  storeId?: string; // Which store this user belongs to
+  permissions: Permission[]; // Array of specific permissions
+  firstLogin: boolean; // New field to track if it's the user's first login
 }
 
-export const defaultPermissions: Record<User["role"], Permission[]> = {
-  admin: [
+// Default permissions for each role
+export const defaultPermissions: Record<User['role'], Permission[]> = {
+  "admin": [
     "user:view", "user:create", "user:update", "user:delete",
     "store:view", "store:create", "store:update", "store:delete",
     "rack:view", "rack:create", "rack:update", "rack:delete",
-    "article:view", "article:create", "article:update", "article:delete",
+    "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add",
+    "log:view",
+    "default_articles:manage",
+    "article:copy_from_store",
   ],
-  store_manager: [
-    "user:view", "user:create", "user:update", "user:delete", // Manažeři mohou spravovat uživatele ve svém obchodě
-    "store:view", "store:update", // Mohou prohlížet a aktualizovat informace o svém obchodě
+  "vedouci_skladu": [
+    "user:view", "user:create", "user:update", "user:delete", // Can manage users in their store
     "rack:view", "rack:create", "rack:update", "rack:delete",
-    "article:view", "article:create", "article:update", "article:delete",
+    "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add",
+    "log:view",
+    "article:copy_from_store",
   ],
-  employee: [
-    "store:view",
-    "rack:view", "rack:update", // Zaměstnanci mohou aktualizovat stav/informace o regálech
-    "article:view", "article:create", "article:update", "article:delete",
+  "store_manager": [
+    "user:view", "user:update", // Can view and update users in their store
+    "rack:view", "rack:update",
+    "article:view", "article:create", "article:update", "article:scan", "article:mass_add",
+    "log:view",
+  ],
+  "deputy_store_manager": [
+    "rack:view",
+    "article:view", "article:create", "article:update", "article:scan", "article:mass_add",
+  ],
+  "ar_assistant_of_sale": [
+    "article:view", "article:scan",
+  ],
+  "skladnik": [
+    "article:view", "article:scan", "article:mass_add", "article:create", "article:update",
+    "rack:view",
   ],
 };
 
+// Initial users - passwords will be hashed on first run or when added/updated
 export const users: User[] = [
   {
-    username: "admin",
-    password: "$2a$10$f/9.QJ/k6gV7.95460wIbeMvD/jXwI4/v6q.x2.9j6d0lU09k", // Hashed 'adminpassword'
+    username: "Dczech",
+    password: "koplkoplko1A", // This will be hashed
     role: "admin",
-    permissions: defaultPermissions.admin,
-    firstLogin: false,
-  },
-  {
-    username: "manager1",
-    password: "$2a$10$f/9.QJ/k6gV7.95460wIbeMvD/jXwI4/v6q.x2.9j6d0lU09k", // Hashed 'managerpassword'
-    role: "store_manager",
-    storeId: "JYSK-001",
-    permissions: defaultPermissions.store_manager,
-    firstLogin: false,
-  },
-  {
-    username: "employee1",
-    password: "$2a$10$f/9.QJ/k6gV7.95460wIbeMvD/jXwI4/v6q.x2.9j6d0lU09k", // Hashed 'employeepassword'
-    role: "employee",
-    storeId: "JYSK-001",
-    permissions: defaultPermissions.employee,
-    firstLogin: false,
-  },
+    permissions: defaultPermissions["admin"],
+    firstLogin: true,
+  }
+];
+
+// Default articles for new stores (if needed)
+export const defaultArticlesForNewStores: Omit<Article, 'rackId' | 'shelfNumber' | 'storeId' | 'quantity'>[] = [
+  { id: "DEFAULT-001", name: "Výchozí artikl A", status: "21" },
+  { id: "DEFAULT-002", name: "Výchozí artikl B", status: "11" },
+  { id: "DEFAULT-003", name: "Výchozí artikl C", status: "41" },
 ];
