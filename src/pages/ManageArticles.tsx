@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useArticles, Article } from "@/data/articles";
 import { Link } from "react-router-dom";
-import { PlusCircle, Edit, Trash2, Scan, Boxes } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Scan, Boxes, ArrowLeft } from "lucide-react";
 import { ArticleFormDialog } from "@/components/ArticleFormDialog";
 import { toast } from "sonner";
 import {
