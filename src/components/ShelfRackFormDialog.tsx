@@ -14,13 +14,13 @@ import { ShelfRack, Shelf } from "@/data/shelfRacks";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { Plus, Minus } from "lucide-react";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
 interface ShelfRackFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (rack: ShelfRack) => boolean; // Returns boolean indicating success
-  rack?: ShelfRack | null; // Optional: if provided, it's for editing
+  onSubmit: (rack: ShelfRack) => boolean;
+  rack?: ShelfRack | null;
 }
 
 export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
@@ -30,13 +30,13 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
   rack,
 }) => {
   const { userStoreId } = useAuth();
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState<ShelfRack>({
     id: "",
     rowId: "",
     rackId: "",
-    shelves: [{ shelfNumber: "1", description: "" }], // Initialize with one shelf
+    shelves: [{ shelfNumber: "1", description: "" }],
     storeId: userStoreId || "",
   });
 
@@ -76,7 +76,6 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
 
   const handleRemoveShelf = (index: number) => {
     const updatedShelves = formData.shelves.filter((_, i) => i !== index);
-    // Re-number shelves after removal
     const renumberedShelves = updatedShelves.map((s, i) => ({
       ...s,
       shelfNumber: (i + 1).toString(),
@@ -90,7 +89,6 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
       toast.error(t("common.fillAllRackFields"));
       return;
     }
-    // Generate ID if adding new rack
     const finalFormData = {
       ...formData,
       id: rack ? formData.id : `${formData.rowId}-${formData.rackId}`.toUpperCase(),
@@ -120,7 +118,7 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
               value={formData.rowId}
               onChange={handleChange}
               className="col-span-3"
-              readOnly={!!rack} // Cannot change rowId/rackId for existing racks
+              readOnly={!!rack}
               placeholder="Např. A"
             />
           </div>
@@ -133,7 +131,7 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
               value={formData.rackId}
               onChange={handleChange}
               className="col-span-3"
-              readOnly={!!rack} // Cannot change rowId/rackId for existing racks
+              readOnly={!!rack}
               placeholder="Např. 1"
             />
           </div>
@@ -146,17 +144,16 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
               value={formData.storeId}
               onChange={handleChange}
               className="col-span-3"
-              readOnly={!!userStoreId} // Store ID is read-only if user has one
+              readOnly={!!userStoreId}
               placeholder="Např. Sklad 1"
             />
           </div>
 
-          {/* Shelves Management */}
           <div className="col-span-full">
             <Label className="text-base font-semibold mb-2 block">{t("common.shelvesAndDescription")}</Label>
             {formData.shelves.map((shelf, index) => (
-              <div key={index} className="flex items-center gap-2 mb-2">
-                <Label className="w-16 text-right">{t("common.shelf")} {shelf.shelfNumber}:</Label>
+              <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-2">
+                <Label className="w-full sm:w-16 sm:text-right">{t("common.shelf")} {shelf.shelfNumber}:</Label>
                 <Input
                   value={shelf.description}
                   onChange={(e) => handleShelfDescriptionChange(index, e.target.value)}
@@ -169,6 +166,7 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
                     variant="destructive"
                     size="icon"
                     onClick={() => handleRemoveShelf(index)}
+                    className="mt-2 sm:mt-0"
                   >
                     <Minus className="h-4 w-4" />
                   </Button>

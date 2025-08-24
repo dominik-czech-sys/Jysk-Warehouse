@@ -16,7 +16,7 @@ import { useShelfRacks } from "@/data/shelfRacks";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/hooks/useAuth";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
 interface ArticleCopyDialogProps {
   isOpen: boolean;
@@ -28,7 +28,7 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
   const { allArticles, addArticle } = useArticles();
   const { allShelfRacks } = useShelfRacks();
   const { user, hasPermission } = useAuth();
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
 
   const [sourceStoreId, setSourceStoreId] = useState<string>("");
   const [targetStoreId, setTargetStoreId] = useState<string>("");
@@ -73,17 +73,14 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
 
       if (existingArticleInTarget && !overwriteExisting) {
         skippedCount++;
-        return; // Skip if exists and not overwriting
+        return;
       }
 
-      // Find a suitable rack in the target store, or assign to N/A
       const targetStoreRacks = allShelfRacks.filter(rack => rack.storeId === targetStoreId);
       let targetRackId = "N/A";
       let targetShelfNumber = "N/A";
 
       if (targetStoreRacks.length > 0 && targetStoreRacks[0].shelves.length > 0) {
-        // For simplicity, assign to the first shelf of the first rack in the target store
-        // In a real scenario, this logic would be more sophisticated (e.g., finding an empty spot)
         targetRackId = targetStoreRacks[0].id;
         targetShelfNumber = targetStoreRacks[0].shelves[0].shelfNumber;
       }
@@ -96,8 +93,7 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
       };
 
       if (existingArticleInTarget && overwriteExisting) {
-        // If overwriting, update the existing article
-        addArticle(newArticle); // addArticle handles updates if ID+storeId match
+        addArticle(newArticle);
       } else {
         addArticle(newArticle);
       }
@@ -108,7 +104,7 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
     onClose();
   };
 
-  const availableStores = stores.filter(s => s.id !== user?.storeId); // Exclude current user's store if not admin
+  const availableStores = stores.filter(s => s.id !== user?.storeId);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

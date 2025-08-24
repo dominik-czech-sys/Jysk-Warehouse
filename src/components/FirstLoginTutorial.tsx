@@ -32,7 +32,7 @@ const FirstLoginTutorial: React.FC<FirstLoginTutorialProps> = ({ onComplete }) =
 
     const success = await changePasswordOnFirstLogin(user.username, newPassword);
     if (success) {
-      setCurrentStep(1); // Move to the next step after password change
+      setCurrentStep(1);
     } else {
       toast.error(t("common.passwordChangeFailed"));
     }
@@ -108,7 +108,7 @@ const FirstLoginTutorial: React.FC<FirstLoginTutorialProps> = ({ onComplete }) =
           },
         ];
       case "ar_assistant_of_sale":
-        return baseSteps; // Only search and scan
+        return baseSteps;
       default:
         return baseSteps;
     }
@@ -125,16 +125,16 @@ const FirstLoginTutorial: React.FC<FirstLoginTutorialProps> = ({ onComplete }) =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-2 sm:p-4">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("common.firstLoginTutorialTitle")}</CardTitle>
-          <CardDescription className="mt-2">{t("common.firstLoginTutorialDescription")}</CardDescription>
+          <CardTitle className="text-2xl sm:text-3xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("common.firstLoginTutorialTitle")}</CardTitle>
+          <CardDescription className="mt-2 text-sm sm:text-base">{t("common.firstLoginTutorialDescription")}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6">
           {user.firstLogin && currentStep === 0 && (
             <div className="space-y-4">
-              <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">{t("common.firstLoginTutorialStep1")}</h2>
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200">{t("common.firstLoginTutorialStep1")}</h2>
               <div className="grid gap-4">
                 <div>
                   <Label htmlFor="newPassword">{t("common.newPassword")}</Label>
@@ -165,15 +165,15 @@ const FirstLoginTutorial: React.FC<FirstLoginTutorialProps> = ({ onComplete }) =
 
           {user.firstLogin && currentStep > 0 && currentStep <= tutorialContent.length && (
             <div className="space-y-4">
-              <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">{t("common.firstLoginTutorialStep2")}</h2>
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200">{t("common.firstLoginTutorialStep2")}</h2>
               <Card className="border-jyskBlue-dark dark:border-jyskBlue-light">
                 <CardHeader>
-                  <CardTitle className="text-xl text-jyskBlue-dark dark:text-jyskBlue-light">
+                  <CardTitle className="text-lg sm:text-xl text-jyskBlue-dark dark:text-jyskBlue-light">
                     {tutorialContent[currentStep - 1].title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-700 dark:text-gray-300">
+                  <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
                     {tutorialContent[currentStep - 1].content}
                   </p>
                 </CardContent>
@@ -188,10 +188,10 @@ const FirstLoginTutorial: React.FC<FirstLoginTutorialProps> = ({ onComplete }) =
 
           {user.firstLogin && currentStep > tutorialContent.length && (
             <div className="text-center space-y-4">
-              <h2 className="text-2xl font-semibold text-green-600 dark:text-green-400 flex items-center justify-center">
+              <h2 className="text-xl sm:text-2xl font-semibold text-green-600 dark:text-green-400 flex items-center justify-center">
                 <Check className="h-6 w-6 mr-2" /> {t("common.tutorialComplete")}
               </h2>
-              <p className="text-lg text-gray-700 dark:text-gray-300">{t("common.tutorialCompleteMessage")}</p>
+              <p className="text-base sm:text-lg text-gray-700 dark:text-gray-300">{t("common.tutorialCompleteMessage")}</p>
               <Button onClick={onComplete} className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
                 {t("common.finishTutorial")}
               </Button>

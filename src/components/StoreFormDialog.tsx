@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Store } from "@/data/stores";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
 interface StoreFormDialogProps {
   isOpen: boolean;
@@ -33,12 +33,12 @@ export const StoreFormDialog: React.FC<StoreFormDialogProps> = ({
     name: "",
   });
   const [addDefaultArticles, setAddDefaultArticles] = useState(true);
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (store) {
       setFormData(store);
-      setAddDefaultArticles(false); // Don't add default articles when editing
+      setAddDefaultArticles(false);
     } else {
       setFormData({
         id: "",
@@ -83,7 +83,7 @@ export const StoreFormDialog: React.FC<StoreFormDialogProps> = ({
               value={formData.id}
               onChange={handleChange}
               className="col-span-3"
-              readOnly={!!store} // ID is read-only when editing
+              readOnly={!!store}
               placeholder="Např. T508"
             />
           </div>
@@ -99,7 +99,7 @@ export const StoreFormDialog: React.FC<StoreFormDialogProps> = ({
               placeholder="Např. JYSK T508"
             />
           </div>
-          {!store && ( // Only show for new stores
+          {!store && (
             <div className="flex items-center space-x-2 col-span-full sm:col-start-2 sm:col-span-3">
               <Checkbox
                 id="addDefaultArticles"

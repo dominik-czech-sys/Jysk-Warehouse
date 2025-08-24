@@ -14,12 +14,12 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useShelfRacks, ShelfRack } from "@/data/shelfRacks";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
 interface ShelfDetails {
   rackId: string;
   shelfNumber: string;
-  storeId: string; // Renamed from warehouseId
+  storeId: string;
 }
 
 const MassAddArticlesPage: React.FC = () => {
@@ -28,7 +28,7 @@ const MassAddArticlesPage: React.FC = () => {
   const { addLogEntry } = useLog();
   const { shelfRacks } = useShelfRacks();
   const navigate = useNavigate();
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
 
   const [shelfDetails, setShelfDetails] = useState<ShelfDetails>({
     rackId: "",
@@ -84,7 +84,6 @@ const MassAddArticlesPage: React.FC = () => {
   useEffect(() => {
     const currentRack = shelfRacks.find(rack => rack.id === selectedRackId && rack.storeId === userStoreId);
     if (currentRack) {
-      // Update storeId from the selected rack
       setShelfDetails({
         rackId: currentRack.id,
         shelfNumber: selectedShelfNumber,
@@ -101,7 +100,7 @@ const MassAddArticlesPage: React.FC = () => {
 
   const handleRackSelect = (value: string) => {
     setSelectedRackId(value);
-    setSelectedShelfNumber(""); // Reset shelf number when rack changes
+    setSelectedShelfNumber("");
   };
 
   const handleShelfNumberSelect = (value: string) => {
@@ -131,24 +130,23 @@ const MassAddArticlesPage: React.FC = () => {
       return;
     }
 
-    const existingArticle = getArticleById(articleId.trim().toUpperCase(), userStoreId); // Check for article in current store
+    const existingArticle = getArticleById(articleId.trim().toUpperCase(), userStoreId);
     const newArticleData: Article = {
       id: articleId.trim().toUpperCase(),
-      name: existingArticle?.name || `${t("common.unknown")} ${t("common.article")} ${articleId.trim().toUpperCase()}`, // Default name if not found
-      status: existingArticle?.status || "21", // Default status
+      name: existingArticle?.name || `${t("common.unknown")} ${t("common.article")} ${articleId.trim().toUpperCase()}`,
+      status: existingArticle?.status || "21",
       quantity: quantity,
-      ...shelfDetails, // Apply preset shelf details
+      ...shelfDetails,
     };
 
-    // Check if this article is already in the current session's list for the same store
     if (articlesToProcess.some(a => a.id === newArticleData.id && a.storeId === newArticleData.storeId)) {
       toast.warning(t("common.articleAlreadyInList", { articleId: newArticleData.id }));
       return;
     }
 
     setArticlesToProcess((prev) => [...prev, newArticleData]);
-    setManualArticleId(""); // Clear manual input after adding
-    setManualArticleQuantity(1); // Reset quantity
+    setManualArticleId("");
+    setManualArticleQuantity(1);
     toast.success(t("common.articleAddedToList", { articleId: newArticleData.id }));
   };
 
@@ -168,12 +166,12 @@ const MassAddArticlesPage: React.FC = () => {
     }
 
     articlesToProcess.forEach(article => {
-      const existing = getArticleById(article.id, article.storeId); // Check for article in its specific store
+      const existing = getArticleById(article.id, article.storeId);
       if (existing) {
-        updateArticle(article); // Update existing article with new location and quantity
+        updateArticle(article);
         addLogEntry(t("common.articleUpdatedMassAdd"), { articleId: article.id, newRackId: article.rackId, newShelfNumber: article.shelfNumber, storeId: article.storeId, quantity: article.quantity }, user?.username);
       } else {
-        addArticle(article); // Add new article
+        addArticle(article);
         addLogEntry(t("common.articleAddedMassAdd"), { articleId: article.id, rackId: article.rackId, shelfNumber: article.shelfNumber, storeId: article.storeId, quantity: article.quantity }, user?.username);
       }
     });
@@ -183,7 +181,7 @@ const MassAddArticlesPage: React.FC = () => {
     setIsShelfDetailsLocked(false);
     setSelectedRackId("");
     setSelectedShelfNumber("");
-    navigate("/spravovat-artikly"); // Redirect to manage articles after saving
+    navigate("/spravovat-artikly");
   };
 
   const availableShelves = selectedRackId
@@ -191,20 +189,20 @@ const MassAddArticlesPage: React.FC = () => {
     : [];
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-8">
-        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-6 space-y-4 sm:space-y-0">
+    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-2 sm:p-4">
+      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 sm:p-6 mt-4 sm:mt-8">
+        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-4 sm:mb-6 space-y-2 sm:space-y-0">
           <Link to="/spravovat-artikly" className="w-full sm:w-auto">
             <Button variant="outline" className="flex items-center w-full">
               <ArrowLeft className="h-4 w-4 mr-2" /> {t("common.backToArticleManagement")}
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("common.massAdd")} {t("common.articles")}</h1>
-          <div className="w-full sm:w-auto"></div> {/* Placeholder for alignment */}
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("common.massAdd")} {t("common.articles")}</h1>
+          <div className="w-full sm:w-auto"></div>
         </div>
 
         {/* Shelf Details Section */}
-        <Card className="mb-6">
+        <Card className="mb-4 sm:mb-6">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("common.shelfDetails")}</CardTitle>
           </CardHeader>
@@ -258,10 +256,10 @@ const MassAddArticlesPage: React.FC = () => {
 
         {isShelfDetailsLocked && (
           <>
-            <Separator className="my-6" />
+            <Separator className="my-4 sm:my-6" />
 
             {/* Article Input Section */}
-            <Card className="mb-6">
+            <Card className="mb-4 sm:mb-6">
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("common.addArticle")}</CardTitle>
               </CardHeader>
@@ -278,7 +276,7 @@ const MassAddArticlesPage: React.FC = () => {
                   )}
                 </div>
 
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
                   <Input
                     type="text"
                     placeholder={t("common.enterArticleIdManually")}
@@ -293,19 +291,19 @@ const MassAddArticlesPage: React.FC = () => {
                     value={manualArticleQuantity}
                     onChange={(e) => setManualArticleQuantity(parseInt(e.target.value, 10) || 1)}
                     min="1"
-                    className="w-24"
+                    className="w-full sm:w-24"
                   />
-                  <Button onClick={handleManualAddArticle} className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+                  <Button onClick={handleManualAddArticle} className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">
                     <PlusCircle className="h-4 w-4 mr-2" /> {t("common.add")}
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
-            <Separator className="my-6" />
+            <Separator className="my-4 sm:my-6" />
 
             {/* Articles to Process List */}
-            <Card className="mb-6 flex flex-col flex-grow">
+            <Card className="mb-4 sm:mb-6 flex flex-col flex-grow">
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("common.articlesToSave")} ({articlesToProcess.length})</CardTitle>
               </CardHeader>
@@ -317,7 +315,7 @@ const MassAddArticlesPage: React.FC = () => {
                     <div className="space-y-2">
                       {articlesToProcess.map((article) => (
                         <div key={article.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                          <span className="font-medium">{article.id} - {article.name} ({t("common.quantity")}: {article.quantity})</span>
+                          <span className="font-medium text-sm sm:text-base">{article.id} - {article.name} ({t("common.quantity")}: {article.quantity})</span>
                           <Button variant="ghost" size="sm" onClick={() => handleRemoveArticleFromList(article.id)}>
                             <XCircle className="h-4 w-4 text-destructive" />
                           </Button>

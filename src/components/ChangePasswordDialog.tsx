@@ -53,7 +53,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({ isOp
       return;
     }
 
-    if (newPassword.length < 6) { // Basic password strength check
+    if (newPassword.length < 6) {
       toast.error(t("common.passwordTooShort"));
       return;
     }
@@ -63,7 +63,6 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({ isOp
     if (success) {
       onClose();
     }
-    // Toast messages are handled within AuthContext
   };
 
   return (

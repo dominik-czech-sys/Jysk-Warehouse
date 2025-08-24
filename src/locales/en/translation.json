@@ -276,7 +276,16 @@
     "incorrectCurrentPassword": "The current password entered is incorrect.",
     "userPasswordChanged": "User password changed.",
     "notLoggedIn": "You are not logged in.",
-    "passwordTooShort": "New password must be at least 6 characters long."
+    "passwordTooShort": "New password must be at least 6 characters long.",
+    "openMenu": "Open menu",
+    "menu": "Menu",
+    "accountSettings": "Account Settings",
+    "personalInformation": "Personal Information",
+    "personalInformationDescription": "Basic information about your account.",
+    "role": "Role",
+    "security": "Security",
+    "securityDescription": "Manage your account security settings.",
+    "pleaseLoginToAccess": "Please log in to access this page."
   },
   "permission": {
     "user": {

@@ -9,17 +9,11 @@ import { Separator } from "@/components/ui/separator";
 import { Trash2, Filter } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
-import { cs, enUS, sk } from "date-fns/locale"; // Import locales for date formatting
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { cs, enUS, sk } from "date-fns/locale";
+import { useTranslation } from "react-i18next";
 
-interface LogViewerProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-// Define log categories and their corresponding action strings
 const logCategories = {
-  "Full Log": [], // All logs
+  "Full Log": [],
   "Login": ["Uživatel se přihlásil", "Neúspěšné přihlášení"],
   "LogOff": ["Uživatel se odhlásil"],
   "User Add": ["Uživatel přidán", "Pokus o přidání existujícího uživatele"],
@@ -39,7 +33,6 @@ const logCategories = {
   "Article Copy": ["Artikly zkopírovány"],
 };
 
-// Map internal category keys to translation keys
 const logCategoryTranslationKeys: Record<keyof typeof logCategories, string> = {
   "Full Log": "logCategory.fullLog",
   "Login": "logCategory.login",
@@ -63,7 +56,7 @@ const logCategoryTranslationKeys: Record<keyof typeof logCategories, string> = {
 
 export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
   const { logEntries, clearLog } = useLog();
-  const { t, i18n } = useTranslation(); // Initialize useTranslation
+  const { t, i18n } = useTranslation();
 
   const [selectedFilter, setSelectedFilter] = useState<keyof typeof logCategories>("Full Log");
 
@@ -87,10 +80,9 @@ export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
       filteredLogs = logEntries.filter(entry => allowedActions.includes(entry.action));
     }
 
-    // Group by day
     const grouped: Record<string, LogEntry[]> = {};
     filteredLogs.forEach(entry => {
-      const date = new Date(entry.timestamp); // Create Date object from number
+      const date = new Date(entry.timestamp);
       const dayKey = format(date, "yyyy-MM-dd");
       if (!grouped[dayKey]) {
         grouped[dayKey] = [];
@@ -98,12 +90,11 @@ export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
       grouped[dayKey].push(entry);
     });
 
-    // Sort days in descending order
     const sortedDays = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
     return sortedDays.map(day => ({
       date: day,
-      entries: grouped[day].sort((a, b) => b.timestamp - a.timestamp), // Sort entries within each day by timestamp number
+      entries: grouped[day].sort((a, b) => b.timestamp - a.timestamp),
     }));
   }, [logEntries, selectedFilter]);
 
@@ -112,49 +103,49 @@ export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-2 sm:p-4">
       <Card className="w-full max-w-3xl h-[90vh] flex flex-col">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-2xl font-bold">{t("common.logActivity")}</CardTitle>
-          <div className="flex items-center space-x-2">
+        <CardHeader className="flex flex-col sm:flex-row items-center justify-between pb-2 space-y-2 sm:space-y-0">
+          <CardTitle className="text-xl sm:text-2xl font-bold">{t("common.logActivity")}</CardTitle>
+          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
             <Select onValueChange={(value: keyof typeof logCategories) => setSelectedFilter(value)} value={selectedFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder={t("common.selectLogType")} />
               </SelectTrigger>
               <SelectContent>
                 {Object.keys(logCategories).map(category => (
                   <SelectItem key={category} value={category}>
-                    {t(logCategoryTranslationKeys[category])} {/* Používáme nové klíče pro překlad */}
+                    {t(logCategoryTranslationKeys[category])}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="destructive" size="sm" onClick={clearLog}>
+            <Button variant="destructive" size="sm" onClick={clearLog} className="w-full sm:w-auto">
               <Trash2 className="h-4 w-4 mr-2" /> {t("common.clearLog")}
             </Button>
-            <Button variant="outline" size="sm" onClick={onClose}>
+            <Button variant="outline" size="sm" onClick={onClose} className="w-full sm:w-auto">
               {t("common.close")}
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="flex-grow p-0 flex flex-col min-h-0"> {/* Added min-h-0 here */}
+        <CardContent className="flex-grow p-0 flex flex-col min-h-0">
           <ScrollArea className="h-full w-full rounded-md border p-4">
             {filteredAndGroupedLogs.length === 0 ? (
               <p className="text-center text-muted-foreground">{t("common.noRecordsForFilter")}</p>
             ) : (
               filteredAndGroupedLogs.map(dayGroup => (
                 <div key={dayGroup.date} className="mb-6">
-                  <h3 className="sticky top-0 bg-white dark:bg-gray-800 py-2 text-lg font-bold text-jyskBlue-dark dark:text-jyskBlue-light border-b mb-3">
+                  <h3 className="sticky top-0 bg-white dark:bg-gray-800 py-2 text-base sm:text-lg font-bold text-jyskBlue-dark dark:text-jyskBlue-light border-b mb-3">
                     {format(new Date(dayGroup.date), "EEEE, d. MMMM yyyy", { locale: currentLocale })}
                   </h3>
                   {dayGroup.entries.map((entry) => (
                     <div key={entry.id} className="mb-4 last:mb-0">
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         <span className="font-semibold">{format(new Date(entry.timestamp), "HH:mm:ss", { locale: currentLocale })}</span> -{" "}
                         <span className="font-semibold text-jyskBlue-dark dark:text-jyskBlue-light">{entry.user}</span>
                       </p>
-                      <p className="text-base font-medium">{entry.action}</p>
+                      <p className="text-sm sm:text-base font-medium">{entry.action}</p>
                       {entry.details && Object.keys(entry.details).length > 0 && (
                         <pre className="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded-md text-xs overflow-x-auto">
                           {JSON.stringify(entry.details, null, 2)}

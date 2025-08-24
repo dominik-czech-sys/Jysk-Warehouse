@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
 interface WarehouseSearchProps {
   onSearch: (articleId: string) => void;
@@ -10,7 +10,7 @@ interface WarehouseSearchProps {
 
 export const WarehouseSearch: React.FC<WarehouseSearchProps> = ({ onSearch }) => {
   const [articleId, setArticleId] = useState("");
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
 
   const handleSearch = () => {
     if (articleId.trim()) {
@@ -25,16 +25,16 @@ export const WarehouseSearch: React.FC<WarehouseSearchProps> = ({ onSearch }) =>
   };
 
   return (
-    <div className="flex w-full max-w-sm items-center space-x-2 p-4">
+    <div className="flex flex-col sm:flex-row w-full max-w-sm items-center space-y-2 sm:space-y-0 sm:space-x-2 p-2 sm:p-4">
       <Input
         type="text"
         placeholder={t("common.enterArticleId")}
         value={articleId}
         onChange={(e) => setArticleId(e.target.value)}
         onKeyPress={handleKeyPress}
-        className="flex-grow"
+        className="flex-grow w-full"
       />
-      <Button type="submit" onClick={handleSearch} className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+      <Button type="submit" onClick={handleSearch} className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">
         <Search className="h-4 w-4 mr-2" /> {t("common.search")}
       </Button>
     </div>

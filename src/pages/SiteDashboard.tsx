@@ -125,9 +125,9 @@ const SiteDashboard: React.FC = () => {
 
   if (!hasPermission("store:view") && !hasPermission("user:view")) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-        <Card className="p-6 text-center">
-          <CardTitle className="text-2xl font-bold text-red-600">{t("common.accessDenied")}</CardTitle>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-2 sm:p-4">
+        <Card className="p-4 sm:p-6 text-center">
+          <CardTitle className="text-xl sm:text-2xl font-bold text-red-600">{t("common.accessDenied")}</CardTitle>
           <CardContent className="mt-4">
             <p className="text-gray-700 dark:text-gray-300">{t("common.noPermission")}</p>
             <Link to="/" className="mt-4 inline-block">
@@ -140,20 +140,20 @@ const SiteDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-6xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-8 animate-fade-in">
-        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-6 space-y-4 sm:space-y-0">
+    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-2 sm:p-4">
+      <div className="w-full max-w-6xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 sm:p-6 mt-4 sm:mt-8 animate-fade-in">
+        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-4 sm:mb-6 space-y-2 sm:space-y-0">
           <Link to="/" className="w-full sm:w-auto">
             <Button variant="outline" className="flex items-center w-full">
               <ArrowLeft className="h-4 w-4 mr-2" /> {t("common.backToMainPage")}
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("common.siteDashboard")} ({isAdmin ? t("common.admin") : translateRole(currentUser?.role || "unknown")})</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("common.siteDashboard")} ({isAdmin ? t("common.admin") : translateRole(currentUser?.role || "unknown")})</h1>
           <div className="w-full sm:w-auto"></div> {/* Placeholder for alignment */}
         </div>
 
         {/* Overview Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-slide-in-up">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8 animate-slide-in-up">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t("common.totalStores")}</CardTitle>
@@ -192,21 +192,21 @@ const SiteDashboard: React.FC = () => {
           </Card>
         </div>
 
-        <Separator className="my-8" />
+        <Separator className="my-6 sm:my-8" />
 
         {/* Store Management Section */}
         {hasPermission("store:view") && (
-          <div className="mb-8 w-full animate-fade-in">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.storeManagement")}</h2>
-              <div className="flex space-x-2">
+          <div className="mb-6 sm:mb-8 w-full animate-fade-in">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("common.storeManagement")}</h2>
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
                 {hasPermission("store:create") && (
-                  <Button onClick={() => setIsAddStoreDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+                  <Button onClick={() => setIsAddStoreDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
                     <PlusCircle className="h-4 w-4 mr-2" /> {t("common.addStore")}
                   </Button>
                 )}
                 {hasPermission("article:copy_from_store") && (
-                  <Button onClick={() => setIsArticleCopyDialogOpen(true)} variant="outline" className="flex items-center">
+                  <Button onClick={() => setIsArticleCopyDialogOpen(true)} variant="outline" className="flex items-center w-full">
                     <Copy className="h-4 w-4 mr-2" /> {t("common.copyArticles")}
                   </Button>
                 )}
@@ -261,16 +261,16 @@ const SiteDashboard: React.FC = () => {
           </div>
         )}
 
-        <Separator className="my-8" />
+        <Separator className="my-6 sm:my-8" />
 
         {/* User Management Section */}
         {hasPermission("user:view") && (
-          <div className="mb-8 w-full animate-fade-in">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.userManagement")}</h2>
-              <div className="flex space-x-2">
+          <div className="mb-6 sm:mb-8 w-full animate-fade-in">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("common.userManagement")}</h2>
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
                 {hasPermission("user:create") && (
-                  <Button onClick={() => setIsAddUserDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+                  <Button onClick={() => setIsAddUserDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
                     <PlusCircle className="h-4 w-4 mr-2" /> {t("common.addUser")}
                   </Button>
                 )}
@@ -303,8 +303,8 @@ const SiteDashboard: React.FC = () => {
                               setIsEditUserDialogOpen(true);
                             }}
                             disabled={
-                              (!isAdmin && user.role === "admin") || // Non-admin cannot edit admins
-                              (!isAdmin && user.storeId !== currentUser?.storeId) // Non-admin cannot edit users outside their store
+                              (!isAdmin && user.role === "admin") ||
+                              (!isAdmin && user.storeId !== currentUser?.storeId)
                             }
                           >
                             <Edit className="h-4 w-4" />
@@ -316,9 +316,9 @@ const SiteDashboard: React.FC = () => {
                             size="sm"
                             onClick={() => handleDeleteUser(user.username)}
                             disabled={
-                              (!isAdmin && user.role === "admin") || // Non-admin cannot delete admins
-                              (!isAdmin && user.storeId !== currentUser?.storeId) || // Non-admin cannot delete users outside their store
-                              (currentUser?.username === user.username) // Cannot delete self
+                              (!isAdmin && user.role === "admin") ||
+                              (!isAdmin && user.storeId !== currentUser?.storeId) ||
+                              (currentUser?.username === user.username)
                             }
                           >
                             <Trash2 className="h-4 w-4" />
@@ -336,13 +336,13 @@ const SiteDashboard: React.FC = () => {
           </div>
         )}
 
-        <Separator className="my-8" />
+        <Separator className="my-6 sm:my-8" />
 
         {/* Log Viewer Section */}
         {hasPermission("log:view") && (
-          <div className="mb-8 w-full animate-fade-in">
+          <div className="mb-6 sm:mb-8 w-full animate-fade-in">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.logActivity")}</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("common.logActivity")}</h2>
               <Button onClick={() => setIsLogViewerOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
                 <ScrollText className="h-4 w-4 mr-2" /> {t("common.viewLog")}
               </Button>
@@ -350,13 +350,13 @@ const SiteDashboard: React.FC = () => {
           </div>
         )}
 
-        <Separator className="my-8" />
+        <Separator className="my-6 sm:my-8" />
 
         {/* Export Data Section */}
         {hasPermission("log:view") && (
-          <div className="mb-8 w-full animate-fade-in">
+          <div className="mb-6 sm:mb-8 w-full animate-fade-in">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t("common.exportData")}</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("common.exportData")}</h2>
               <Link to="/export-dat" className="w-full sm:w-auto">
                 <Button className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
                   <Download className="h-4 w-4 mr-2" /> {t("common.exportData")}

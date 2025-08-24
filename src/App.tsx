@@ -13,6 +13,7 @@ import CteckaCarkoduPage from "./pages/CteckaCarkoduPage";
 import MassAddArticlesPage from "./pages/MassAddArticlesPage";
 import ManageShelfRacksPage from "./pages/ManageShelfRacksPage";
 import ExportDataPage from "./pages/ExportDataPage"; // Import ExportDataPage
+import AccountSettingsPage from "./pages/AccountSettingsPage"; // Import AccountSettingsPage
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { useContext } from "react";
@@ -109,6 +110,14 @@ const AppContent = () => {
         element={
           <PrivateRoute requiredPermission="log:view">
             <ExportDataPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/account-settings"
+        element={
+          <PrivateRoute>
+            <AccountSettingsPage />
           </PrivateRoute>
         }
       />

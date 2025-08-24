@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import { useGlobalArticles, GlobalArticle } from "@/data/globalArticles"; // Import global articles hook
+import { useGlobalArticles, GlobalArticle } from "@/data/globalArticles";
 
 const ManageArticles = () => {
   const { articles, addArticle, updateArticle, deleteArticle } = useArticles();
@@ -39,7 +39,7 @@ const ManageArticles = () => {
   const [editingArticle, setEditingArticle] = useState<Article | GlobalArticle | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [articleToDeleteId, setArticleToDeleteId] = useState<string | null>(null);
-  const [articleToDeleteStoreId, setArticleToDeleteStoreId] = useState<string | null>(null); // Can be "GLOBAL"
+  const [articleToDeleteStoreId, setArticleToDeleteStoreId] = useState<string | null>(null);
 
   const currentArticles = isAdmin ? globalArticles : articles;
 
@@ -116,15 +116,15 @@ const ManageArticles = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-8">
-        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-6 space-y-4 sm:space-y-0">
+    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-2 sm:p-4">
+      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 sm:p-6 mt-4 sm:mt-8">
+        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-4 sm:mb-6 space-y-2 sm:space-y-0">
           <Link to="/" className="w-full sm:w-auto">
             <Button variant="outline" className="flex items-center w-full">
               <ArrowLeft className="h-4 w-4 mr-2" /> {t("common.backToMainPage")}
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">
             {isAdmin ? t("common.globalArticleManagement") : t("common.articleManagement")}
           </h1>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">

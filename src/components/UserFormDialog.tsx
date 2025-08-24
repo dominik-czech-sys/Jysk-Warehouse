@@ -15,10 +15,9 @@ import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useStores } from "@/data/stores"; // Import useStores
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useStores } from "@/data/stores";
+import { useTranslation } from "react-i18next";
 
-// Define all possible permissions for display
 const allPermissions: Permission[] = [
   "user:view", "user:create", "user:update", "user:delete",
   "store:view", "store:create", "store:update", "store:delete",
@@ -29,7 +28,6 @@ const allPermissions: Permission[] = [
   "article:copy_from_store",
 ];
 
-// Map permissions to their translation keys for descriptions
 const permissionDescriptions: Record<Permission, string> = {
   "user:view": "permission.user.view",
   "user:create": "permission.user.create",
@@ -57,8 +55,8 @@ const permissionDescriptions: Record<Permission, string> = {
 interface UserFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (user: User) => Promise<void>; // Changed to async
-  user?: User | null; // Optional: if provided, it's for editing
+  onSubmit: (user: User) => Promise<void>;
+  user?: User | null;
 }
 
 export const UserFormDialog: React.FC<UserFormDialogProps> = ({
@@ -68,8 +66,8 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
   user,
 }) => {
   const { isAdmin, userStoreId: currentUserStoreId, user: currentUser } = useAuth();
-  const { stores } = useStores(); // Get list of all stores
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { stores } = useStores();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState<User>({
     username: "",
@@ -77,7 +75,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
     role: "skladnik",
     storeId: currentUserStoreId || "",
     permissions: defaultPermissions["skladnik"],
-    firstLogin: true, // New users always have firstLogin true
+    firstLogin: true,
   });
 
   useEffect(() => {
@@ -104,8 +102,8 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
     setFormData((prev) => ({
       ...prev,
       role: value,
-      storeId: value === "admin" ? undefined : (prev.storeId || currentUserStoreId || ""), // Admin doesn't need storeId
-      permissions: defaultPermissions[value] || [], // Set default permissions for the role
+      storeId: value === "admin" ? undefined : (prev.storeId || currentUserStoreId || ""),
+      permissions: defaultPermissions[value] || [],
     }));
   };
 
@@ -128,7 +126,6 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
       toast.error(t("common.fillAllRequiredFields"));
       return;
     }
-    // For new users, password is required. For existing users, it's optional.
     if (!user && !formData.password) {
       toast.error(t("common.passwordRequiredForNewUser"));
       return;
@@ -137,16 +134,13 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
     onClose();
   };
 
-  // Filter stores based on current user's role
   const availableStores = isAdmin
     ? stores
     : stores.filter(s => s.id === currentUserStoreId);
 
-  // Determine if role selection should be disabled
-  const isRoleSelectDisabled = !isAdmin && user?.username === currentUser?.username; // Non-admin cannot change their own role
+  const isRoleSelectDisabled = !isAdmin && user?.username === currentUser?.username;
 
-  // Determine if store selection should be disabled
-  const isStoreSelectDisabled = !isAdmin && !!currentUserStoreId && formData.role !== "admin"; // Non-admin cannot change storeId if they have one, unless setting to admin
+  const isStoreSelectDisabled = !isAdmin && !!currentUserStoreId && formData.role !== "admin";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -225,7 +219,6 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
             </div>
           )}
 
-          {/* Permissions Management */}
           <div className="col-span-full mt-4">
             <Label className="text-base font-semibold mb-2 block">{t("common.permissions")}</Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -235,10 +228,10 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
                     id={permission}
                     checked={formData.permissions.includes(permission)}
                     onCheckedChange={(checked) => handlePermissionChange(permission, !!checked)}
-                    disabled={!isAdmin && formData.role === "admin"} // Only admin can change admin permissions
+                    disabled={!isAdmin && formData.role === "admin"}
                   />
                   <Label htmlFor={permission} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                    {t(permissionDescriptions[permission])} {/* Zobrazujeme popis oprávnění */}
+                    {t(permissionDescriptions[permission])}
                   </Label>
                 </div>
               ))}

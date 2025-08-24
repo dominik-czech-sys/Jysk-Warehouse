@@ -15,15 +15,15 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useShelfRacks } from "@/data/shelfRacks";
-import { useTranslation } from "react-i18next"; // Import useTranslation
-import { GlobalArticle } from "@/data/globalArticles"; // Import GlobalArticle
+import { useTranslation } from "react-i18next";
+import { GlobalArticle } from "@/data/globalArticles";
 
 interface ArticleFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (article: Article | GlobalArticle) => void;
   article?: Article | GlobalArticle | null;
-  isGlobalAdminContext?: boolean; // New prop to indicate if it's for global articles
+  isGlobalAdminContext?: boolean;
 }
 
 export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
@@ -35,7 +35,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
 }) => {
   const { userStoreId } = useAuth();
   const { shelfRacks } = useShelfRacks();
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState<Article | GlobalArticle>({
     id: "",
@@ -93,7 +93,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
 
   const handleRackSelect = (value: string) => {
     setSelectedRackId(value);
-    setSelectedShelfNumber(""); // Reset shelf number when rack changes
+    setSelectedShelfNumber("");
   };
 
   const handleShelfNumberSelect = (value: string) => {
@@ -107,7 +107,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
       return;
     }
     if (!isGlobalAdminContext && (!selectedRackId || !selectedShelfNumber)) {
-      toast.error(t("common.fillAllArticleFields")); // Specific message for rack/shelf
+      toast.error(t("common.fillAllArticleFields"));
       return;
     }
     onSubmit(formData);
@@ -120,7 +120,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{article ? (isGlobalAdminContext ? t("common.editGlobalArticle") : t("common.editArticle")) : (isGlobalAdminContext ? t("common.addGlobalArticle") : t("common.addArticle"))}</DialogTitle>
           <DialogDescription>
@@ -154,7 +154,6 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
 
           {!isGlobalAdminContext && (
             <>
-              {/* Shelf Rack Selection */}
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
                 <Label htmlFor="rackId" className="sm:text-right">
                   {t("common.rackRowRack")}
@@ -173,7 +172,6 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
                 </Select>
               </div>
 
-              {/* Shelf Number Selection */}
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
                 <Label htmlFor="shelfNumber" className="sm:text-right">
                   {t("common.shelfNumberLabel")}
@@ -192,7 +190,6 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
                 </Select>
               </div>
 
-              {/* Display derived fields as read-only */}
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
                 <Label htmlFor="storeId" className="sm:text-right">
                   {t("common.storeId")}

@@ -25,12 +25,12 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useShelfRacks, ShelfRack } from "@/data/shelfRacks";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
 const ManageShelfRacksPage: React.FC = () => {
   const { shelfRacks, addShelfRack, updateShelfRack, deleteShelfRack } = useShelfRacks();
   const { isAdmin, userStoreId, hasPermission } = useAuth();
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -44,7 +44,6 @@ const ManageShelfRacksPage: React.FC = () => {
       toast.error(t("common.noPermissionToAddRacks"));
       return false;
     }
-    // Ensure the rack is added to the user's store if not admin
     const finalRack = isAdmin ? newRack : { ...newRack, storeId: userStoreId || newRack.storeId };
     return addShelfRack(finalRack);
   };
@@ -54,7 +53,6 @@ const ManageShelfRacksPage: React.FC = () => {
       toast.error(t("common.noPermissionToEditRacks"));
       return false;
     }
-    // Ensure the rack is updated within the user's store if not admin
     const finalRack = isAdmin ? updatedRack : { ...updatedRack, storeId: userStoreId || updatedRack.storeId };
     updateShelfRack(finalRack);
     return true;
@@ -80,15 +78,15 @@ const ManageShelfRacksPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mt-8">
-        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-6 space-y-4 sm:space-y-0">
+    <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-2 sm:p-4">
+      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 sm:p-6 mt-4 sm:mt-8">
+        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-4 sm:mb-6 space-y-2 sm:space-y-0">
           <Link to="/" className="w-full sm:w-auto">
             <Button variant="outline" className="flex items-center w-full">
               <ArrowLeft className="h-4 w-4 mr-2" /> {t("common.backToMainPage")}
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("common.rackManagement")}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("common.rackManagement")}</h1>
           {hasPermission("rack:create") && (
             <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">
               <PlusCircle className="h-4 w-4 mr-2" /> {t("common.addRack")}

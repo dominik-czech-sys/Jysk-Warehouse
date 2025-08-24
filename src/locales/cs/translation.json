@@ -276,7 +276,16 @@
     "incorrectCurrentPassword": "Zadané aktuální heslo je nesprávné.",
     "userPasswordChanged": "Heslo uživatele bylo změněno.",
     "notLoggedIn": "Nejste přihlášeni.",
-    "passwordTooShort": "Nové heslo musí mít alespoň 6 znaků."
+    "passwordTooShort": "Nové heslo musí mít alespoň 6 znaků.",
+    "openMenu": "Otevřít menu",
+    "menu": "Menu",
+    "accountSettings": "Nastavení účtu",
+    "personalInformation": "Osobní informace",
+    "personalInformationDescription": "Základní informace o vašem účtu.",
+    "role": "Role",
+    "security": "Zabezpečení",
+    "securityDescription": "Spravujte nastavení zabezpečení vašeho účtu.",
+    "pleaseLoginToAccess": "Pro přístup k této stránce se prosím přihlaste."
   },
   "permission": {
     "user": {
