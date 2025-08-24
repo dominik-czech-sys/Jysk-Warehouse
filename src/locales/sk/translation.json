@@ -207,7 +207,7 @@
     "tutorialStep4Content": "Funkcia 'Hromadné pridávanie článkov' vám umožní rýchlo pridať viac článkov na konkrétne miesto v sklade.",
     "tutorialStep5Title": "Správa používateľov",
     "tutorialStep5Content": "Ako administrátor môžete spravovať používateľské účty, priraďovať roly a oprávnenia.",
-    "tutorialStep6Title": "Správa obchodov",
+    "tutorialTep6Title": "Správa obchodov",
     "tutorialStep6Content": "Ako administrátor môžete pridávať, upravovať a mazať obchody v systéme.",
     "tutorialStep7Title": "Protokol aktivít",
     "tutorialStep7Content": "V protokole aktivít môžete monitorovať všetky dôležité udalosti v systéme.",
@@ -269,7 +269,14 @@
     "changeLanguage": "Zmeniť jazyk",
     "shelfNumberLabel": "Číslo police",
     "itemStatus": "Status položky",
-    "rackRowRack": "Rad-Regál"
+    "rackRowRack": "Rad-Regál",
+    "changePasswordDescription": "Tu si môžete zmeniť svoje heslo.",
+    "currentPassword": "Aktuálne heslo",
+    "fillAllPasswordFields": "Vyplňte prosím všetky polia pre heslo.",
+    "incorrectCurrentPassword": "Zadané aktuálne heslo je nesprávne.",
+    "userPasswordChanged": "Heslo používateľa bolo zmenené.",
+    "notLoggedIn": "Nie ste prihlásení.",
+    "passwordTooShort": "Nové heslo musí mať aspoň 6 znakov."
   },
   "permission": {
     "user": {

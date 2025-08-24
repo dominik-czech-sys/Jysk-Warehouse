@@ -269,7 +269,14 @@
     "changeLanguage": "Change language",
     "shelfNumberLabel": "Shelf Number",
     "itemStatus": "Item Status",
-    "rackRowRack": "Row-Rack"
+    "rackRowRack": "Row-Rack",
+    "changePasswordDescription": "Here you can change your password.",
+    "currentPassword": "Current password",
+    "fillAllPasswordFields": "Please fill in all password fields.",
+    "incorrectCurrentPassword": "The current password entered is incorrect.",
+    "userPasswordChanged": "User password changed.",
+    "notLoggedIn": "You are not logged in.",
+    "passwordTooShort": "New password must be at least 6 characters long."
   },
   "permission": {
     "user": {

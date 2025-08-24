@@ -7,18 +7,19 @@ import * as bcrypt from 'bcryptjs'; // Import bcryptjs
 
 interface AuthContextType {
   user: User | null;
-  login: (username: string, password: string) => Promise<boolean>; // Changed to async
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
   userStoreId: string | undefined;
   allUsers: User[];
-  addUser: (newUser: User) => Promise<void>; // Changed to async
-  updateUser: (updatedUser: User) => Promise<void>; // Changed to async
+  addUser: (newUser: User) => Promise<void>;
+  updateUser: (updatedUser: User) => Promise<void>;
   deleteUser: (username: string) => void;
   hasPermission: (permission: Permission) => boolean;
   getStoreUsers: (storeId: string) => User[];
-  changePasswordOnFirstLogin: (username: string, newPassword: string) => Promise<boolean>; // New function
+  changePasswordOnFirstLogin: (username: string, newPassword: string) => Promise<boolean>;
+  changeUserPassword: (username: string, currentPassword: string, newPassword: string) => Promise<boolean>; // New function
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -166,11 +167,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         toast.error(t("common.noPermissionToChangeRoleToAdmin"));
         return;
       }
-      // The problematic line was here, it's removed as it's redundant:
-      // if (existingUser.role === "admin" && updatedUser.role !== "admin") { // Prevent non-admins from changing admin's role
-      //   toast.error(t("common.noPermissionToChangeAdminRole"));
-      //   return;
-      // }
     }
 
     let finalPassword = existingUser.password;
@@ -258,6 +254,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return true;
   };
 
+  const changeUserPassword = async (username: string, currentPassword: string, newPassword: string): Promise<boolean> => {
+    const userToUpdate = allUsers.find(u => u.username === username);
+    if (!userToUpdate) {
+      toast.error(t("common.userNotFound"));
+      return false;
+    }
+
+    const isCurrentPasswordCorrect = await bcrypt.compare(currentPassword, userToUpdate.password);
+    if (!isCurrentPasswordCorrect) {
+      toast.error(t("common.incorrectCurrentPassword"));
+      return false;
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const updatedUser = { ...userToUpdate, password: hashedPassword, firstLogin: false }; // Mark firstLogin as false if it was true
+
+    setAllUsers((prev) =>
+      prev.map((u) => (u.username === username ? updatedUser : u))
+    );
+    if (currentUser?.username === username) {
+      setCurrentUser(updatedUser);
+      localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+    }
+    toast.success(t("common.passwordChangedSuccess"));
+    addLogEntry(t("common.userPasswordChanged"), { username }, username);
+    return true;
+  };
+
   const getStoreUsers = (storeId: string) => {
     return allUsers.filter(user => user.storeId === storeId);
   };
@@ -282,6 +306,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         hasPermission,
         getStoreUsers,
         changePasswordOnFirstLogin,
+        changeUserPassword, // Provide the new function
       }}
     >
       {children}

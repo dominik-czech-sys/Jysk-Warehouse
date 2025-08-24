@@ -269,7 +269,14 @@
     "changeLanguage": "Změnit jazyk",
     "shelfNumberLabel": "Číslo police",
     "itemStatus": "Status položky",
-    "rackRowRack": "Řada-Regál"
+    "rackRowRack": "Řada-Regál",
+    "changePasswordDescription": "Zde si můžete změnit své heslo.",
+    "currentPassword": "Aktuální heslo",
+    "fillAllPasswordFields": "Vyplňte prosím všechna pole pro heslo.",
+    "incorrectCurrentPassword": "Zadané aktuální heslo je nesprávné.",
+    "userPasswordChanged": "Heslo uživatele bylo změněno.",
+    "notLoggedIn": "Nejste přihlášeni.",
+    "passwordTooShort": "Nové heslo musí mít alespoň 6 znaků."
   },
   "permission": {
     "user": {

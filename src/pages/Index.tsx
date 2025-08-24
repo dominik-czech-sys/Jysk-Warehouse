@@ -6,22 +6,24 @@ import { toast } from "sonner";
 import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut, Scan, Users } from "lucide-react";
+import { LogOut, Scan, Users, KeyRound } from "lucide-react"; // Added KeyRound icon
 import { IframeViewer } from "@/components/IframeViewer";
 import { useLog } from "@/contexts/LogContext";
 import { ManagementMenu } from "@/components/ManagementMenu";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
-import FirstLoginTutorial from "@/components/FirstLoginTutorial"; // Import FirstLoginTutorial
+import FirstLoginTutorial from "@/components/FirstLoginTutorial";
+import { ChangePasswordDialog } from "@/components/ChangePasswordDialog"; // Import ChangePasswordDialog
 
 const Index = () => {
   const { getArticleById, articles } = useArticles();
   const [foundArticle, setFoundArticle] = useState<Article | null>(null);
-  const { logout, isAdmin, user, userStoreId, hasPermission, updateUser } = useAuth(); // Added updateUser
+  const { logout, isAdmin, user, userStoreId, hasPermission, updateUser } = useAuth();
   const { addLogEntry } = useLog();
   const [searchParams] = useSearchParams();
   const [iframeSrc, setIframeSrc] = useState<string | null>(null);
+  const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] = useState(false); // State for password change dialog
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -59,9 +61,14 @@ const Index = () => {
     }
   };
 
-  // If it's the first login, show the tutorial
-  if (user && user.firstLogin) {
+  // If it's the first login and not an admin, show the tutorial
+  if (user && user.firstLogin && !isAdmin) {
     return <FirstLoginTutorial onComplete={handleTutorialComplete} />;
+  }
+
+  // If it's the first login and an admin, automatically complete the tutorial
+  if (user && user.firstLogin && isAdmin) {
+    handleTutorialComplete(); // Mark firstLogin as false for admin without showing tutorial
   }
 
   return (
@@ -90,6 +97,9 @@ const Index = () => {
           {(hasPermission("article:view") || hasPermission("rack:view")) && <ManagementMenu />}
           <ThemeToggle />
           <LanguageSwitcher />
+          <Button onClick={() => setIsChangePasswordDialogOpen(true)} variant="outline" className="flex items-center w-full sm:w-auto">
+            <KeyRound className="h-4 w-4 mr-2" /> {t("common.changePassword")}
+          </Button>
           <Button onClick={logout} variant="outline" className="flex items-center w-full sm:w-auto">
             <LogOut className="h-4 w-4 mr-2" /> {t("common.logout")}
           </Button>
@@ -137,6 +147,7 @@ const Index = () => {
       </footer>
 
       <IframeViewer src={iframeSrc} onClose={handleCloseIframe} />
+      <ChangePasswordDialog isOpen={isChangePasswordDialogOpen} onClose={() => setIsChangePasswordDialogOpen(false)} />
     </div>
   );
 };
