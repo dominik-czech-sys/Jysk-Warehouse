@@ -11,7 +11,7 @@ interface ManagementMenuProps {
 }
 
 export const ManagementMenu: React.FC<ManagementMenuProps> = (/* { onViewLog } */) => {
-  const { hasPermission } = useAuth();
+  const { hasPermission, isAdmin } = useAuth();
   const { t } = useTranslation(); // Initialize useTranslation
 
   return (
@@ -29,7 +29,7 @@ export const ManagementMenu: React.FC<ManagementMenuProps> = (/* { onViewLog } *
             </Link>
           </DropdownMenuItem>
         )}
-        {hasPermission("rack:view") && (
+        {!isAdmin && hasPermission("rack:view") && ( // Only show for non-admins with rack:view permission
           <DropdownMenuItem asChild>
             <Link to="/admin/regaly" className="flex items-center">
               <Warehouse className="h-4 w-4 mr-2" /> {t("common.rackManagement")}

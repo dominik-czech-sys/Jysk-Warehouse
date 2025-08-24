@@ -13,7 +13,6 @@ import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Co
 import { UserFormDialog } from "@/components/UserFormDialog";
 import { StoreFormDialog } from "@/components/StoreFormDialog";
 import { ArticleCopyDialog } from "@/components/ArticleCopyDialog";
-import { DefaultArticleManager } from "@/components/DefaultArticleManager";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -334,15 +333,6 @@ const SiteDashboard: React.FC = () => {
             {filteredUsers.length === 0 && (
               <p className="text-center text-muted-foreground mt-4">{t("common.noUsersFound")}</p>
             )}
-          </div>
-        )}
-
-        <Separator className="my-8" />
-
-        {/* Default Article Management Section */}
-        {hasPermission("default_articles:manage") && (
-          <div className="mb-8 w-full animate-fade-in">
-            <DefaultArticleManager />
           </div>
         )}
 

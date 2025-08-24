@@ -24,7 +24,7 @@ export const IframeViewer: React.FC<IframeViewerProps> = ({ src, onClose }) => {
       </div>
       <iframe
         src={src}
-        title="External Content"
+        title={t("common.viewExternalContent")}
         className="flex-grow w-full border-none rounded-lg shadow-lg"
         allowFullScreen
         // Přidání atributu sandbox pro lepší kontrolu nad obsahem iframe

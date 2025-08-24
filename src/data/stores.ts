@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useLog } from "@/contexts/LogContext";
 import { useArticles, Article } from "./articles"; // Import useArticles and Article
-import { defaultArticlesForNewStores } from "./users"; // Import default articles
+import { useGlobalArticles } from "./globalArticles"; // Import useGlobalArticles
 import { useTranslation } from "react-i18next"; // Import useTranslation
 
 export interface Store {
@@ -17,6 +17,7 @@ export const useStores = () => {
   const { user, isAdmin } = useAuth();
   const { addLogEntry } = useLog();
   const { addArticle } = useArticles(); // Use addArticle from useArticles hook
+  const { globalArticles } = useGlobalArticles(); // Use global articles
   const { t } = useTranslation(); // Initialize useTranslation
 
   const [stores, setStores] = useState<Store[]>(() => {
@@ -50,9 +51,11 @@ export const useStores = () => {
     addLogEntry(t("common.storeAdded"), { storeId: newStore.id, storeName: newStore.name }, user?.username);
 
     if (addDefaultArticles) {
-      defaultArticlesForNewStores.forEach(defaultArticle => {
+      globalArticles.forEach(defaultArticle => { // Use globalArticles here
         const newArticle: Article = {
-          ...defaultArticle,
+          id: defaultArticle.id,
+          name: defaultArticle.name,
+          status: defaultArticle.status,
           rackId: "N/A", // Placeholder
           shelfNumber: "N/A", // Placeholder
           storeId: newStore.id,
@@ -61,7 +64,7 @@ export const useStores = () => {
         addArticle(newArticle);
       });
       toast.info(t("common.defaultArticlesAddedToStore", { storeId: newStore.id }));
-      addLogEntry(t("common.defaultArticlesAddedToStore"), { storeId: newStore.id, articlesCount: defaultArticlesForNewStores.length }, user?.username);
+      addLogEntry(t("common.defaultArticlesAddedToStore"), { storeId: newStore.id, articlesCount: globalArticles.length }, user?.username);
     }
     return true;
   };

@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useArticles, Article } from "@/data/articles";
 import { Link } from "react-router-dom";
-import { ArrowLeft, PlusCircle, Edit, Trash2, Scan, Boxes } from "lucide-react"; // Added Boxes icon
+import { PlusCircle, Edit, Trash2, Scan, Boxes } from "lucide-react";
 import { ArticleFormDialog } from "@/components/ArticleFormDialog";
 import { toast } from "sonner";
 import {
@@ -25,53 +25,75 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/useAuth";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
+import { useGlobalArticles, GlobalArticle } from "@/data/globalArticles"; // Import global articles hook
 
 const ManageArticles = () => {
   const { articles, addArticle, updateArticle, deleteArticle } = useArticles();
+  const { globalArticles, addGlobalArticle, updateGlobalArticle, deleteGlobalArticle } = useGlobalArticles();
   const { isAdmin, userStoreId, hasPermission } = useAuth();
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingArticle, setEditingArticle] = useState<Article | null>(null);
+  const [editingArticle, setEditingArticle] = useState<Article | GlobalArticle | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [articleToDeleteId, setArticleToDeleteId] = useState<string | null>(null);
-  const [articleToDeleteStoreId, setArticleToDeleteStoreId] = useState<string | null>(null);
+  const [articleToDeleteStoreId, setArticleToDeleteStoreId] = useState<string | null>(null); // Can be "GLOBAL"
 
+  const currentArticles = isAdmin ? globalArticles : articles;
 
-  const handleAddArticle = (newArticle: Article) => {
-    if (!hasPermission("article:create")) {
-      toast.error(t("common.noPermissionToAddArticles"));
-      return;
+  const handleAddArticle = (newArticle: Article | GlobalArticle) => {
+    if (isAdmin) {
+      if (!hasPermission("default_articles:manage")) {
+        toast.error(t("common.noPermissionToAddArticles"));
+        return;
+      }
+      addGlobalArticle(newArticle as GlobalArticle);
+    } else {
+      if (!hasPermission("article:create")) {
+        toast.error(t("common.noPermissionToAddArticles"));
+        return;
+      }
+      const finalArticle = { ...(newArticle as Article), storeId: userStoreId || (newArticle as Article).storeId };
+      if (articles.some(article => article.id === finalArticle.id && article.storeId === finalArticle.storeId)) {
+        toast.error(t("common.articleExistsInStore", { articleId: finalArticle.id }));
+        return;
+      }
+      addArticle(finalArticle);
+      toast.success(t("common.articleAddedSuccess", { articleId: finalArticle.id }));
     }
-    // Ensure the article is added to the user's store if not admin
-    const finalArticle = isAdmin ? newArticle : { ...newArticle, storeId: userStoreId || newArticle.storeId };
-
-    if (articles.some(article => article.id === finalArticle.id && article.storeId === finalArticle.storeId)) {
-      toast.error(t("common.articleExistsInStore", { articleId: finalArticle.id }));
-      return;
-    }
-    addArticle(finalArticle);
-    toast.success(t("common.articleAddedSuccess", { articleId: finalArticle.id }));
   };
 
-  const handleEditArticle = (updatedArticle: Article) => {
-    if (!hasPermission("article:update")) {
-      toast.error(t("common.noPermissionToEditArticles"));
-      return;
+  const handleEditArticle = (updatedArticle: Article | GlobalArticle) => {
+    if (isAdmin) {
+      if (!hasPermission("default_articles:manage")) {
+        toast.error(t("common.noPermissionToEditArticles"));
+        return;
+      }
+      updateGlobalArticle(updatedArticle as GlobalArticle);
+    } else {
+      if (!hasPermission("article:update")) {
+        toast.error(t("common.noPermissionToEditArticles"));
+        return;
+      }
+      const finalArticle = { ...(updatedArticle as Article), storeId: userStoreId || (updatedArticle as Article).storeId };
+      updateArticle(finalArticle);
+      toast.success(t("common.articleUpdatedSuccess", { articleId: finalArticle.id }));
     }
-    // Ensure the article is updated within the user's store if not admin
-    const finalArticle = isAdmin ? updatedArticle : { ...updatedArticle, storeId: userStoreId || updatedArticle.storeId };
-
-    updateArticle(finalArticle);
-    toast.success(t("common.articleUpdatedSuccess", { articleId: finalArticle.id }));
   };
 
   const handleDeleteArticle = (id: string, storeId: string) => {
-    if (!hasPermission("article:delete")) {
-      toast.error(t("common.noPermissionToDeleteArticles"));
-      return;
+    if (isAdmin) {
+      if (!hasPermission("default_articles:manage")) {
+        toast.error(t("common.noPermissionToDeleteArticles"));
+        return;
+      }
+    } else {
+      if (!hasPermission("article:delete")) {
+        toast.error(t("common.noPermissionToDeleteArticles"));
+        return;
+      }
     }
     setArticleToDeleteId(id);
     setArticleToDeleteStoreId(storeId);
@@ -79,9 +101,14 @@ const ManageArticles = () => {
   };
 
   const confirmDeleteArticle = () => {
-    if (articleToDeleteId && articleToDeleteStoreId) {
-      deleteArticle(articleToDeleteId, articleToDeleteStoreId);
-      toast.success(t("common.articleDeletedSuccess", { articleId: articleToDeleteId }));
+    if (articleToDeleteId) {
+      if (isAdmin && articleToDeleteStoreId === "GLOBAL") {
+        deleteGlobalArticle(articleToDeleteId);
+        toast.success(t("common.globalArticleDeletedSuccess", { articleId: articleToDeleteId }));
+      } else if (articleToDeleteStoreId) {
+        deleteArticle(articleToDeleteId, articleToDeleteStoreId);
+        toast.success(t("common.articleDeletedSuccess", { articleId: articleToDeleteId }));
+      }
       setArticleToDeleteId(null);
       setArticleToDeleteStoreId(null);
     }
@@ -97,27 +124,29 @@ const ManageArticles = () => {
               <ArrowLeft className="h-4 w-4 mr-2" /> {t("common.backToMainPage")}
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("common.articleManagement")}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">
+            {isAdmin ? t("common.globalArticleManagement") : t("common.articleManagement")}
+          </h1>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-            {hasPermission("article:scan") && (
+            {!isAdmin && hasPermission("article:scan") && (
               <Link to="/skenovat-carkod" className="w-full sm:w-auto">
                 <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
                   <Scan className="h-4 w-4 mr-2" /> {t("common.scanBarcode")}
                 </Button>
               </Link>
             )}
-            {hasPermission("article:mass_add") && (
+            {!isAdmin && hasPermission("article:mass_add") && (
               <Link to="/mass-add-artikly" className="w-full sm:w-auto">
                 <Button variant="outline" className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
                   <Boxes className="h-4 w-4 mr-2" /> {t("common.massAdd")}
                 </Button>
               </Link>
             )}
-            {hasPermission("article:create") && (
+            {(isAdmin && hasPermission("default_articles:manage")) || (!isAdmin && hasPermission("article:create")) ? (
               <Button onClick={() => setIsAddDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full sm:w-auto">
-                <PlusCircle className="h-4 w-4 mr-2" /> {t("common.addArticle")}
+                <PlusCircle className="h-4 w-4 mr-2" /> {isAdmin ? t("common.addGlobalArticle") : t("common.addArticle")}
               </Button>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -127,24 +156,24 @@ const ManageArticles = () => {
               <TableRow>
                 <TableHead className="min-w-[80px]">{t("common.articleId")}</TableHead>
                 <TableHead className="min-w-[150px]">{t("common.articleName")}</TableHead>
-                <TableHead className="min-w-[80px]">{t("common.rackId")}</TableHead>
-                <TableHead className="min-w-[100px]">{t("common.shelfNumber")}</TableHead>
+                {!isAdmin && <TableHead className="min-w-[80px]">{t("common.rackId")}</TableHead>}
+                {!isAdmin && <TableHead className="min-w-[100px]">{t("common.shelfNumber")}</TableHead>}
                 <TableHead className="min-w-[100px]">{t("common.status")}</TableHead>
-                {isAdmin && <TableHead className="min-w-[100px]">{t("common.storeId")}</TableHead>}
+                {!isAdmin && <TableHead className="min-w-[100px]">{t("common.storeId")}</TableHead>}
                 <TableHead className="text-right min-w-[100px]">{t("common.action")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {articles.map((article) => (
-                <TableRow key={`${article.id}-${article.storeId}`}>
+              {currentArticles.map((article) => (
+                <TableRow key={`${article.id}-${isAdmin ? "GLOBAL" : (article as Article).storeId}`}>
                   <TableCell className="font-medium">{article.id}</TableCell>
                   <TableCell>{article.name}</TableCell>
-                  <TableCell>{article.rackId}</TableCell>
-                  <TableCell>{article.shelfNumber}</TableCell>
+                  {!isAdmin && <TableCell>{(article as Article).rackId}</TableCell>}
+                  {!isAdmin && <TableCell>{(article as Article).shelfNumber}</TableCell>}
                   <TableCell>{article.status}</TableCell>
-                  {isAdmin && <TableCell>{article.storeId}</TableCell>}
+                  {!isAdmin && <TableCell>{(article as Article).storeId}</TableCell>}
                   <TableCell className="text-right">
-                    {hasPermission("article:update") && (
+                    {((isAdmin && hasPermission("default_articles:manage")) || (!isAdmin && hasPermission("article:update"))) && (
                       <Button
                         variant="ghost"
                         size="sm"
@@ -157,11 +186,11 @@ const ManageArticles = () => {
                         <Edit className="h-4 w-4" />
                       </Button>
                     )}
-                    {hasPermission("article:delete") && (
+                    {((isAdmin && hasPermission("default_articles:manage")) || (!isAdmin && hasPermission("article:delete"))) && (
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDeleteArticle(article.id, article.storeId)}
+                        onClick={() => handleDeleteArticle(article.id, isAdmin ? "GLOBAL" : (article as Article).storeId)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -173,8 +202,8 @@ const ManageArticles = () => {
           </Table>
         </div>
 
-        {articles.length === 0 && (
-          <p className="text-center text-muted-foreground mt-4">{t("common.noArticlesFound")}</p>
+        {currentArticles.length === 0 && (
+          <p className="text-center text-muted-foreground mt-4">{isAdmin ? t("common.noGlobalArticles") : t("common.noArticlesFound")}</p>
         )}
       </div>
 
@@ -183,6 +212,7 @@ const ManageArticles = () => {
         onClose={() => setIsAddDialogOpen(false)}
         onSubmit={handleAddArticle}
         article={null}
+        isGlobalAdminContext={isAdmin}
       />
 
       <ArticleFormDialog
@@ -193,15 +223,18 @@ const ManageArticles = () => {
         }}
         onSubmit={handleEditArticle}
         article={editingArticle}
+        isGlobalAdminContext={isAdmin}
       />
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("common.confirmDeleteArticleTitle")}</AlertDialogTitle>
+            <AlertDialogTitle>{isAdmin ? t("common.confirmDeleteGlobalArticleTitle") : t("common.confirmDeleteArticleTitle")}</AlertDialogTitle>
             <AlertDialogDescription
               dangerouslySetInnerHTML={{
-                __html: t("common.confirmDeleteArticleDescription", { articleId: articleToDeleteId, storeId: articleToDeleteStoreId }),
+                __html: isAdmin
+                  ? t("common.confirmDeleteGlobalArticleDescription", { articleId: articleToDeleteId })
+                  : t("common.confirmDeleteArticleDescription", { articleId: articleToDeleteId, storeId: articleToDeleteStoreId }),
               }}
             />
           </AlertDialogHeader>

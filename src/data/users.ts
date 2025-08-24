@@ -37,10 +37,9 @@ export const defaultPermissions: Record<User['role'], Permission[]> = {
   "admin": [
     "user:view", "user:create", "user:update", "user:delete",
     "store:view", "store:create", "store:update", "store:delete",
-    "rack:view", "rack:create", "rack:update", "rack:delete",
     "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add",
     "log:view",
-    "default_articles:manage",
+    "default_articles:manage", // Admin can manage global articles
     "article:copy_from_store",
   ],
   "vedouci_skladu": [
@@ -78,11 +77,4 @@ export const users: User[] = [
     permissions: defaultPermissions["admin"],
     firstLogin: true,
   }
-];
-
-// Default articles for new stores (if needed)
-export const defaultArticlesForNewStores: Omit<Article, 'rackId' | 'shelfNumber' | 'storeId' | 'quantity'>[] = [
-  { id: "DEFAULT-001", name: "Výchozí artikl A", status: "21" },
-  { id: "DEFAULT-002", name: "Výchozí artikl B", status: "11" },
-  { id: "DEFAULT-003", name: "Výchozí artikl C", status: "41" },
 ];
