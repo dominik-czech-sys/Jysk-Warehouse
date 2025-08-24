@@ -1,8 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-// Import your translation files here
-// For now, we'll use a simple English translation
 const resources = {
   en: {
     translation: {
@@ -56,6 +54,31 @@ const resources = {
         userUpdateFailed: "Failed to update user.",
         userDeleteFailed: "Failed to delete user.",
         usersFetchFailed: "Failed to fetch users.",
+        login: "Login",
+        enterCredentials: "Enter your credentials to access the system.",
+        username: "Username",
+        usernamePlaceholder: "Enter your username",
+        password: "Password",
+        passwordPlaceholder: "Enter your password",
+        loggingIn: "Logging in...",
+        loginButton: "Login",
+        dashboardWelcome: "Welcome to your JYSK Warehouse Management System dashboard!",
+        storesOverview: "Stores Overview",
+        storesOverviewDescription: "Manage and view all your JYSK stores.",
+        racksOverview: "Racks Overview",
+        racksOverviewDescription: "Monitor and organize all warehouse racks.",
+        articlesOverview: "Articles Overview",
+        articlesOverviewDescription: "Track and manage all articles in your inventory.",
+      },
+      sidebar: {
+        dashboard: "Dashboard",
+        users: "Users",
+        stores: "Stores",
+        racks: "Racks",
+        articles: "Articles",
+        settings: "Settings",
+        account: "Account",
+        logout: "Logout",
       },
     },
   },
@@ -111,19 +134,44 @@ const resources = {
         userUpdateFailed: "Nepodařilo se aktualizovat uživatele.",
         userDeleteFailed: "Nepodařilo se smazat uživatele.",
         usersFetchFailed: "Nepodařilo se načíst uživatele.",
+        login: "Přihlášení",
+        enterCredentials: "Zadejte své přihlašovací údaje pro přístup do systému.",
+        username: "Uživatelské jméno",
+        usernamePlaceholder: "Zadejte své uživatelské jméno",
+        password: "Heslo",
+        passwordPlaceholder: "Zadejte své heslo",
+        loggingIn: "Přihlašování...",
+        loginButton: "Přihlásit se",
+        dashboardWelcome: "Vítejte na dashboardu vašeho systému správy skladu JYSK!",
+        storesOverview: "Přehled obchodů",
+        storesOverviewDescription: "Spravujte a prohlížejte všechny své obchody JYSK.",
+        racksOverview: "Přehled regálů",
+        racksOverviewDescription: "Monitorujte a organizujte všechny skladové regály.",
+        articlesOverview: "Přehled článků",
+        articlesOverviewDescription: "Sledujte a spravujte všechny články ve vašem inventáři.",
+      },
+      sidebar: {
+        dashboard: "Dashboard",
+        users: "Uživatelé",
+        stores: "Obchody",
+        racks: "Regály",
+        articles: "Články",
+        settings: "Nastavení",
+        account: "Účet",
+        logout: "Odhlásit se",
       },
     },
   },
 };
 
 i18n
-  .use(initReactI18next) // passes i18n down to react-i18next
+  .use(initReactI18next)
   .init({
     resources,
-    lng: 'en', // default language
+    lng: 'en',
     fallbackLng: 'en',
     interpolation: {
-      escapeValue: false, // react already safes from xss
+      escapeValue: false,
     },
   });
 
