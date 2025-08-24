@@ -37,22 +37,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { addLogEntry } = useLog();
   const { t } = useTranslation();
 
-  // Načtení aktuálního uživatele z localStorage a všech uživatelů z API při startu
-  useEffect(() => {
-    const initializeAuth = async () => {
-      setIsLoading(true);
-      const storedUser = localStorage.getItem("currentUser");
-      if (storedUser) {
-        setCurrentUser(JSON.parse(storedUser));
-      }
-      await refreshUsers(); // Načtení všech uživatelů z API
-      setIsLoading(false);
-    };
-    initializeAuth();
-  }, []);
-
   // Funkce pro obnovení seznamu uživatelů z API
   const refreshUsers = async () => {
+    const token = localStorage.getItem("jwtToken");
+    if (!token) {
+      setAllUsers([]);
+      return; // No token, no need to fetch users
+    }
     try {
       const usersFromApi = await getAllUsers();
       // Hashování hesel pro initialUsers, pokud ještě nejsou hashovaná (pouze pro první spuštění)
@@ -65,16 +56,47 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return u;
       });
       setAllUsers(processedUsers);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch all users from API:", error);
-      toast.error(t("common.usersFetchFailed"));
+      // If fetching users fails due to auth, log out the user
+      if (error.message === 'Authentication token required' || error.message === 'Invalid or expired token') {
+        logout(); // Log out if token is invalid
+        toast.error(t("common.sessionExpired"));
+      } else {
+        toast.error(error.message || t("common.usersFetchFailed"));
+      }
       setAllUsers([]); // V případě chyby nastavíme prázdné pole
     }
   };
 
+  // Načtení aktuálního uživatele z localStorage a všech uživatelů z API při startu
+  useEffect(() => {
+    const initializeAuth = async () => {
+      setIsLoading(true);
+      const storedUser = localStorage.getItem("currentUser");
+      const storedToken = localStorage.getItem("jwtToken"); // Also get the token
+
+      if (storedUser && storedToken) {
+        const parsedUser = JSON.parse(storedUser);
+        setCurrentUser(parsedUser);
+        // Attempt to refresh users. If token is invalid, refreshUsers will call logout.
+        await refreshUsers();
+      } else {
+        // If no user or no token, ensure current user is null and users are empty
+        setCurrentUser(null);
+        setAllUsers([]);
+      }
+      setIsLoading(false);
+    };
+    initializeAuth();
+  }, []);
+
   // Ukládání allUsers do localStorage (pro persistenci, i když primární zdroj je API)
   useEffect(() => {
-    localStorage.setItem("allUsers", JSON.stringify(allUsers));
+    // This useEffect should ideally not be needed if API is the source of truth
+    // and allUsers is only derived from API calls.
+    // Keeping it for now, but it might be removed in future refactors.
+    // localStorage.setItem("allUsers", JSON.stringify(allUsers));
   }, [allUsers]);
 
   const hasPermission = (permission: Permission): boolean => {
@@ -87,7 +109,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       const userFromApi = await loginUser(username, password);
-      if (userFromApi) {
+      if (userFromApi && userFromApi.token) { // Check for token
+        localStorage.setItem("jwtToken", userFromApi.token); // Store the token
         // Získání kompletních dat uživatele z API po úspěšném přihlášení
         const fullUser = await getUser(username);
         if (fullUser) {
@@ -95,6 +118,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           localStorage.setItem("currentUser", JSON.stringify(fullUser));
           toast.success(t("common.welcomeUser", { username: fullUser.username }));
           addLogEntry(t("common.userLoggedIn"), { username: fullUser.username, role: fullUser.role, storeId: fullUser.storeId }, fullUser.username);
+          await refreshUsers(); // Refresh users after successful login
           return true;
         }
       }
@@ -116,6 +140,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
     setCurrentUser(null);
     localStorage.removeItem("currentUser");
+    localStorage.removeItem("jwtToken"); // Remove token on logout
+    setAllUsers([]); // Clear users on logout
     toast.info(t("common.loggedOut"));
   };
 

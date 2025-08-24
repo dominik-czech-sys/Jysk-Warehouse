@@ -5,6 +5,12 @@ export const getApiUrl = (): string => {
   return localStorage.getItem('API_URL') || 'http://127.0.0.1:3001/api'; // Změněno na 127.0.0.1
 };
 
+// Helper function to get authorization headers
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('jwtToken');
+  return token ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+};
+
 interface UserApiData {
   username: string;
   password?: string;
@@ -12,6 +18,7 @@ interface UserApiData {
   storeId?: string;
   permissions: string[];
   firstLogin: boolean;
+  token?: string; // Add token to UserApiData for login response
 }
 
 export interface StoreApiData {
@@ -44,7 +51,7 @@ export interface ArticleApiData {
 
 
 // Funkce pro přihlášení uživatele
-export const loginUser = async (username: string, password: string): Promise<any | null> => {
+export const loginUser = async (username: string, password: string): Promise<UserApiData | null> => {
   const API_URL = getApiUrl();
   try {
     const response = await fetch(`${API_URL}/login`, {
@@ -58,7 +65,7 @@ export const loginUser = async (username: string, password: string): Promise<any
     if (!response.ok) {
       throw new Error(data.message || 'Login failed');
     }
-    return data.user; // Předpokládáme, že backend vrátí objekt uživatele
+    return data; // Předpokládáme, že backend vrátí objekt uživatele s tokenem
   } catch (error: any) {
     console.error('Login Error:', error);
     toast.error(error.message || 'common.loginFailed');
@@ -70,7 +77,9 @@ export const loginUser = async (username: string, password: string): Promise<any
 export const getUser = async (username: string): Promise<UserApiData | null> => {
   const API_URL = getApiUrl();
   try {
-    const response = await fetch(`${API_URL}/users/${username}`);
+    const response = await fetch(`${API_URL}/users/${username}`, {
+      headers: getAuthHeaders(),
+    });
     const data = await response.json();
 
     if (!response.ok) {
@@ -90,7 +99,7 @@ export const createUser = async (user: UserApiData): Promise<UserApiData | null>
   try {
     const response = await fetch(`${API_URL}/users`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(user),
     });
 
@@ -113,7 +122,7 @@ export const updateUser = async (username: string, user: Partial<UserApiData>): 
   try {
     const response = await fetch(`${API_URL}/users/${username}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(user),
     });
 
@@ -136,7 +145,7 @@ export const deleteUser = async (username: string): Promise<boolean> => {
   try {
     const response = await fetch(`${API_URL}/users/${username}`, {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -157,7 +166,7 @@ export const initDatabase = async (): Promise<boolean> => {
   try {
     const response = await fetch(`${API_URL}/init-db`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(), // init-db should also be authenticated (admin action)
     });
 
     const data = await response.json();
@@ -177,7 +186,9 @@ export const initDatabase = async (): Promise<boolean> => {
 export const getAllUsers = async (): Promise<UserApiData[]> => {
   const API_URL = getApiUrl();
   try {
-    const response = await fetch(`${API_URL}/users`);
+    const response = await fetch(`${API_URL}/users`, {
+      headers: getAuthHeaders(),
+    });
     const data = await response.json();
 
     if (!response.ok) {
@@ -195,7 +206,9 @@ export const getAllUsers = async (): Promise<UserApiData[]> => {
 export const getAllStores = async (): Promise<StoreApiData[]> => {
   const API_URL = getApiUrl();
   try {
-    const response = await fetch(`${API_URL}/stores`);
+    const response = await fetch(`${API_URL}/stores`, {
+      headers: getAuthHeaders(),
+    });
     const data = await response.json();
     if (!response.ok) {
       throw new Error(data.message || 'Failed to fetch stores');
@@ -213,7 +226,7 @@ export const createStore = async (store: StoreApiData): Promise<StoreApiData | n
   try {
     const response = await fetch(`${API_URL}/stores`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(store),
     });
     const data = await response.json();
@@ -233,7 +246,7 @@ export const updateStore = async (id: string, store: Partial<StoreApiData>): Pro
   try {
     const response = await fetch(`${API_URL}/stores/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(store),
     });
     const data = await response.json();
@@ -253,7 +266,7 @@ export const deleteStore = async (id: string): Promise<boolean> => {
   try {
     const response = await fetch(`${API_URL}/stores/${id}`, {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
     });
     if (!response.ok) {
       const data = await response.json();
@@ -271,7 +284,9 @@ export const deleteStore = async (id: string): Promise<boolean> => {
 export const getAllShelfRacks = async (): Promise<ShelfRackApiData[]> => {
   const API_URL = getApiUrl();
   try {
-    const response = await fetch(`${API_URL}/racks`);
+    const response = await fetch(`${API_URL}/racks`, {
+      headers: getAuthHeaders(),
+    });
     const data = await response.json();
     if (!response.ok) {
       throw new Error(data.message || 'Failed to fetch racks');
@@ -289,7 +304,7 @@ export const createShelfRack = async (rack: ShelfRackApiData): Promise<ShelfRack
   try {
     const response = await fetch(`${API_URL}/racks`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(rack),
     });
     const data = await response.json();
@@ -309,7 +324,7 @@ export const updateShelfRack = async (id: string, rack: Partial<ShelfRackApiData
   try {
     const response = await fetch(`${API_URL}/racks/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(rack),
     });
     const data = await response.json();
@@ -329,7 +344,7 @@ export const deleteShelfRack = async (id: string): Promise<boolean> => {
   try {
     const response = await fetch(`${API_URL}/racks/${id}`, {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
     });
     if (!response.ok) {
       const data = await response.json();
@@ -347,7 +362,9 @@ export const deleteShelfRack = async (id: string): Promise<boolean> => {
 export const getAllArticles = async (): Promise<ArticleApiData[]> => {
   const API_URL = getApiUrl();
   try {
-    const response = await fetch(`${API_URL}/articles`);
+    const response = await fetch(`${API_URL}/articles`, {
+      headers: getAuthHeaders(),
+    });
     const data = await response.json();
     if (!response.ok) {
       throw new Error(data.message || 'Failed to fetch articles');
@@ -365,7 +382,7 @@ export const createArticle = async (article: ArticleApiData): Promise<ArticleApi
   try {
     const response = await fetch(`${API_URL}/articles`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(article),
     });
     const data = await response.json();
@@ -385,7 +402,7 @@ export const updateArticle = async (id: string, storeId: string, article: Partia
   try {
     const response = await fetch(`${API_URL}/articles/${id}/${storeId}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify(article),
     });
     const data = await response.json();
@@ -405,7 +422,7 @@ export const deleteArticle = async (id: string, storeId: string): Promise<boolea
   try {
     const response = await fetch(`${API_URL}/articles/${id}/${storeId}`, {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
     });
     if (!response.ok) {
       const data = await response.json();
