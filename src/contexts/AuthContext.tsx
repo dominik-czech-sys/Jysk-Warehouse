@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { User, users as initialUsers, defaultPermissions } from "@/data/users";
-import { Permission } from "@/types/auth";
+import { Permission } from "@/types/auth"; // <-- Opravený import pro Permission
 import { toast } from "sonner";
 import { useLog } from "@/contexts/LogContext";
 import { useTranslation } from "react-i18next";
@@ -120,6 +120,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
     setCurrentUser(null);
     localStorage.removeItem("currentUser");
+    localStorage.removeItem("jwtToken"); // Ensure token is removed if it was ever set
     toast.info(t("common.loggedOut"));
   };
 
