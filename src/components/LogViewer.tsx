@@ -12,6 +12,11 @@ import { format } from "date-fns";
 import { cs, enUS, sk } from "date-fns/locale";
 import { useTranslation } from "react-i18next";
 
+interface LogViewerProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 const logCategories = {
   "Full Log": [],
   "Login": ["Uživatel se přihlásil", "Neúspěšné přihlášení"],
