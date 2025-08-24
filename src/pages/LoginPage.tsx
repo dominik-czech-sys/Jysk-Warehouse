@@ -16,9 +16,10 @@ const LoginPage: React.FC = () => {
   const [iframeSrc, setIframeSrc] = useState<string | null>(null); // Stav pro iframe
   const { t } = useTranslation(); // Initialize useTranslation
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(username, password)) {
+    const success = await login(username, password); // Await the asynchronous login call
+    if (success) {
       navigate("/");
     } else {
       // toast.error is already called in AuthContext
