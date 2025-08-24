@@ -1,0 +1,17 @@
+export type Permission =
+  | "user:view"
+  | "user:create"
+  | "user:update"
+  | "user:delete"
+  | "store:view"
+  | "store:create"
+  | "store:update"
+  | "store:delete"
+  | "rack:view"
+  | "rack:create"
+  | "rack:update"
+  | "rack:delete"
+  | "article:view"
+  | "article:create"
+  | "article:update"
+  | "article:delete";
