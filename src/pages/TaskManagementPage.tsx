@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { useTasks, Task } from "@/data/tasks";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
@@ -22,8 +22,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlusCircle, Edit, Trash2 } from "lucide-react";
 import { TaskFormDialog } from "@/components/TaskFormDialog";
+import { KanbanBoard } from "@/components/KanbanBoard";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { cs } from "date-fns/locale";
@@ -97,48 +99,59 @@ const TaskManagementPage: React.FC = () => {
           </Button>
         )}
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("common.task.taskList")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("common.task.title")}</TableHead>
-                  <TableHead>{t("common.task.status")}</TableHead>
-                  <TableHead>{t("common.task.priority")}</TableHead>
-                  <TableHead>{t("common.task.dueDate")}</TableHead>
-                  <TableHead className="text-right">{t("common.action")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow><TableCell colSpan={5} className="text-center">{t("common.task.loadingTasks")}</TableCell></TableRow>
-                ) : (
-                  tasks.map((task) => (
-                    <TableRow key={task.id}>
-                      <TableCell className="font-medium">{task.title}</TableCell>
-                      <TableCell>{getStatusBadge(task.status)}</TableCell>
-                      <TableCell>{getPriorityText(task.priority)}</TableCell>
-                      <TableCell>{task.due_date ? format(new Date(task.due_date), "d. M. yyyy", { locale: cs }) : '-'}</TableCell>
-                      <TableCell className="text-right">
-                        {hasPermission("task:update") && (
-                          <Button variant="ghost" size="sm" onClick={() => handleEditTask(task)} className="mr-2"><Edit className="h-4 w-4" /></Button>
-                        )}
-                        {hasPermission("task:delete") && (
-                          <Button variant="ghost" size="sm" onClick={() => handleDeleteTask(task)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                        )}
-                      </TableCell>
+      <Tabs defaultValue="board">
+        <TabsList>
+          <TabsTrigger value="board">{t("common.task.boardView")}</TabsTrigger>
+          <TabsTrigger value="list">{t("common.task.listView")}</TabsTrigger>
+        </TabsList>
+        <TabsContent value="board" className="mt-4">
+          <KanbanBoard />
+        </TabsContent>
+        <TabsContent value="list" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("common.task.taskList")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t("common.task.title")}</TableHead>
+                      <TableHead>{t("common.task.status")}</TableHead>
+                      <TableHead>{t("common.task.priority")}</TableHead>
+                      <TableHead>{t("common.task.dueDate")}</TableHead>
+                      <TableHead className="text-right">{t("common.action")}</TableHead>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                  </TableHeader>
+                  <TableBody>
+                    {isLoading ? (
+                      <TableRow><TableCell colSpan={5} className="text-center">{t("common.task.loadingTasks")}</TableCell></TableRow>
+                    ) : (
+                      tasks.map((task) => (
+                        <TableRow key={task.id}>
+                          <TableCell className="font-medium">{task.title}</TableCell>
+                          <TableCell>{getStatusBadge(task.status)}</TableCell>
+                          <TableCell>{getPriorityText(task.priority)}</TableCell>
+                          <TableCell>{task.due_date ? format(new Date(task.due_date), "d. M. yyyy", { locale: cs }) : '-'}</TableCell>
+                          <TableCell className="text-right">
+                            {hasPermission("task:update") && (
+                              <Button variant="ghost" size="sm" onClick={() => handleEditTask(task)} className="mr-2"><Edit className="h-4 w-4" /></Button>
+                            )}
+                            {hasPermission("task:delete") && (
+                              <Button variant="ghost" size="sm" onClick={() => handleDeleteTask(task)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
       <TaskFormDialog
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}

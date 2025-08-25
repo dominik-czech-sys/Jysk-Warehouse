@@ -323,7 +323,10 @@
       "deleteSuccess": "Úkol byl úspěšně smazán.",
       "confirmDeleteTitle": "Opravdu chcete smazat tento úkol?",
       "confirmDeleteDescription": "Tato akce je nevratná. Úkol '{{taskTitle}}' bude trvale odstraněn.",
-      "errorFetchingUsers": "Nepodařilo se načíst uživatele z obchodu."
+      "errorFetchingUsers": "Nepodařilo se načíst uživatele z obchodu.",
+      "boardView": "Nástěnka",
+      "listView": "Seznam",
+      "noDueDate": "Bez termínu"
     },
     "permission": {
       "user": {
