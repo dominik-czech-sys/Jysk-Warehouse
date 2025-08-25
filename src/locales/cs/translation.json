@@ -28,7 +28,8 @@
     "articles": "Artikly",
     "shelf": "Police",
     "users": "Uživatelé",
-    "warehouse": "Sklad"
+    "warehouse": "Sklad",
+    "role": "Role"
   },
   "pageTitle": {
     "articleManagement": "Správa artiklů",
@@ -230,7 +231,6 @@
       "templateNameRequired": "Název šablony je povinný.",
       "allQuestionsRequired": "Všechny otázky musí mít vyplněný text.",
       "submitGeneric": "Při odesílání auditu došlo k chybě.",
-      "allQuestionsRequired": "Prosím, odpovězte na všechny otázky.",
       "loadingDetail": "Při načítání detailu auditu došlo k chybě.",
       "titleContentRequired": "Nadpis a obsah jsou povinné.",
       "fetchingUsersForNotification": "Chyba při načítání uživatelů pro notifikaci: {{error}}",
@@ -490,6 +490,14 @@
       "copyArticlesContent": "V záložce 'Správa Obchodů' můžete zkopírovat kompletní seznam artiklů z jednoho obchodu do druhého. Můžete si zvolit, zda chcete přepsat existující artikly v cílovém obchodě."
     },
     "permission": {
+      "roles": "Role a oprávnění",
+      "roleList": "Seznam rolí",
+      "permissionCount": "Počet oprávnění",
+      "loadingRoles": "Načítání rolí...",
+      "editPermissions": "Upravit oprávnění",
+      "editTitle": "Upravit oprávnění pro roli '{{roleName}}'",
+      "editDescription": "Vyberte oprávnění, která má tato role mít.",
+      "updateSuccess": "Oprávnění role byla úspěšně aktualizována.",
       "user": {
         "view": "Zobrazit uživatele",
         "create": "Vytvořit uživatele",

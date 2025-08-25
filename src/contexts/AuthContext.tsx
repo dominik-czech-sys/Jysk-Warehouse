@@ -1,23 +1,24 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { Session, User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { Permission, defaultPermissions } from "@/data/users";
+import { Permission } from "@/data/users";
 import { useLog } from "@/contexts/LogContext";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 interface UserProfile {
   id: string;
   first_name: string;
   last_name: string;
   username: string;
-  role: "admin" | "vedouci_skladu" | "store_manager" | "deputy_store_manager" | "ar_assistant_of_sale" | "skladnik";
+  role: string; // Role name from profiles table
   store_id: string;
   first_login: boolean;
   is_approved: boolean;
 }
 
-export type User = SupabaseUser & UserProfile;
+export type User = SupabaseUser & UserProfile & { permissions: Permission[] };
 
 interface AuthContextType {
   user: User | null;
@@ -37,12 +38,47 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+const fetchUserPermissions = async (roleName: string): Promise<Permission[]> => {
+  if (!roleName) return [];
+
+  // First, get the role ID from the role name
+  const { data: roleData, error: roleError } = await supabase
+    .from("roles")
+    .select("id")
+    .eq("name", roleName)
+    .single();
+
+  if (roleError || !roleData) {
+    console.error("Error fetching role ID for:", roleName, roleError);
+    return [];
+  }
+
+  // Then, get all permissions for that role ID
+  const { data: permissionsData, error: permsError } = await supabase
+    .from("role_permissions")
+    .select("permission")
+    .eq("role_id", roleData.id);
+
+  if (permsError) {
+    console.error("Error fetching permissions for role ID:", roleData.id, permsError);
+    return [];
+  }
+
+  return permissionsData.map(p => p.permission as Permission);
+};
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const { addLogEntry } = useLog();
   const { t } = useTranslation();
+
+  const { data: permissions, isLoading: isLoadingPermissions } = useQuery({
+    queryKey: ['userPermissions', userProfile?.role],
+    queryFn: () => fetchUserPermissions(userProfile!.role),
+    enabled: !!userProfile,
+  });
 
   useEffect(() => {
     const fetchInitialSession = async () => {
@@ -58,11 +94,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         if (error || !profile || !profile.is_approved) {
           await supabase.auth.signOut();
-          setUser(null);
+          setUserProfile(null);
           setSession(null);
         } else {
-          const fullUser = { ...session.user, ...profile };
-          setUser(fullUser);
+          setUserProfile(profile);
           setSession(session);
         }
       }
@@ -82,19 +117,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
           if (error || !profile || !profile.is_approved) {
             await supabase.auth.signOut();
-            setUser(null);
+            setUserProfile(null);
             setSession(null);
           } else {
-            const fullUser = { ...session.user, ...profile };
-            setUser(fullUser);
+            setUserProfile(profile);
             setSession(session);
             if (_event === 'SIGNED_IN') {
-              toast.success(t("common.welcomeUser", { username: fullUser.username || fullUser.first_name || fullUser.email }));
-              addLogEntry(t("common.userLoggedIn"), { username: fullUser.username, role: fullUser.role, storeId: fullUser.store_id }, fullUser.email);
+              toast.success(t("notification.welcome", { username: profile.username || profile.first_name || profile.email }));
+              addLogEntry(t("logAction.userLoggedIn"), { username: profile.username, role: profile.role, storeId: profile.store_id }, profile.email);
             }
           }
         } else {
-          setUser(null);
+          setUserProfile(null);
           setSession(null);
         }
       }
@@ -106,24 +140,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [addLogEntry, t]);
 
   const logout = async () => {
-    if (user) {
-      addLogEntry(t("common.userLoggedOut"), { username: user.username, storeId: user.store_id }, user.email);
+    if (userProfile) {
+      addLogEntry(t("logAction.userLoggedOut"), { username: userProfile.username, storeId: userProfile.store_id }, session?.user.email);
     }
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error("Error logging out:", error);
       toast.error("Chyba při odhlašování.");
     } else {
-      toast.info(t("common.loggedOut"));
+      toast.info(t("notification.info.loggedOut"));
       window.location.href = '/prihlaseni';
     }
   };
 
   const hasPermission = (permission: Permission): boolean => {
-    if (!user) return false;
-    if (user.role === "admin") return true;
-    const userPermissions = defaultPermissions[user.role] || [];
-    return userPermissions.includes(permission);
+    if (!userProfile || !permissions) return false;
+    if (userProfile.role === "admin") return true; // Admin always has all permissions
+    return permissions.includes(permission);
   };
 
   const changePassword = async (newPassword: string): Promise<boolean> => {
@@ -132,33 +165,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       toast.error(error.message);
       return false;
     }
-    toast.success(t("common.passwordChangedSuccess"));
-    addLogEntry(t("common.userPasswordChanged"), {}, user?.email);
+    toast.success(t("notification.success.passwordChanged"));
+    addLogEntry(t("logAction.userPasswordChanged"), {}, session?.user.email);
     return true;
   };
 
   const completeFirstLogin = async (newPassword: string): Promise<boolean> => {
-    if (!user) return false;
+    if (!session?.user) return false;
     const passwordChanged = await changePassword(newPassword);
     if (passwordChanged) {
       const { error } = await supabase
         .from('profiles')
         .update({ first_login: false })
-        .eq('id', user.id);
+        .eq('id', session.user.id);
 
       if (error) {
         toast.error(error.message);
         return false;
       }
-      setUser(prevUser => prevUser ? { ...prevUser, first_login: false } : null);
+      setUserProfile(prevProfile => prevProfile ? { ...prevProfile, first_login: false } : null);
       return true;
     }
     return false;
   };
 
-  const isAuthenticated = !!session?.user && !!user;
-  const isAdmin = user?.role === "admin";
-  const userStoreId = user?.store_id;
+  const user: User | null = session?.user && userProfile && permissions
+    ? { ...session.user, ...userProfile, permissions }
+    : null;
+
+  const isAuthenticated = !!session?.user && !!userProfile && !isLoadingPermissions;
+  const isAdmin = userProfile?.role === "admin";
+  const userStoreId = userProfile?.store_id;
 
   const value = {
     session,

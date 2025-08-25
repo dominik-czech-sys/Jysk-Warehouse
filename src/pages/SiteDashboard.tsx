@@ -11,6 +11,7 @@ import { useArticles, Article } from "@/data/articles";
 import { useGlobalArticles } from "@/data/globalArticles";
 import { StoreManagementSection } from "@/components/dashboard/StoreManagementSection";
 import { UserManagementSection } from "@/components/dashboard/UserManagementSection";
+import { RoleManagementSection } from "@/components/dashboard/RoleManagementSection";
 import { HelpPostManagementSection } from "@/components/dashboard/HelpPostManagementSection";
 import { AdminTutorialsSection } from "@/components/dashboard/AdminTutorialsSection";
 import { LogViewerSection } from "@/components/dashboard/LogViewerSection";
@@ -56,9 +57,9 @@ const SiteDashboard: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-2 sm:p-4">
         <Card className="p-4 sm:p-6 text-center">
-          <CardTitle className="text-xl sm:text-2xl font-bold text-red-600">{t("common.accessDenied")}</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl font-bold text-red-600">{t("common.auth.accessDenied")}</CardTitle>
           <CardContent className="mt-4">
-            <p className="text-gray-700 dark:text-gray-300">{t("common.noPermission")}</p>
+            <p className="text-gray-700 dark:text-gray-300">{t("common.auth.noPermission")}</p>
             <Link to="/" className="mt-4 inline-block">
               <Button className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">{t("common.backToMainPage")}</Button>
             </Link>
@@ -77,27 +78,27 @@ const SiteDashboard: React.FC = () => {
               <ArrowLeft className="h-4 w-4 mr-2" /> {t("common.backToMainPage")}
             </Button>
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("common.siteDashboard")}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("pageTitle.siteDashboard")}</h1>
           <div className="w-full sm:w-auto"></div> {/* Placeholder for alignment */}
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-8">
-            <TabsTrigger value="overview">{t("common.overview")}</TabsTrigger>
-            <TabsTrigger value="analytics">{t("common.analytics.title")}</TabsTrigger>
-            <TabsTrigger value="stores">{t("common.storeManagement")}</TabsTrigger>
-            <TabsTrigger value="users">{t("common.userManagement")}</TabsTrigger>
-            <TabsTrigger value="communication">{t("common.announcement.communication")}</TabsTrigger>
-            <TabsTrigger value="audits">{t("common.audit.management")}</TabsTrigger>
-            <TabsTrigger value="system">{t("common.system")}</TabsTrigger>
-            <TabsTrigger value="todo">{t("common.todoList")}</TabsTrigger>
+            <TabsTrigger value="overview">{t("common.admin.overview")}</TabsTrigger>
+            <TabsTrigger value="analytics">{t("common.admin.analytics")}</TabsTrigger>
+            <TabsTrigger value="stores">{t("common.admin.stores")}</TabsTrigger>
+            <TabsTrigger value="users">{t("common.admin.users")}</TabsTrigger>
+            <TabsTrigger value="roles">{t("common.permission.roles")}</TabsTrigger>
+            <TabsTrigger value="communication">{t("common.admin.communication")}</TabsTrigger>
+            <TabsTrigger value="audits">{t("common.admin.audits")}</TabsTrigger>
+            <TabsTrigger value="system">{t("common.admin.system")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-4">
             <Card>
               <CardHeader>
-                <CardTitle>{t("common.systemOverview")}</CardTitle>
-                <CardDescription>{t("common.systemOverviewDescription")}</CardDescription>
+                <CardTitle>{t("common.admin.systemOverview")}</CardTitle>
+                <CardDescription>{t("common.admin.systemOverviewDescription")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <StatisticsOverview />
@@ -129,6 +130,10 @@ const SiteDashboard: React.FC = () => {
             <UserManagementSection />
           </TabsContent>
 
+          <TabsContent value="roles" className="mt-4">
+            <RoleManagementSection />
+          </TabsContent>
+
           <TabsContent value="communication" className="mt-4">
             <AnnouncementManagementSection />
           </TabsContent>
@@ -136,14 +141,14 @@ const SiteDashboard: React.FC = () => {
           <TabsContent value="audits" className="mt-4">
             <Card>
               <CardHeader>
-                <CardTitle>{t("common.audit.management")}</CardTitle>
-                <CardDescription>{t("common.audit.managementDescription")}</CardDescription>
+                <CardTitle>{t("module.audit.management")}</CardTitle>
+                <CardDescription>{t("module.audit.managementDescription")}</CardDescription>
               </CardHeader>
               <CardContent>
                 {hasPermission("audit:manage_templates") && (
                   <Button onClick={() => navigate("/admin/audit-templates")}>
                     <FileText className="h-4 w-4 mr-2" />
-                    {t("common.audit.manageTemplates")}
+                    {t("module.audit.manageTemplates")}
                   </Button>
                 )}
               </CardContent>
@@ -155,18 +160,7 @@ const SiteDashboard: React.FC = () => {
             <AdminTutorialsSection isAdmin={isAdmin} />
             <LogViewerSection hasPermission={hasPermission} />
             <ExportDataSection hasPermission={hasPermission} />
-          </TabsContent>
-          
-          <TabsContent value="todo" className="mt-4">
-             <Card>
-              <CardHeader>
-                <CardTitle>{t("common.todoList")}</CardTitle>
-                <CardDescription>{t("common.todoListDescription")}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <ScrapeDataSection />
-              </CardContent>
-            </Card>
+            <ScrapeDataSection />
           </TabsContent>
         </Tabs>
       </div>
