@@ -375,9 +375,31 @@
     },
     "audit": {
       "management": "Audity",
+      "managementDescription": "Spravujte a provádějte audity prodejen.",
+      "manageTemplates": "Spravovat šablony",
       "templateManagement": "Správa šablon auditů",
       "templateManagementDescription": "Vytvářejte a spravujte šablony pro audity prodejen a další kontroly.",
-      "comingSoon": "Tato funkce se připravuje."
+      "comingSoon": "Tato funkce se připravuje.",
+      "addTemplate": "Přidat šablonu",
+      "editTemplate": "Upravit šablonu",
+      "templateList": "Seznam šablon",
+      "templateListDescription": "Přehled všech dostupných šablon auditů.",
+      "templateName": "Název šablony",
+      "itemCount": "Počet položek",
+      "loadingTemplates": "Načítání šablon...",
+      "editTemplateDescription": "Upravte název, popis a otázky této šablony.",
+      "addTemplateDescription": "Vytvořte novou šablonu auditu s vlastními otázkami.",
+      "checklistItems": "Položky checklistu",
+      "questionPlaceholder": "Zadejte text otázky...",
+      "addQuestion": "Přidat otázku",
+      "createTemplate": "Vytvořit šablonu",
+      "templateNameRequired": "Název šablony je povinný.",
+      "allQuestionsRequired": "Všechny otázky musí mít vyplněný text.",
+      "templateAddedSuccess": "Šablona auditu byla úspěšně vytvořena.",
+      "templateUpdatedSuccess": "Šablona auditu byla úspěšně aktualizována.",
+      "templateDeletedSuccess": "Šablona auditu byla úspěšně smazána.",
+      "confirmDeleteTitle": "Opravdu chcete smazat tuto šablonu?",
+      "confirmDeleteDescription": "Tato akce je nevratná. Šablona '{{templateName}}' a všechny její otázky budou trvale odstraněny."
     }
   }
 }

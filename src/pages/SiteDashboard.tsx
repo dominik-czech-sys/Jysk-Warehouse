@@ -1,10 +1,10 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle, CardHeader, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileText } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useStores, Store } from "@/data/stores";
 import { useArticles, Article } from "@/data/articles";
@@ -25,6 +25,7 @@ const SiteDashboard: React.FC = () => {
   const { globalArticles } = useGlobalArticles();
   const { addArticle } = useArticles();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const handleAddStore = async (newStore: Store, addDefaultArticles: boolean) => {
     await addStore(newStore);
@@ -119,11 +120,16 @@ const SiteDashboard: React.FC = () => {
           <TabsContent value="audits" className="mt-4">
             <Card>
               <CardHeader>
-                <CardTitle>{t("common.audit.templateManagement")}</CardTitle>
-                <CardDescription>{t("common.audit.templateManagementDescription")}</CardDescription>
+                <CardTitle>{t("common.audit.management")}</CardTitle>
+                <CardDescription>{t("common.audit.managementDescription")}</CardDescription>
               </CardHeader>
               <CardContent>
-                <p>{t("common.audit.comingSoon")}</p>
+                {hasPermission("audit:manage_templates") && (
+                  <Button onClick={() => navigate("/admin/audit-templates")}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    {t("common.audit.manageTemplates")}
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

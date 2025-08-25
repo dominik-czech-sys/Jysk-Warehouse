@@ -7,7 +7,7 @@ import DashboardPage from "./pages/DashboardPage";
 import NotFound from "./pages/NotFound";
 import ManageArticles from "./pages/ManageArticles";
 import LoginPage from "./pages/LoginPage";
-import SignUpPage from "./pages/SignUpPage"; // Import
+import SignUpPage from "./pages/SignUpPage";
 import SiteDashboard from "./pages/SiteDashboard";
 import CteckaCarkoduPage from "./pages/CteckaCarkoduPage";
 import MassAddArticlesPage from "./pages/MassAddArticlesPage";
@@ -16,7 +16,8 @@ import ExportDataPage from "./pages/ExportDataPage";
 import AccountSettingsPage from "./pages/AccountSettingsPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
 import ManageHelpPostsPage from "./pages/ManageHelpPostsPage";
-import TaskManagementPage from "./pages/TaskManagementPage"; // Import
+import TaskManagementPage from "./pages/TaskManagementPage";
+import ManageAuditTemplatesPage from "./pages/ManageAuditTemplatesPage"; // Import
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
@@ -70,6 +71,7 @@ const AppContent = () => {
         <Route path="/admin/help-posts" element={<PrivateRoute requiredPermission="help_posts:manage"><ManageHelpPostsPage /></PrivateRoute>} />
         <Route path="/doplnovani" element={<PrivateRoute><ReplenishmentPage /></PrivateRoute>} />
         <Route path="/ukoly" element={<PrivateRoute requiredPermission="task:view"><TaskManagementPage /></PrivateRoute>} />
+        <Route path="/admin/audit-templates" element={<PrivateRoute requiredPermission="audit:manage_templates"><ManageAuditTemplatesPage /></PrivateRoute>} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
