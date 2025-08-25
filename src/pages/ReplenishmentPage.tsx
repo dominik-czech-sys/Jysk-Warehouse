@@ -43,36 +43,38 @@ const ReplenishmentPage = () => {
           <CardDescription>{t("common.replenishmentListDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("common.articleId")}</TableHead>
-                <TableHead>{t("common.articleName")}</TableHead>
-                <TableHead>{t("common.warehouseLocation")}</TableHead>
-                <TableHead>{t("common.shopFloorStock")}</TableHead>
-                <TableHead>{t("common.replenishmentTrigger")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {articlesToReplenish.length > 0 ? (
-                articlesToReplenish.map((article) => (
-                  <TableRow key={article.id}>
-                    <TableCell className="font-medium">{article.id}</TableCell>
-                    <TableCell>{article.name}</TableCell>
-                    <TableCell>{`${article.rackId} - ${t("common.shelf")} ${article.shelfNumber}`}</TableCell>
-                    <TableCell>{article.shopFloorStock}</TableCell>
-                    <TableCell>{article.replenishmentTrigger}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
+          <div className="overflow-x-auto rounded-md border">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">
-                    {t("common.noArticlesToReplenish")}
-                  </TableCell>
+                  <TableHead>{t("common.articleId")}</TableHead>
+                  <TableHead>{t("common.articleName")}</TableHead>
+                  <TableHead>{t("common.warehouseLocation")}</TableHead>
+                  <TableHead>{t("common.shopFloorStock")}</TableHead>
+                  <TableHead>{t("common.replenishmentTrigger")}</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {articlesToReplenish.length > 0 ? (
+                  articlesToReplenish.map((article) => (
+                    <TableRow key={article.id}>
+                      <TableCell className="font-medium">{article.id}</TableCell>
+                      <TableCell>{article.name}</TableCell>
+                      <TableCell>{`${article.rackId} - ${t("common.shelf")} ${article.shelfNumber}`}</TableCell>
+                      <TableCell>{article.shopFloorStock}</TableCell>
+                      <TableCell>{article.replenishmentTrigger}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center">
+                      {t("common.noArticlesToReplenish")}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

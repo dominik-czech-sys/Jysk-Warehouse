@@ -84,46 +84,48 @@ const ManageUsersPage: React.FC = () => {
             <CardDescription>{t("common.userListDescription")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("common.username")}</TableHead>
-                  <TableHead>{t("common.name")}</TableHead>
-                  <TableHead>{t("common.role")}</TableHead>
-                  <TableHead>{t("common.storeId")}</TableHead>
-                  <TableHead>{t("common.status")}</TableHead>
-                  <TableHead className="text-right">{t("common.action")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow><TableCell colSpan={6} className="text-center">{t("common.loadingUsers")}</TableCell></TableRow>
-                ) : (
-                  users.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>{user.username}</TableCell>
-                      <TableCell>{user.first_name} {user.last_name}</TableCell>
-                      <TableCell>{user.role}</TableCell>
-                      <TableCell>{user.store_id}</TableCell>
-                      <TableCell>
-                        {user.is_approved ? (
-                          <Badge variant="default" className="bg-green-500 hover:bg-green-600"><CheckCircle className="h-4 w-4 mr-1"/>{t("common.approved")}</Badge>
-                        ) : (
-                          <Badge variant="secondary"><Clock className="h-4 w-4 mr-1"/>{t("common.pendingApproval")}</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {!user.is_approved && (
-                          <Button size="sm" onClick={() => handleApproveUser(user.id)}>
-                            {t("common.approve")}
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+            <div className="overflow-x-auto rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("common.username")}</TableHead>
+                    <TableHead>{t("common.name")}</TableHead>
+                    <TableHead>{t("common.role")}</TableHead>
+                    <TableHead>{t("common.storeId")}</TableHead>
+                    <TableHead>{t("common.status")}</TableHead>
+                    <TableHead className="text-right">{t("common.action")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow><TableCell colSpan={6} className="text-center">{t("common.loadingUsers")}</TableCell></TableRow>
+                  ) : (
+                    users.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell>{user.username}</TableCell>
+                        <TableCell>{user.first_name} {user.last_name}</TableCell>
+                        <TableCell>{user.role}</TableCell>
+                        <TableCell>{user.store_id}</TableCell>
+                        <TableCell>
+                          {user.is_approved ? (
+                            <Badge variant="default" className="bg-green-500 hover:bg-green-600"><CheckCircle className="h-4 w-4 mr-1"/>{t("common.approved")}</Badge>
+                          ) : (
+                            <Badge variant="secondary"><Clock className="h-4 w-4 mr-1"/>{t("common.pendingApproval")}</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {!user.is_approved && (
+                            <Button size="sm" onClick={() => handleApproveUser(user.id)}>
+                              {t("common.approve")}
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </div>

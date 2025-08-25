@@ -89,7 +89,7 @@ const MainLayout: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col min-w-0">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
           <MobileSidebar />
           <div className="w-full flex-1">
