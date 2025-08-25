@@ -28,6 +28,12 @@ export interface CompletedAudit {
   profiles: { username: string } | null;
 }
 
+export interface AuditResult {
+    item_id: string;
+    result: string;
+    notes?: string;
+}
+
 type NewAuditTemplate = Omit<AuditTemplate, 'id' | 'created_at' | 'audit_template_items'> & {
   audit_template_items: Omit<AuditTemplateItem, 'id' | 'template_id'>[];
 };
@@ -35,7 +41,8 @@ type NewAuditTemplate = Omit<AuditTemplate, 'id' | 'created_at' | 'audit_templat
 const fetchAuditTemplates = async (): Promise<AuditTemplate[]> => {
   const { data, error } = await supabase
     .from("audit_templates")
-    .select("*, audit_template_items(*)");
+    .select("*, audit_template_items(*)")
+    .order('item_order', { referencedTable: 'audit_template_items', ascending: true });
   if (error) throw new Error(error.message);
   return data as AuditTemplate[];
 };
@@ -119,6 +126,35 @@ const fetchCompletedAudits = async (): Promise<CompletedAudit[]> => {
   return data as unknown as CompletedAudit[];
 };
 
+const submitAuditToDb = async ({ template_id, store_id, user_id, results }: { template_id: string; store_id: string; user_id: string; results: AuditResult[] }) => {
+    // 1. Create the main audit record
+    const { data: auditData, error: auditError } = await supabase
+        .from('audits')
+        .insert({ template_id, store_id, user_id })
+        .select()
+        .single();
+
+    if (auditError) throw auditError;
+
+    // 2. Prepare and insert the results
+    const resultsToInsert = results.map(result => ({
+        audit_id: auditData.id,
+        ...result
+    }));
+
+    const { error: resultsError } = await supabase
+        .from('audit_results')
+        .insert(resultsToInsert);
+
+    if (resultsError) {
+        // Clean up if results fail
+        await supabase.from('audits').delete().eq('id', auditData.id);
+        throw resultsError;
+    }
+
+    return auditData;
+};
+
 export const useAuditTemplates = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
@@ -166,14 +202,27 @@ export const useAuditTemplates = () => {
 };
 
 export const useCompletedAudits = () => {
+    const queryClient = useQueryClient();
+    const { t } = useTranslation();
+
     const { data: audits, isLoading, error } = useQuery<CompletedAudit[]>({
         queryKey: ["completedAudits"],
         queryFn: fetchCompletedAudits,
+    });
+
+    const submitAuditMutation = useMutation({
+        mutationFn: submitAuditToDb,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["completedAudits"] });
+            toast.success(t("common.audit.submitSuccess"));
+        },
+        onError: (err) => toast.error(err.message),
     });
 
     return {
         audits: audits || [],
         isLoading,
         error,
+        submitAudit: submitAuditMutation.mutateAsync,
     };
 };

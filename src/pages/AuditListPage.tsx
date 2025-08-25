@@ -1,5 +1,5 @@
 import React from "react";
-import { useCompletedAudits, CompletedAudit } from "@/data/audits";
+import { useCompletedAudits } from "@/data/audits";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -27,9 +27,11 @@ const AuditListPage: React.FC = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">{t("common.audit.audits")}</h1>
         {hasPermission("audit:perform") && (
-          <Button disabled>
-            <PlusCircle className="h-4 w-4 mr-2" /> {t("common.audit.startNewAudit")}
-          </Button>
+          <Link to="/audity/provadet">
+            <Button>
+              <PlusCircle className="h-4 w-4 mr-2" /> {t("common.audit.startNewAudit")}
+            </Button>
+          </Link>
         )}
       </div>
       <Card>

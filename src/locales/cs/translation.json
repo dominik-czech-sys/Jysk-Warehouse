@@ -408,7 +408,20 @@
       "completedAuditsDescription": "Historie všech provedených auditů ve vašem obchodě.",
       "completedBy": "Dokončil",
       "completionDate": "Datum dokončení",
-      "loadingAudits": "Načítání auditů..."
+      "loadingAudits": "Načítání auditů...",
+      "performAudit": "Provést audit",
+      "backToList": "Zpět na seznam",
+      "selectTemplateTitle": "Krok 1: Vyberte šablonu auditu",
+      "selectTemplateDescription": "Vyberte šablonu, podle které chcete provést kontrolu.",
+      "selectTemplate": "Vyberte šablonu",
+      "yes": "Ano",
+      "no": "Ne",
+      "notesPlaceholder": "Přidat poznámku...",
+      "submitAudit": "Odeslat audit",
+      "submitting": "Odesílám...",
+      "submitSuccess": "Audit byl úspěšně odeslán.",
+      "submitErrorGeneric": "Při odesílání auditu došlo k chybě.",
+      "allQuestionsRequiredError": "Prosím, odpovězte na všechny otázky."
     }
   }
 }
