@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardTitle, CardHeader, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,9 +16,9 @@ import { AdminTutorialsSection } from "@/components/dashboard/AdminTutorialsSect
 import { LogViewerSection } from "@/components/dashboard/LogViewerSection";
 import { ExportDataSection } from "@/components/dashboard/ExportDataSection";
 import { StatisticsOverview } from "@/components/dashboard/StatisticsOverview";
-import { UserDistributionChart } from "@/components/dashboard/UserDistributionChart";
-import { ArticleStatusChart } from "@/components/dashboard/ArticleStatusChart";
-import { ScrapeDataSection } from "@/components/dashboard/ScrapeDataSection"; // Import
+import { UserDistributionChart } from "@/components/dashboard/charts/UserDistributionChart";
+import { ArticleStatusChart } from "@/components/dashboard/charts/ArticleStatusChart";
+import { ScrapeDataSection } from "@/components/dashboard/ScrapeDataSection";
 
 const SiteDashboard: React.FC = () => {
   const { isAdmin, hasPermission } = useAuth();
@@ -79,21 +79,28 @@ const SiteDashboard: React.FC = () => {
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
             <TabsTrigger value="overview">{t("common.overview")}</TabsTrigger>
             <TabsTrigger value="stores">{t("common.storeManagement")}</TabsTrigger>
             <TabsTrigger value="users">{t("common.userManagement")}</TabsTrigger>
             <TabsTrigger value="system">{t("common.system")}</TabsTrigger>
+            <TabsTrigger value="todo">{t("common.todoList")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-4">
-            <div className="flex flex-col gap-4">
-              <StatisticsOverview />
-              <div className="grid gap-4 md:grid-cols-2">
-                <UserDistributionChart />
-                <ArticleStatusChart />
-              </div>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("common.systemOverview")}</CardTitle>
+                <CardDescription>{t("common.systemOverviewDescription")}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <StatisticsOverview />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <UserDistributionChart />
+                  <ArticleStatusChart />
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="stores" className="mt-4">
@@ -111,11 +118,22 @@ const SiteDashboard: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="system" className="mt-4 space-y-6">
-            <ScrapeDataSection />
             <HelpPostManagementSection hasPermission={hasPermission} />
             <AdminTutorialsSection isAdmin={isAdmin} />
             <LogViewerSection hasPermission={hasPermission} />
             <ExportDataSection hasPermission={hasPermission} />
+          </TabsContent>
+          
+          <TabsContent value="todo" className="mt-4">
+             <Card>
+              <CardHeader>
+                <CardTitle>{t("common.todoList")}</CardTitle>
+                <CardDescription>{t("common.todoListDescription")}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <ScrapeDataSection />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
