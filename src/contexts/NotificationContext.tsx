@@ -1,8 +1,9 @@
-import React, { createContext, useContext, ReactNode } from "react";
+import React, { createContext, useContext, ReactNode, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 export interface AppNotification {
   id: string;
@@ -49,6 +50,32 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     queryFn: () => fetchNotifications(user!.id),
     enabled: !!user,
   });
+
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel(`notifications:${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
+        (payload) => {
+          queryClient.invalidateQueries({ queryKey: ['notifications', user.id] });
+          const newNotification = payload.new as AppNotification;
+          toast.info(newNotification.message, {
+            action: {
+              label: t('common.view'),
+              onClick: () => { /* Could open dropdown here in future */ },
+            },
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, queryClient, t]);
 
   const markAsReadMutation = useMutation({
     mutationFn: async (id: string) => {

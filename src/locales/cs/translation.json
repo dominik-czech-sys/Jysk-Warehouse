@@ -464,6 +464,7 @@
     "analytics": {
       "title": "Analytika"
     },
-    "loading": "Načítání"
+    "loading": "Načítání",
+    "view": "Zobrazit"
   }
 }
