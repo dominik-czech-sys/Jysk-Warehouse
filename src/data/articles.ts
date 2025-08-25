@@ -12,6 +12,7 @@ export interface Article {
   storeId: string; // Derived from ShelfRack (renamed from warehouseId)
   status: string; // Nové pole pro status zboží
   quantity: number; // New field for article quantity
+  minQuantity?: number; // Optional minimum quantity for low stock alerts
 }
 
 export const useArticles = () => {
@@ -43,6 +44,7 @@ export const useArticles = () => {
           shelfNumber: "N/A",
           storeId: "GLOBAL", // Special storeId for global articles
           quantity: 0, // Global articles don't have a quantity in this context
+          minQuantity: ga.minQuantity,
         }))
       ]
     : articles.filter((article) => article.storeId === userStoreId);
@@ -64,14 +66,14 @@ export const useArticles = () => {
 
   const addArticle = (newArticle: Article) => {
     setArticles((prev) => [...prev, newArticle]);
-    addLogEntry("Artikl přidán", { articleId: newArticle.id, name: newArticle.name, rackId: newArticle.rackId, shelfNumber: newArticle.shelfNumber, storeId: newArticle.storeId, quantity: newArticle.quantity }, user?.username);
+    addLogEntry("Artikl přidán", { articleId: newArticle.id, name: newArticle.name, rackId: newArticle.rackId, shelfNumber: newArticle.shelfNumber, storeId: newArticle.storeId, quantity: newArticle.quantity, minQuantity: newArticle.minQuantity }, user?.username);
   };
 
   const updateArticle = (updatedArticle: Article) => {
     setArticles((prev) =>
       prev.map((article) => (article.id === updatedArticle.id && article.storeId === updatedArticle.storeId ? updatedArticle : article))
     );
-    addLogEntry("Artikl aktualizován", { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, storeId: updatedArticle.storeId, quantity: updatedArticle.quantity }, user?.username);
+    addLogEntry("Artikl aktualizován", { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, storeId: updatedArticle.storeId, quantity: updatedArticle.quantity, minQuantity: updatedArticle.minQuantity }, user?.username);
   };
 
   const deleteArticle = (id: string, storeId: string) => {

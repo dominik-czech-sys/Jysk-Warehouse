@@ -15,7 +15,8 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import FirstLoginTutorial from "@/components/FirstLoginTutorial";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
-import { MobileSidebar } from "@/components/MobileSidebar"; // Import MobileSidebar
+import { MobileSidebar } from "@/components/MobileSidebar";
+import { LowStockAlerts } from "@/components/LowStockAlerts"; // Import LowStockAlerts
 
 const Index = () => {
   const { getArticleById, articles } = useArticles();
@@ -128,6 +129,9 @@ const Index = () => {
               </Button>
             </Link>
           )}
+        </div>
+        <div className="mt-6 w-full flex justify-center">
+          <LowStockAlerts />
         </div>
       </main>
 

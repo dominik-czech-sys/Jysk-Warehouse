@@ -8,9 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { useArticles, Article } from "@/data/articles";
 import { Link } from "react-router-dom";
-import { PlusCircle, Edit, Trash2, Scan, Boxes, ArrowLeft } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Scan, Boxes, ArrowLeft, QrCode } from "lucide-react"; // Import QrCode icon
 import { ArticleFormDialog } from "@/components/ArticleFormDialog";
 import { toast } from "sonner";
 import {
@@ -27,6 +26,8 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { useGlobalArticles, GlobalArticle } from "@/data/globalArticles";
+import { useArticles, Article } from "@/data/articles";
+import { ArticleBarcodeGenerator } from "@/components/ArticleBarcodeGenerator"; // Import ArticleBarcodeGenerator
 
 const ManageArticles = () => {
   const { articles, addArticle, updateArticle, deleteArticle } = useArticles();
@@ -40,6 +41,9 @@ const ManageArticles = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [articleToDeleteId, setArticleToDeleteId] = useState<string | null>(null);
   const [articleToDeleteStoreId, setArticleToDeleteStoreId] = useState<string | null>(null);
+
+  const [isBarcodeGeneratorOpen, setIsBarcodeGeneratorOpen] = useState(false);
+  const [articleToGenerateBarcode, setArticleToGenerateBarcode] = useState<{ id: string; storeId: string } | null>(null);
 
   const currentArticles = isAdmin ? globalArticles : articles;
 
@@ -115,6 +119,11 @@ const ManageArticles = () => {
     setIsDeleteDialogOpen(false);
   };
 
+  const handleGenerateBarcode = (id: string, storeId: string) => {
+    setArticleToGenerateBarcode({ id, storeId });
+    setIsBarcodeGeneratorOpen(true);
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-2 sm:p-4">
       <div className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 sm:p-6 mt-4 sm:mt-8">
@@ -159,6 +168,8 @@ const ManageArticles = () => {
                 {!isAdmin && <TableHead className="min-w-[80px]">{t("common.rackId")}</TableHead>}
                 {!isAdmin && <TableHead className="min-w-[100px]">{t("common.shelfNumber")}</TableHead>}
                 <TableHead className="min-w-[100px]">{t("common.status")}</TableHead>
+                {!isAdmin && <TableHead className="min-w-[80px]">{t("common.quantity")}</TableHead>}
+                <TableHead className="min-w-[100px]">{t("common.minQuantity")}</TableHead>
                 {!isAdmin && <TableHead className="min-w-[100px]">{t("common.storeId")}</TableHead>}
                 <TableHead className="text-right min-w-[100px]">{t("common.action")}</TableHead>
               </TableRow>
@@ -171,6 +182,8 @@ const ManageArticles = () => {
                   {!isAdmin && <TableCell>{(article as Article).rackId}</TableCell>}
                   {!isAdmin && <TableCell>{(article as Article).shelfNumber}</TableCell>}
                   <TableCell>{article.status}</TableCell>
+                  {!isAdmin && <TableCell>{(article as Article).quantity}</TableCell>}
+                  <TableCell>{article.minQuantity || 0}</TableCell>
                   {!isAdmin && <TableCell>{(article as Article).storeId}</TableCell>}
                   <TableCell className="text-right">
                     {((isAdmin && hasPermission("default_articles:manage")) || (!isAdmin && hasPermission("article:update"))) && (
@@ -190,11 +203,19 @@ const ManageArticles = () => {
                       <Button
                         variant="ghost"
                         size="sm"
+                        className="mr-2"
                         onClick={() => handleDeleteArticle(article.id, isAdmin ? "GLOBAL" : (article as Article).storeId)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleGenerateBarcode(article.id, isAdmin ? "GLOBAL" : (article as Article).storeId)}
+                    >
+                      <QrCode className="h-4 w-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -244,6 +265,15 @@ const ManageArticles = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {articleToGenerateBarcode && (
+        <ArticleBarcodeGenerator
+          isOpen={isBarcodeGeneratorOpen}
+          onClose={() => setIsBarcodeGeneratorOpen(false)}
+          articleId={articleToGenerateBarcode.id}
+          storeId={articleToGenerateBarcode.storeId}
+        />
+      )}
     </div>
   );
 };

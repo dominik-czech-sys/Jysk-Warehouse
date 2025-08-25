@@ -41,7 +41,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
     id: "",
     name: "",
     status: "",
-    ...(isGlobalAdminContext ? {} : { rackId: "", shelfNumber: "", storeId: userStoreId || "", quantity: 1 }),
+    ...(isGlobalAdminContext ? { minQuantity: 0 } : { rackId: "", shelfNumber: "", storeId: userStoreId || "", quantity: 1, minQuantity: 0 }),
   });
   const [selectedRackId, setSelectedRackId] = useState<string>("");
   const [selectedShelfNumber, setSelectedShelfNumber] = useState<string>("");
@@ -58,7 +58,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
         id: "",
         name: "",
         status: "",
-        ...(isGlobalAdminContext ? {} : { rackId: "", shelfNumber: "", storeId: userStoreId || "", quantity: 1 }),
+        ...(isGlobalAdminContext ? { minQuantity: 0 } : { rackId: "", shelfNumber: "", storeId: userStoreId || "", quantity: 1, minQuantity: 0 }),
       });
       setSelectedRackId("");
       setSelectedShelfNumber("");
@@ -87,8 +87,11 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
   }, [selectedRackId, selectedShelfNumber, shelfRacks, userStoreId, (formData as Article).storeId, article, isGlobalAdminContext]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({ ...prev, [id]: value }));
+    const { id, value, type } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: type === "number" ? parseInt(value, 10) || 0 : value,
+    }));
   };
 
   const handleRackSelect = (value: string) => {
@@ -211,6 +214,37 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               placeholder="Např. 21"
             />
           </div>
+
+          {!isGlobalAdminContext && (
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+              <Label htmlFor="quantity" className="sm:text-right">
+                {t("common.quantity")}
+              </Label>
+              <Input
+                id="quantity"
+                type="number"
+                value={(formData as Article).quantity}
+                onChange={handleChange}
+                className="col-span-3"
+                min="0"
+              />
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="minQuantity" className="sm:text-right">
+              {t("common.minQuantity")}
+            </Label>
+            <Input
+              id="minQuantity"
+              type="number"
+              value={formData.minQuantity || 0}
+              onChange={handleChange}
+              className="col-span-3"
+              min="0"
+            />
+          </div>
+
           <DialogFooter>
             <Button type="submit" className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
               {article ? t("common.saveChanges") : t("common.addArticle")}

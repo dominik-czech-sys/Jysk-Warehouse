@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { format } from "date-fns";
 import { cs, enUS, sk } from "date-fns/locale";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/hooks/useAuth"; // Import useAuth
+import { useStores } from "@/data/stores"; // Import useStores
 
 interface LogViewerProps {
   isOpen: boolean;
@@ -36,6 +38,7 @@ const logCategories = {
   "Store Delete": ["Obchod smazán"],
   "Default Articles Add": ["Výchozí artikly přidány do obchodu"],
   "Article Copy": ["Artikly zkopírovány"],
+  "Password Change": ["Heslo změněno", "Uživatelské heslo změněno"],
 };
 
 const logCategoryTranslationKeys: Record<keyof typeof logCategories, string> = {
@@ -57,13 +60,18 @@ const logCategoryTranslationKeys: Record<keyof typeof logCategories, string> = {
   "Store Delete": "logCategory.storeDelete",
   "Default Articles Add": "logCategory.defaultArticlesAdd",
   "Article Copy": "logCategory.articleCopy",
+  "Password Change": "logCategory.passwordChange",
 };
 
 export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
   const { logEntries, clearLog } = useLog();
   const { t, i18n } = useTranslation();
+  const { allUsers } = useAuth(); // Get all users for filtering
+  const { stores } = useStores(); // Get all stores for filtering
 
   const [selectedFilter, setSelectedFilter] = useState<keyof typeof logCategories>("Full Log");
+  const [filterByUser, setFilterByUser] = useState<string>("all");
+  const [filterByStore, setFilterByStore] = useState<string>("all");
 
   const currentLocale = useMemo(() => {
     switch (i18n.language) {
@@ -82,7 +90,15 @@ export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
 
     if (selectedFilter !== "Full Log") {
       const allowedActions = logCategories[selectedFilter];
-      filteredLogs = logEntries.filter(entry => allowedActions.includes(entry.action));
+      filteredLogs = filteredLogs.filter(entry => allowedActions.includes(entry.action));
+    }
+
+    if (filterByUser !== "all") {
+      filteredLogs = filteredLogs.filter(entry => entry.user === filterByUser);
+    }
+
+    if (filterByStore !== "all") {
+      filteredLogs = filteredLogs.filter(entry => entry.details?.storeId === filterByStore);
     }
 
     const grouped: Record<string, LogEntry[]> = {};
@@ -101,7 +117,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
       date: day,
       entries: grouped[day].sort((a, b) => b.timestamp - a.timestamp),
     }));
-  }, [logEntries, selectedFilter]);
+  }, [logEntries, selectedFilter, filterByUser, filterByStore]);
 
   if (!isOpen) {
     return null;
@@ -126,6 +142,35 @@ export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
                 ))}
               </SelectContent>
             </Select>
+
+            <Select onValueChange={setFilterByUser} value={filterByUser}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder={t("common.filterByUser")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("common.allUsers")}</SelectItem>
+                {allUsers.map(user => (
+                  <SelectItem key={user.username} value={user.username}>
+                    {user.username}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select onValueChange={setFilterByStore} value={filterByStore}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder={t("common.filterByStore")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("common.allStores")}</SelectItem>
+                {stores.map(store => (
+                  <SelectItem key={store.id} value={store.id}>
+                    {store.name} ({store.id})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             <Button variant="destructive" size="sm" onClick={clearLog} className="w-full sm:w-auto">
               <Trash2 className="h-4 w-4 mr-2" /> {t("common.clearLog")}
             </Button>
