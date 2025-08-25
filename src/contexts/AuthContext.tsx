@@ -44,70 +44,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { addLogEntry } = useLog();
   const { t } = useTranslation();
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-  };
-
   useEffect(() => {
-    const getSessionAndProfile = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-
-        if (session?.user) {
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-
-          if (error || !profile) {
-            console.error("Error or missing profile for active session, signing out:", error);
-            toast.error(t("common.sessionError"));
-            await handleSignOut();
-          } else if (!profile.is_approved) {
-            toast.error(t("common.accountNotApproved"));
-            await handleSignOut();
-          } else {
-            setUser({ ...session.user, ...profile });
-          }
-        }
-      } catch (e) {
-        console.error("Critical error during session validation, signing out:", e);
-        toast.error(t("common.sessionError"));
-        await handleSignOut();
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getSessionAndProfile();
-
+    setLoading(true);
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        setSession(session);
         if (session?.user) {
           const { data: profile, error } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single();
-          
+
           if (error || !profile) {
             console.error("Profile error on auth state change, signing out:", error);
+            await supabase.auth.signOut();
             setUser(null);
+            setSession(null);
           } else if (!profile.is_approved) {
             if (_event === 'SIGNED_IN') {
               toast.error(t("common.accountNotApproved"));
-              await handleSignOut();
             }
+            await supabase.auth.signOut();
             setUser(null);
             setSession(null);
           } else {
             const fullUser = { ...session.user, ...profile };
             setUser(fullUser);
+            setSession(session);
             if (_event === 'SIGNED_IN') {
               toast.success(t("common.welcomeUser", { username: fullUser.username || fullUser.first_name || fullUser.email }));
               addLogEntry(t("common.userLoggedIn"), { username: fullUser.username, role: fullUser.role, storeId: fullUser.store_id }, fullUser.email);
@@ -115,7 +78,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         } else {
           setUser(null);
+          setSession(null);
         }
+        setLoading(false);
       }
     );
 
@@ -134,7 +99,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       toast.error("Chyba při odhlašování.");
     } else {
       toast.info(t("common.loggedOut"));
-      // Force a full page reload to the login page to ensure clean state
       window.location.href = '/prihlaseni';
     }
   };
