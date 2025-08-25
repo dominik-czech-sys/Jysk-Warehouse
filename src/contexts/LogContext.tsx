@@ -23,21 +23,30 @@ interface LogProviderProps {
 
 export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
   const [logEntries, setLogEntries] = useState<LogEntry[]>(() => {
-    const storedLog = localStorage.getItem("appLog");
-    if (storedLog) {
-      const parsedLog: LogEntry[] = JSON.parse(storedLog);
-      // Ensure timestamps are numbers when loading from storage
-      return parsedLog.map(entry => ({
-        ...entry,
-        timestamp: typeof entry.timestamp === 'string' ? new Date(entry.timestamp).getTime() : entry.timestamp
-      }));
+    try {
+      const storedLog = localStorage.getItem("appLog");
+      if (storedLog) {
+        const parsedLog: LogEntry[] = JSON.parse(storedLog);
+        // Ensure timestamps are numbers when loading from storage
+        return parsedLog.map(entry => ({
+          ...entry,
+          timestamp: typeof entry.timestamp === 'string' ? new Date(entry.timestamp).getTime() : entry.timestamp
+        }));
+      }
+    } catch (error) {
+      console.error("Failed to parse log entries from localStorage", error);
+      localStorage.removeItem("appLog"); // Clear corrupted data
     }
     return [];
   });
   const { t } = useTranslation(); // Initialize useTranslation
 
   useEffect(() => {
-    localStorage.setItem("appLog", JSON.stringify(logEntries));
+    try {
+      localStorage.setItem("appLog", JSON.stringify(logEntries));
+    } catch (error) {
+      console.error("Failed to save log entries to localStorage", error);
+    }
   }, [logEntries]);
 
   const addLogEntry = (action: string, details?: Record<string, any>, username?: string) => {

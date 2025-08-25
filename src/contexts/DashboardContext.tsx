@@ -26,21 +26,31 @@ interface DashboardProviderProps {
   children: ReactNode;
 }
 
+const defaultWidgets: DashboardWidgetConfig[] = [
+  { id: "low-stock-1", component: "LowStockAlertsWidget", layout: { x: 0, y: 0, w: 1, h: 1 } },
+  { id: "article-overview-1", component: "ArticleOverviewWidget", layout: { x: 1, y: 0, w: 1, h: 1 } },
+];
+
 export const DashboardProvider: React.FC<DashboardProviderProps> = ({ children }) => {
   const [widgets, setWidgets] = useState<DashboardWidgetConfig[]>(() => {
-    const storedWidgets = localStorage.getItem("dashboardWidgets");
-    if (storedWidgets) {
-      return JSON.parse(storedWidgets);
+    try {
+      const storedWidgets = localStorage.getItem("dashboardWidgets");
+      if (storedWidgets) {
+        return JSON.parse(storedWidgets);
+      }
+    } catch (error) {
+      console.error("Failed to parse dashboard widgets from localStorage", error);
+      localStorage.removeItem("dashboardWidgets");
     }
-    // Default widgets if none are stored
-    return [
-      { id: "low-stock-1", component: "LowStockAlertsWidget", layout: { x: 0, y: 0, w: 1, h: 1 } },
-      { id: "article-overview-1", component: "ArticleOverviewWidget", layout: { x: 1, y: 0, w: 1, h: 1 } },
-    ];
+    return defaultWidgets;
   });
 
   useEffect(() => {
-    localStorage.setItem("dashboardWidgets", JSON.stringify(widgets));
+    try {
+      localStorage.setItem("dashboardWidgets", JSON.stringify(widgets));
+    } catch (error) {
+      console.error("Failed to save dashboard widgets to localStorage", error);
+    }
   }, [widgets]);
 
   const availableWidgets = [

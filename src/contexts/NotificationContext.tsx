@@ -27,13 +27,25 @@ interface NotificationProviderProps {
 
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
   const [notifications, setNotifications] = useState<AppNotification[]>(() => {
-    const storedNotifications = localStorage.getItem("appNotifications");
-    return storedNotifications ? JSON.parse(storedNotifications) : [];
+    try {
+      const storedNotifications = localStorage.getItem("appNotifications");
+      if (storedNotifications) {
+        return JSON.parse(storedNotifications);
+      }
+    } catch (error) {
+      console.error("Failed to parse notifications from localStorage", error);
+      localStorage.removeItem("appNotifications");
+    }
+    return [];
   });
   const { t } = useTranslation();
 
   useEffect(() => {
-    localStorage.setItem("appNotifications", JSON.stringify(notifications));
+    try {
+      localStorage.setItem("appNotifications", JSON.stringify(notifications));
+    } catch (error) {
+      console.error("Failed to save notifications to localStorage", error);
+    }
   }, [notifications]);
 
   const addNotification = (type: AppNotification['type'], message: string, link?: string) => {
