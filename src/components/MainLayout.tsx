@@ -4,16 +4,16 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
-  Bell,
   Boxes,
   Home,
   LifeBuoy,
   LogOut,
   Package,
-  Settings,
   Users,
   Warehouse,
   RefreshCw,
+  Settings,
+  Globe,
 } from "lucide-react";
 import { MobileSidebar } from "@/components/MobileSidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -35,6 +35,49 @@ const MainLayout: React.FC = () => {
         : "text-muted-foreground hover:text-primary"
     }`;
 
+  const AdminNav = () => (
+    <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+      <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.admin.systemManagement")}</h3>
+      <NavLink to="/admin/site-dashboard" end className={navLinkClasses}>
+        <Home className="h-4 w-4" />
+        {t("common.siteDashboard")}
+      </NavLink>
+      <NavLink to="/spravovat-artikly" className={navLinkClasses}>
+        <Globe className="h-4 w-4" />
+        {t("common.globalArticleManagement")}
+      </NavLink>
+    </nav>
+  );
+
+  const UserNav = () => (
+    <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+      <NavLink to="/" end className={navLinkClasses}>
+        <Home className="h-4 w-4" />
+        {t("common.dashboard")}
+      </NavLink>
+      
+      <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.warehouse")}</h3>
+      <NavLink to="/doplnovani" className={navLinkClasses}>
+        <RefreshCw className="h-4 w-4" />
+        {t("common.replenishment")}
+      </NavLink>
+
+      <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.management")}</h3>
+      {hasPermission("article:view") && (
+        <NavLink to="/spravovat-artikly" className={navLinkClasses}>
+          <Boxes className="h-4 w-4" />
+          {t("common.articleManagement")}
+        </NavLink>
+      )}
+      {hasPermission("rack:view") && (
+        <NavLink to="/admin/regaly" className={navLinkClasses}>
+          <Warehouse className="h-4 w-4" />
+          {t("common.rackManagement")}
+        </NavLink>
+      )}
+    </nav>
+  );
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
@@ -46,43 +89,16 @@ const MainLayout: React.FC = () => {
             </Link>
           </div>
           <div className="flex-1">
-            <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-              <NavLink to="/" end className={navLinkClasses}>
-                <Home className="h-4 w-4" />
-                {t("common.dashboard")}
-              </NavLink>
-              
-              <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.warehouse")}</h3>
-              <NavLink to="/doplnovani" className={navLinkClasses}>
-                <RefreshCw className="h-4 w-4" />
-                {t("common.replenishment")}
-              </NavLink>
-
-              <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.management")}</h3>
-              {hasPermission("article:view") && (
-                <NavLink to="/spravovat-artikly" className={navLinkClasses}>
-                  <Boxes className="h-4 w-4" />
-                  {t("common.articleManagement")}
-                </NavLink>
-              )}
-              {hasPermission("rack:view") && (
-                <NavLink to="/admin/regaly" className={navLinkClasses}>
-                  <Warehouse className="h-4 w-4" />
-                  {t("common.rackManagement")}
-                </NavLink>
-              )}
-              {isAdmin && (
-                 <NavLink to="/admin/site-dashboard" className={navLinkClasses}>
-                   <Users className="h-4 w-4" />
-                   {t("common.siteDashboard")}
-                 </NavLink>
-              )}
-            </nav>
+            {isAdmin ? <AdminNav /> : <UserNav />}
           </div>
           <div className="mt-auto p-4 border-t">
              <NavLink to="/help-center" className={navLinkClasses}>
                 <LifeBuoy className="h-4 w-4" />
                 {t("common.helpCenter")}
+              </NavLink>
+              <NavLink to="/account-settings" className={navLinkClasses}>
+                <Settings className="h-4 w-4" />
+                {t("common.accountSettings")}
               </NavLink>
           </div>
         </div>

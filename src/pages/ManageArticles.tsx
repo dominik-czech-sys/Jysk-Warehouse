@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { PlusCircle, Edit, Trash2, Scan, Boxes, ArrowLeft, QrCode, Filter, ArrowUpDown, X } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Scan, Boxes, ArrowLeft, QrCode, Filter, X } from "lucide-react";
 import { ArticleFormDialog } from "@/components/ArticleFormDialog";
 import { toast } from "sonner";
 import {
@@ -50,10 +50,9 @@ const ManageArticles = () => {
   // Filter and Sort States
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [minQuantityFilter, setMinQuantityFilter] = useState<number | ''>('');
   const [sortBy, setSortBy] = useState("id-asc"); // e.g., "id-asc", "name-desc", "quantity-asc"
 
-  const allArticlesForDisplay = isAdmin ? globalArticles : articles;
+  const allArticlesForDisplay = isAdmin ? globalArticles : articles.filter(a => a.store_id === userStoreId);
 
   const filteredAndSortedArticles = useMemo(() => {
     let currentFilteredArticles = allArticlesForDisplay;
@@ -77,41 +76,28 @@ const ManageArticles = () => {
       );
     }
 
-    // Apply min quantity filter
-    if (minQuantityFilter !== '' && minQuantityFilter >= 0) {
-      currentFilteredArticles = currentFilteredArticles.filter(
-        (article) => (article.min_quantity || 0) >= minQuantityFilter
-      );
-    }
-
     // Apply sorting
-    currentFilteredArticles.sort((a, b) => {
+    const sorted = [...currentFilteredArticles].sort((a, b) => {
       const aId = (a as Article).article_number || (a as GlobalArticle).id;
       const bId = (b as Article).article_number || (b as GlobalArticle).id;
-      switch (sortBy) {
-        case "id-asc":
-          return aId.localeCompare(bId);
-        case "id-desc":
-          return bId.localeCompare(aId);
-        case "name-asc":
-          return a.name.localeCompare(b.name);
-        case "name-desc":
-          return b.name.localeCompare(a.name);
-        case "quantity-asc":
-          return ((a as Article).quantity || 0) - ((b as Article).quantity || 0);
-        case "quantity-desc":
-          return ((b as Article).quantity || 0) - ((a as Article).quantity || 0);
-        case "status-asc":
-          return a.status.localeCompare(b.status);
-        case "status-desc":
-          return b.status.localeCompare(a.status);
+      const [key, direction] = sortBy.split('-');
+      const dir = direction === 'asc' ? 1 : -1;
+
+      switch (key) {
+        case "id":
+          return aId.localeCompare(bId) * dir;
+        case "name":
+          return a.name.localeCompare(b.name) * dir;
+        case "quantity":
+          return (((a as Article).quantity || 0) - ((b as Article).quantity || 0)) * dir;
+        case "status":
+          return a.status.localeCompare(b.status) * dir;
         default:
           return 0;
       }
     });
-
-    return currentFilteredArticles;
-  }, [allArticlesForDisplay, searchTerm, filterStatus, minQuantityFilter, sortBy]);
+    return sorted;
+  }, [allArticlesForDisplay, searchTerm, filterStatus, sortBy]);
 
   const handleAddArticle = (newArticle: Article | GlobalArticle) => {
     if (isAdmin) {
@@ -196,7 +182,6 @@ const ManageArticles = () => {
   const handleResetFilters = () => {
     setSearchTerm("");
     setFilterStatus("all");
-    setMinQuantityFilter('');
     setSortBy("id-asc");
   };
 
@@ -249,8 +234,8 @@ const ManageArticles = () => {
               <Filter className="h-5 w-5 mr-2" /> {t("common.articlesFilter")}
             </CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="col-span-full md:col-span-2 lg:col-span-1">
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="col-span-full md:col-span-1">
               <Input
                 placeholder={t("common.searchArticles")}
                 value={searchTerm}
@@ -271,16 +256,6 @@ const ManageArticles = () => {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-            <div>
-              <Input
-                type="number"
-                placeholder={t("common.minQuantity")}
-                value={minQuantityFilter}
-                onChange={(e) => setMinQuantityFilter(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
-                className="w-full"
-                min="0"
-              />
             </div>
             <div>
               <Select onValueChange={setSortBy} value={sortBy}>

@@ -10,20 +10,23 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useAuth } from "@/hooks/useAuth";
 
 const ReplenishmentPage = () => {
   const { t } = useTranslation();
   const { articles } = useArticles();
+  const { userStoreId } = useAuth();
 
   const articlesToReplenish = useMemo(() => {
     return articles.filter(
       (article) =>
+        article.store_id === userStoreId &&
         article.has_shop_floor_stock &&
         article.shop_floor_stock !== undefined &&
         article.replenishment_trigger !== undefined &&
         article.shop_floor_stock < article.replenishment_trigger
     );
-  }, [articles]);
+  }, [articles, userStoreId]);
 
   return (
     <div className="flex flex-col gap-4">

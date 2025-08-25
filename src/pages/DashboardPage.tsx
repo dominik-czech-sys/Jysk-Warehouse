@@ -6,6 +6,7 @@ import { ArticleOverviewWidget } from "@/components/widgets/ArticleOverviewWidge
 import { LowStockAlertsWidget } from "@/components/widgets/LowStockAlertsWidget";
 import { WarehouseSearchWidget } from "@/components/widgets/WarehouseSearchWidget";
 import { WarehouseLocationDisplayWidget } from "@/components/widgets/WarehouseLocationDisplayWidget";
+import { Navigate } from "react-router-dom";
 
 // Map widget component names to actual components
 const widgetComponents: { [key: string]: React.FC<{ id: string }> } = {
@@ -16,9 +17,14 @@ const widgetComponents: { [key: string]: React.FC<{ id: string }> } = {
 };
 
 const DashboardPage = () => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { t } = useTranslation();
   const { widgets } = useDashboard();
+
+  // Admins should see the site dashboard, not the user dashboard
+  if (isAdmin) {
+    return <Navigate to="/admin/site-dashboard" replace />;
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -26,7 +32,7 @@ const DashboardPage = () => {
         <h1 className="text-lg font-semibold md:text-2xl">{t("common.dashboard")}</h1>
       </div>
       <p className="text-muted-foreground">
-        {t("common.welcomeMessage", { username: user?.username || user?.first_name || user?.email })}
+        {t("common.welcomeMessage", { username: user?.first_name || user?.email })}
       </p>
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         {widgets.map((widgetConfig) => {
