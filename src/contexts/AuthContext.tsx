@@ -109,7 +109,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const fullUser = { ...session.user, ...profile };
             setUser(fullUser);
             if (_event === 'SIGNED_IN') {
-              toast.success(t("common.welcomeUser", { username: fullUser.username || fullUser.email }));
+              toast.success(t("common.welcomeUser", { username: fullUser.username || fullUser.first_name || fullUser.email }));
               addLogEntry(t("common.userLoggedIn"), { username: fullUser.username, role: fullUser.role, storeId: fullUser.store_id }, fullUser.email);
             }
           }

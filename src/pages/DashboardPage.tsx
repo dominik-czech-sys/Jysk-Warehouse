@@ -26,7 +26,7 @@ const DashboardPage = () => {
         <h1 className="text-lg font-semibold md:text-2xl">{t("common.dashboard")}</h1>
       </div>
       <p className="text-muted-foreground">
-        {t("common.welcomeMessage", { username: user?.username || user?.email })}
+        {t("common.welcomeMessage", { username: user?.username || user?.first_name || user?.email })}
       </p>
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         {widgets.map((widgetConfig) => {
