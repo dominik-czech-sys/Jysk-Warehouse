@@ -22,19 +22,22 @@ async function scrapePage(url: string) {
   }
 
   const products = [];
-  const productElements = doc.querySelectorAll(".product-compact");
+  // AKTUALIZOVÁNO: Používáme nový selektor pro kartu produktu
+  const productElements = doc.querySelectorAll(".product-card");
 
   for (const element of productElements) {
-    const name = element.querySelector(".product-compact__name")?.textContent.trim();
-    const articleNoRaw = element.querySelector(".product-compact__articleno")?.textContent.trim();
-    const category = element.querySelector(".product-compact__category")?.textContent.trim();
+    // AKTUALIZOVÁNO: Používáme nové selektory pro název a číslo artiklu
+    const name = element.querySelector('[data-testid="product-card-name"]')?.textContent.trim();
+    const articleNoRaw = element.querySelector('[data-testid="product-card-article-number"]')?.textContent.trim();
+    // Kategorie již není na kartě produktu snadno dostupná, nastavíme ji jako výchozí
+    const category = "Neznámá";
 
     if (name && articleNoRaw) {
       const articleNo = articleNoRaw.replace("Art. č.:", "").trim();
       products.push({
         id: articleNo,
         name: name,
-        category: category || "Neznámá",
+        category: category,
         status: "21", // Default status
         min_quantity: 0,
       });
@@ -60,7 +63,7 @@ serve(async (req) => {
     let page = 1;
     let hasMore = true;
 
-    console.log("Starting scrape...");
+    console.log("Starting scrape with updated selectors...");
 
     while (hasMore) {
       const url = `${baseUrl}?page=${page}`;
