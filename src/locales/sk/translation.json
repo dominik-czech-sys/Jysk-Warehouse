@@ -310,6 +310,28 @@
     "stopScanning": "Zastaviť skenovanie",
     "startScanning": "Spustiť skenovanie",
     "viewTutorials": "Zobraziť tutoriály",
+    "maxCapacity": "Max. kapacita",
+    "capacityExceeded": "Kapacita regálu/police prekročená. Max. položiek: {maxItems}",
+    "stockAdjustment": "Úprava zásob",
+    "adjustStock": "Upraviť zásoby",
+    "adjustStockDescription": "Upravte množstvo článku a zadajte dôvod.",
+    "adjustmentReason": "Dôvod úpravy",
+    "selectReason": "Vyberte dôvod",
+    "otherReason": "Iný dôvod",
+    "quantityChange": "Zmena množstva",
+    "currentQuantity": "Aktuálne množstvo",
+    "newQuantity": "Nové množstvo",
+    "stockAdjustedSuccess": "Zásoby článku {articleId} boli úspešne upravené.",
+    "stockAdjusted": "Zásoby upravené",
+    "locationBarcodeGenerator": "Generátor čiarových kódov pre lokácie",
+    "generateLocationBarcode": "Generovať čiarový kód lokácie",
+    "generateLocationBarcodeDescription": "Vygenerujte a vytlačte čiarový kód pre regál alebo policu.",
+    "locationType": "Typ lokácie",
+    "selectLocationType": "Vyberte typ lokácie",
+    "rackLocation": "Regál",
+    "shelfLocation": "Polica",
+    "selectRackForBarcode": "Vyberte regál",
+    "selectShelfForBarcode": "Vyberte policu",
     "logCategory": {
       "fullLog": "Celý protokol",
       "login": "Prihlásenie",
@@ -329,7 +351,9 @@
       "storeDelete": "Vymazanie obchodu",
       "defaultArticlesAdd": "Pridanie predvolených článkov",
       "articleCopy": "Kopírovanie článkov",
-      "passwordChange": "Zmena hesla"
+      "passwordChange": "Zmena hesla",
+      "stockAdjustment": "Úprava zásob",
+      "locationBarcodeGenerated": "Čiarový kód lokácie vygenerovaný"
     },
     "permission": {
       "user": {
@@ -357,7 +381,8 @@
         "delete": "Vymazať články",
         "scan": "Skenovať články",
         "massAdd": "Hromadné pridávanie článkov",
-        "copyFromStore": "Kopírovať články z iných obchodov"
+        "copyFromStore": "Kopírovať články z iných obchodov",
+        "adjustStock": "Upraviť zásoby"
       },
       "log": {
         "view": "Zobraziť protokol"

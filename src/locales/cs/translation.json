@@ -48,7 +48,7 @@
     "username": "Uživatelské jméno",
     "enterUsername": "Zadejte uživatelské jméno",
     "password": "Heslo",
-    "enterPassword": "Zadajte heslo",
+    "enterPassword": "Zadejte heslo",
     "login": "Přihlásit se",
     "viewExternalContent": "Zobrazit externí obsah",
     "scanBarcodeTitle": "Skenovat čárový kód",
@@ -310,6 +310,28 @@
     "stopScanning": "Zastavit skenování",
     "startScanning": "Spustit skenování",
     "viewTutorials": "Zobrazit tutoriály",
+    "maxCapacity": "Max. kapacita",
+    "capacityExceeded": "Kapacita regálu/police překročena. Max. položek: {maxItems}",
+    "stockAdjustment": "Úprava zásob",
+    "adjustStock": "Upravit zásoby",
+    "adjustStockDescription": "Upravte množství artiklu a zadejte důvod.",
+    "adjustmentReason": "Důvod úpravy",
+    "selectReason": "Vyberte důvod",
+    "otherReason": "Jiný důvod",
+    "quantityChange": "Změna množství",
+    "currentQuantity": "Aktuální množství",
+    "newQuantity": "Nové množství",
+    "stockAdjustedSuccess": "Zásoby artiklu {articleId} byly úspěšně upraveny.",
+    "stockAdjusted": "Zásoby upraveny",
+    "locationBarcodeGenerator": "Generátor čárových kódů pro lokace",
+    "generateLocationBarcode": "Generovat čárový kód lokace",
+    "generateLocationBarcodeDescription": "Vygenerujte a vytiskněte čárový kód pro regál nebo polici.",
+    "locationType": "Typ lokace",
+    "selectLocationType": "Vyberte typ lokace",
+    "rackLocation": "Regál",
+    "shelfLocation": "Police",
+    "selectRackForBarcode": "Vyberte regál",
+    "selectShelfForBarcode": "Vyberte polici",
     "logCategory": {
       "fullLog": "Celý protokol",
       "login": "Přihlášení",
@@ -329,7 +351,9 @@
       "storeDelete": "Smazání obchodu",
       "defaultArticlesAdd": "Přidání výchozích artiklů",
       "articleCopy": "Kopírování artiklů",
-      "passwordChange": "Změna hesla"
+      "passwordChange": "Změna hesla",
+      "stockAdjustment": "Úprava zásob",
+      "locationBarcodeGenerated": "Čárový kód lokace vygenerován"
     },
     "permission": {
       "user": {
@@ -357,7 +381,8 @@
         "delete": "Smazat artikl",
         "scan": "Skenovat artikly",
         "massAdd": "Hromadně přidávat artikly",
-        "copyFromStore": "Kopírovat artikly z jiných obchodů"
+        "copyFromStore": "Kopírovat artikly z jiných obchodů",
+        "adjustStock": "Upravit zásoby"
       },
       "log": {
         "view": "Zobrazit protokol"
