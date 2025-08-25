@@ -1,69 +1,83 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useLog } from "@/contexts/LogContext";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
 export interface GlobalArticle {
   id: string; // Article Number
-  name: string; // Name
-  status: string; // Status of the article
-  minQuantity?: number; // Optional minimum quantity for low stock alerts
+  name: string;
+  status: string;
+  min_quantity?: number;
 }
 
-// Initial global articles data
-const initialGlobalArticles: GlobalArticle[] = [
-  { id: "DEFAULT-001", name: "Výchozí artikl A", status: "21", minQuantity: 5 },
-  { id: "DEFAULT-002", name: "Výchozí artikl B", status: "11", minQuantity: 10 },
-  { id: "DEFAULT-003", name: "Výchozí artikl C", status: "41", minQuantity: 2 },
-];
+type NewGlobalArticle = Omit<GlobalArticle, 'id'>;
+
+const fetchGlobalArticles = async (): Promise<GlobalArticle[]> => {
+  const { data, error } = await supabase.from("global_articles").select("*");
+  if (error) throw new Error(error.message);
+  return data;
+};
+
+const addGlobalArticleToDb = async (newArticle: NewGlobalArticle) => {
+  const { data, error } = await supabase.from("global_articles").insert(newArticle).select();
+  if (error) throw new Error(error.message);
+  return data;
+};
+
+const updateGlobalArticleInDb = async (updatedArticle: GlobalArticle) => {
+  const { data, error } = await supabase.from("global_articles").update(updatedArticle).eq("id", updatedArticle.id).select();
+  if (error) throw new Error(error.message);
+  return data;
+};
+
+const deleteGlobalArticleFromDb = async (articleId: string) => {
+  const { error } = await supabase.from("global_articles").delete().eq("id", articleId);
+  if (error) throw new Error(error.message);
+  return articleId;
+};
 
 export const useGlobalArticles = () => {
-  const { user } = useAuth();
-  const { addLogEntry } = useLog();
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
 
-  const [globalArticles, setGlobalArticles] = useState<GlobalArticle[]>(() => {
-    const storedGlobalArticles = localStorage.getItem("globalArticles");
-    if (storedGlobalArticles) {
-      return JSON.parse(storedGlobalArticles);
-    }
-    return initialGlobalArticles;
+  const { data: globalArticles, isLoading, error } = useQuery<GlobalArticle[]>({
+    queryKey: ["globalArticles"],
+    queryFn: fetchGlobalArticles,
   });
 
-  useEffect(() => {
-    localStorage.setItem("globalArticles", JSON.stringify(globalArticles));
-  }, [globalArticles]);
+  const addGlobalArticleMutation = useMutation({
+    mutationFn: addGlobalArticleToDb,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["globalArticles"] });
+      toast.success(t("common.globalArticleAddedSuccess"));
+    },
+    onError: (err) => toast.error(err.message),
+  });
 
-  const getGlobalArticleById = (id: string) => {
-    return globalArticles.find((article) => article.id === id);
+  const updateGlobalArticleMutation = useMutation({
+    mutationFn: updateGlobalArticleInDb,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["globalArticles"] });
+      toast.success(t("common.globalArticleUpdatedSuccess"));
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  const deleteGlobalArticleMutation = useMutation({
+    mutationFn: deleteGlobalArticleFromDb,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["globalArticles"] });
+      toast.success(t("common.globalArticleDeletedSuccess"));
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  return {
+    globalArticles: globalArticles || [],
+    isLoading,
+    error,
+    addGlobalArticle: addGlobalArticleMutation.mutateAsync,
+    updateGlobalArticle: updateGlobalArticleMutation.mutateAsync,
+    deleteGlobalArticle: deleteGlobalArticleMutation.mutateAsync,
   };
-
-  const addGlobalArticle = (newArticle: GlobalArticle) => {
-    if (globalArticles.some(article => article.id === newArticle.id)) {
-      toast.error(t("common.globalArticleExists", { articleId: newArticle.id }));
-      addLogEntry(t("common.attemptToAddExistingGlobalArticle"), { articleId: newArticle.id }, user?.email);
-      return false;
-    }
-    setGlobalArticles((prev) => [...prev, newArticle]);
-    toast.success(t("common.globalArticleAddedSuccess", { articleId: newArticle.id }));
-    addLogEntry(t("common.globalArticleAdded"), { articleId: newArticle.id, name: newArticle.name, status: newArticle.status, minQuantity: newArticle.minQuantity }, user?.email);
-    return true;
-  };
-
-  const updateGlobalArticle = (updatedArticle: GlobalArticle) => {
-    setGlobalArticles((prev) =>
-      prev.map((article) => (article.id === updatedArticle.id ? updatedArticle : article))
-    );
-    toast.success(t("common.globalArticleUpdatedSuccess", { articleId: updatedArticle.id }));
-    addLogEntry(t("common.globalArticleUpdated"), { articleId: updatedArticle.id, name: updatedArticle.name, status: updatedArticle.status, minQuantity: updatedArticle.minQuantity }, user?.email);
-  };
-
-  const deleteGlobalArticle = (id: string) => {
-    setGlobalArticles((prev) => prev.filter((article) => article.id !== id));
-    toast.success(t("common.globalArticleDeletedSuccess", { articleId: id }));
-    addLogEntry(t("common.globalArticleDeleted"), { articleId: id }, user?.email);
-  };
-
-  return { globalArticles, getGlobalArticleById, addGlobalArticle, updateGlobalArticle, deleteGlobalArticle };
 };

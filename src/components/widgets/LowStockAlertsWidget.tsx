@@ -16,9 +16,9 @@ export const LowStockAlertsWidget: React.FC<LowStockAlertsWidgetProps> = ({ id }
 
   const lowStockArticles = useMemo(() => {
     return articles.filter(article =>
-      article.minQuantity !== undefined &&
-      article.quantity < article.minQuantity &&
-      article.storeId !== "GLOBAL" // Exclude global articles from low stock alerts
+      article.min_quantity !== undefined &&
+      article.quantity < article.min_quantity &&
+      article.store_id !== "GLOBAL" // Exclude global articles from low stock alerts
     );
   }, [articles]);
 
@@ -32,12 +32,12 @@ export const LowStockAlertsWidget: React.FC<LowStockAlertsWidgetProps> = ({ id }
         <ScrollArea className="h-[120px] w-full rounded-md border p-2">
           <ul className="space-y-1">
             {lowStockArticles.map((article) => (
-              <li key={`${article.id}-${article.storeId}`} className="flex justify-between items-center text-sm text-red-800 dark:text-red-200">
+              <li key={`${article.id}-${article.store_id}`} className="flex justify-between items-center text-sm text-red-800 dark:text-red-200">
                 <span>
-                  <strong>{article.id}</strong> ({article.name})
+                  <strong>{article.article_number}</strong> ({article.name})
                 </span>
                 <span className="font-semibold">
-                  {article.quantity} / {article.minQuantity}
+                  {article.quantity} / {article.min_quantity}
                 </span>
               </li>
             ))}

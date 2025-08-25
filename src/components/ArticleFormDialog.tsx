@@ -23,7 +23,7 @@ import { Separator } from "@/components/ui/separator";
 interface ArticleFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (article: Article | GlobalArticle) => void;
+  onSubmit: (article: Partial<Article | GlobalArticle>) => void;
   article?: Article | GlobalArticle | null;
   isGlobalAdminContext?: boolean;
 }
@@ -39,29 +39,22 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
   const { shelfRacks } = useShelfRacks();
   const { t } = useTranslation();
 
-  const [formData, setFormData] = useState<Article | GlobalArticle>({
-    id: "",
-    name: "",
-    status: "",
-    ...(isGlobalAdminContext ? { minQuantity: 0 } : { rackId: "", shelfNumber: "", storeId: userStoreId || "", quantity: 1, minQuantity: 0, hasShopFloorStock: false, shopFloorStock: 0, replenishmentTrigger: 0 }),
-  });
+  const [formData, setFormData] = useState<Partial<Article | GlobalArticle>>({});
   const [selectedRackId, setSelectedRackId] = useState<string>("");
   const [selectedShelfNumber, setSelectedShelfNumber] = useState<string>("");
 
   useEffect(() => {
     if (article) {
       setFormData(article);
-      if (!isGlobalAdminContext && "rackId" in article) {
-        setSelectedRackId(article.rackId);
-        setSelectedShelfNumber(article.shelfNumber);
+      if (!isGlobalAdminContext && "rack_id" in article) {
+        setSelectedRackId(article.rack_id || "");
+        setSelectedShelfNumber(article.shelf_number || "");
       }
     } else {
-      setFormData({
-        id: "",
-        name: "",
-        status: "",
-        ...(isGlobalAdminContext ? { minQuantity: 0 } : { rackId: "", shelfNumber: "", storeId: userStoreId || "", quantity: 1, minQuantity: 0, hasShopFloorStock: false, shopFloorStock: 0, replenishmentTrigger: 0 }),
-      });
+      const initialData: Partial<Article | GlobalArticle> = isGlobalAdminContext
+        ? { id: "", name: "", status: "", min_quantity: 0 }
+        : { article_number: "", name: "", status: "", rack_id: "", shelf_number: "", store_id: userStoreId || "", quantity: 1, min_quantity: 0, has_shop_floor_stock: false, shop_floor_stock: 0, replenishment_trigger: 0 };
+      setFormData(initialData);
       setSelectedRackId("");
       setSelectedShelfNumber("");
     }
@@ -69,24 +62,13 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
 
   useEffect(() => {
     if (!isGlobalAdminContext) {
-      const currentRack = shelfRacks.find(rack => rack.id === selectedRackId && rack.storeId === (formData as Article).storeId);
-      if (currentRack) {
-        setFormData(prev => ({
-          ...(prev as Article),
-          rackId: currentRack.id,
-          shelfNumber: selectedShelfNumber,
-          storeId: currentRack.storeId,
-        }));
-      } else if (!article) {
-        setFormData(prev => ({
-          ...(prev as Article),
-          rackId: "",
-          shelfNumber: "",
-          storeId: userStoreId || "",
-        }));
-      }
+      setFormData(prev => ({
+        ...prev,
+        rack_id: selectedRackId,
+        shelf_number: selectedShelfNumber,
+      }));
     }
-  }, [selectedRackId, selectedShelfNumber, shelfRacks, userStoreId, (formData as Article).storeId, article, isGlobalAdminContext]);
+  }, [selectedRackId, selectedShelfNumber, isGlobalAdminContext]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value, type } = e.target;
@@ -99,7 +81,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
   const handleCheckboxChange = (checked: boolean) => {
     setFormData((prev) => ({
       ...prev,
-      hasShopFloorStock: checked,
+      has_shop_floor_stock: checked,
     }));
   };
 
@@ -114,20 +96,27 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.id || !formData.name || !formData.status) {
-      toast.error(t("common.fillAllArticleFields"));
-      return;
+    const finalData = { ...formData, rack_id: selectedRackId, shelf_number: selectedShelfNumber };
+
+    if (isGlobalAdminContext) {
+        if (!finalData.id || !finalData.name || !finalData.status) {
+            toast.error(t("common.fillAllArticleFields"));
+            return;
+        }
+    } else {
+        const articleData = finalData as Partial<Article>;
+        if (!articleData.article_number || !articleData.name || !articleData.status || !articleData.rack_id || !articleData.shelf_number) {
+            toast.error(t("common.fillAllArticleFields"));
+            return;
+        }
     }
-    if (!isGlobalAdminContext && (!selectedRackId || !selectedShelfNumber)) {
-      toast.error(t("common.fillAllArticleFields"));
-      return;
-    }
-    onSubmit(formData);
+    
+    onSubmit(finalData);
     onClose();
   };
 
   const availableShelves = selectedRackId
-    ? shelfRacks.find(r => r.id === selectedRackId && r.storeId === (formData as Article).storeId)?.shelves || []
+    ? shelfRacks.find(r => r.id === selectedRackId && r.store_id === (formData as Article).store_id)?.shelves || []
     : [];
 
   return (
@@ -140,14 +129,13 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          {/* ... existing fields ... */}
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="id" className="sm:text-right">
+            <Label htmlFor={isGlobalAdminContext ? "id" : "article_number"} className="sm:text-right">
               {t("common.articleId")}
             </Label>
             <Input
-              id="id"
-              value={formData.id}
+              id={isGlobalAdminContext ? "id" : "article_number"}
+              value={isGlobalAdminContext ? (formData as GlobalArticle).id : (formData as Article).article_number}
               onChange={handleChange}
               className="col-span-3"
               readOnly={!!article}
@@ -168,7 +156,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           {!isGlobalAdminContext && (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-                <Label htmlFor="rackId" className="sm:text-right">
+                <Label htmlFor="rack_id" className="sm:text-right">
                   {t("common.rackRowRack")}
                 </Label>
                 <Select onValueChange={handleRackSelect} value={selectedRackId}>
@@ -176,9 +164,9 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
                     <SelectValue placeholder={t("common.selectRack")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {shelfRacks.filter(rack => !userStoreId || rack.storeId === userStoreId).map((rack) => (
+                    {shelfRacks.filter(rack => !userStoreId || rack.store_id === userStoreId).map((rack) => (
                       <SelectItem key={rack.id} value={rack.id}>
-                        {rack.rowId}-{rack.rackId} ({rack.shelves.map(s => s.description).join(', ')}) - {rack.storeId}
+                        {rack.row_id}-{rack.rack_id} ({rack.shelves.map(s => s.description).join(', ')}) - {rack.store_id}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -186,7 +174,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-                <Label htmlFor="shelfNumber" className="sm:text-right">
+                <Label htmlFor="shelf_number" className="sm:text-right">
                   {t("common.shelfNumberLabel")}
                 </Label>
                 <Select onValueChange={handleShelfNumberSelect} value={selectedShelfNumber} disabled={!selectedRackId}>
@@ -204,10 +192,10 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-                <Label htmlFor="storeId" className="sm:text-right">
+                <Label htmlFor="store_id" className="sm:text-right">
                   {t("common.storeId")}
                 </Label>
-                <Input id="storeId" value={(formData as Article).storeId} readOnly className="col-span-3 bg-gray-100 dark:bg-gray-700" />
+                <Input id="store_id" value={(formData as Article).store_id} readOnly className="col-span-3 bg-gray-100 dark:bg-gray-700" />
               </div>
             </>
           )}
@@ -242,13 +230,13 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="minQuantity" className="sm:text-right">
+            <Label htmlFor="min_quantity" className="sm:text-right">
               {t("common.minQuantity")}
             </Label>
             <Input
-              id="minQuantity"
+              id="min_quantity"
               type="number"
-              value={formData.minQuantity || 0}
+              value={formData.min_quantity || 0}
               onChange={handleChange}
               className="col-span-3"
               min="0"
@@ -260,35 +248,35 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               <Separator className="col-span-full my-2" />
               <div className="col-span-full flex items-center space-x-2">
                 <Checkbox
-                  id="hasShopFloorStock"
-                  checked={(formData as Article).hasShopFloorStock}
+                  id="has_shop_floor_stock"
+                  checked={(formData as Article).has_shop_floor_stock}
                   onCheckedChange={(checked) => handleCheckboxChange(!!checked)}
                 />
-                <Label htmlFor="hasShopFloorStock">{t("common.hasShopFloorStock")}</Label>
+                <Label htmlFor="has_shop_floor_stock">{t("common.hasShopFloorStock")}</Label>
               </div>
-              {(formData as Article).hasShopFloorStock && (
+              {(formData as Article).has_shop_floor_stock && (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-                    <Label htmlFor="shopFloorStock" className="sm:text-right">
+                    <Label htmlFor="shop_floor_stock" className="sm:text-right">
                       {t("common.shopFloorStock")}
                     </Label>
                     <Input
-                      id="shopFloorStock"
+                      id="shop_floor_stock"
                       type="number"
-                      value={(formData as Article).shopFloorStock || 0}
+                      value={(formData as Article).shop_floor_stock || 0}
                       onChange={handleChange}
                       className="col-span-3"
                       min="0"
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-                    <Label htmlFor="replenishmentTrigger" className="sm:text-right">
+                    <Label htmlFor="replenishment_trigger" className="sm:text-right">
                       {t("common.replenishmentTrigger")}
                     </Label>
                     <Input
-                      id="replenishmentTrigger"
+                      id="replenishment_trigger"
                       type="number"
-                      value={(formData as Article).replenishmentTrigger || 0}
+                      value={(formData as Article).replenishment_trigger || 0}
                       onChange={handleChange}
                       className="col-span-3"
                       min="0"

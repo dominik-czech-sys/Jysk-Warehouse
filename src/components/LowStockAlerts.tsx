@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge"; // Now correctly imported as a named export
+import { Badge } from "@/components/ui/badge";
 
 export const LowStockAlerts: React.FC = () => {
   const { articles } = useArticles();
@@ -12,9 +12,9 @@ export const LowStockAlerts: React.FC = () => {
 
   const lowStockArticles = useMemo(() => {
     return articles.filter(article => 
-      article.minQuantity !== undefined && 
-      article.quantity < article.minQuantity &&
-      article.storeId !== "GLOBAL" // Exclude global articles from low stock alerts
+      article.min_quantity !== undefined && 
+      article.quantity < article.min_quantity &&
+      article.store_id !== "GLOBAL" // Exclude global articles from low stock alerts
     );
   }, [articles]);
 
@@ -35,12 +35,12 @@ export const LowStockAlerts: React.FC = () => {
         <ScrollArea className="h-[150px] w-full rounded-md border border-red-100 dark:border-red-800 p-2">
           <ul className="space-y-2">
             {lowStockArticles.map((article) => (
-              <li key={`${article.id}-${article.storeId}`} className="flex justify-between items-center text-sm text-red-800 dark:text-red-200">
+              <li key={`${article.id}-${article.store_id}`} className="flex justify-between items-center text-sm text-red-800 dark:text-red-200">
                 <span>
-                  <strong>{article.id}</strong> ({article.name}) - {t("common.storeId")}: {article.storeId}
+                  <strong>{article.article_number}</strong> ({article.name}) - {t("common.storeId")}: {article.store_id}
                 </span>
                 <span className="font-semibold">
-                  {t("common.current")}: {article.quantity} / {t("common.min")}: {article.minQuantity}
+                  {t("common.current")}: {article.quantity} / {t("common.min")}: {article.min_quantity}
                 </span>
               </li>
             ))}

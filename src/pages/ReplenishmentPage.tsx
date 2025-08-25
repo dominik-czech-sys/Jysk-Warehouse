@@ -16,19 +16,12 @@ const ReplenishmentPage = () => {
   const { articles } = useArticles();
 
   const articlesToReplenish = useMemo(() => {
-    // First, filter to only include actual store articles, which have replenishment properties.
-    // This also acts as a type guard for TypeScript.
-    const storeArticles = articles.filter(
-      (article): article is Article => article.storeId !== "GLOBAL"
-    );
-
-    // Now, from the store articles, find the ones that need replenishment.
-    return storeArticles.filter(
+    return articles.filter(
       (article) =>
-        article.hasShopFloorStock &&
-        article.shopFloorStock !== undefined &&
-        article.replenishmentTrigger !== undefined &&
-        article.shopFloorStock < article.replenishmentTrigger
+        article.has_shop_floor_stock &&
+        article.shop_floor_stock !== undefined &&
+        article.replenishment_trigger !== undefined &&
+        article.shop_floor_stock < article.replenishment_trigger
     );
   }, [articles]);
 
@@ -58,11 +51,11 @@ const ReplenishmentPage = () => {
                 {articlesToReplenish.length > 0 ? (
                   articlesToReplenish.map((article) => (
                     <TableRow key={article.id}>
-                      <TableCell className="font-medium">{article.id}</TableCell>
+                      <TableCell className="font-medium">{article.article_number}</TableCell>
                       <TableCell>{article.name}</TableCell>
-                      <TableCell>{`${article.rackId} - ${t("common.shelf")} ${article.shelfNumber}`}</TableCell>
-                      <TableCell>{article.shopFloorStock}</TableCell>
-                      <TableCell>{article.replenishmentTrigger}</TableCell>
+                      <TableCell>{`${article.rack_id} - ${t("common.shelf")} ${article.shelf_number}`}</TableCell>
+                      <TableCell>{article.shop_floor_stock}</TableCell>
+                      <TableCell>{article.replenishment_trigger}</TableCell>
                     </TableRow>
                   ))
                 ) : (

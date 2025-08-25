@@ -9,35 +9,39 @@ import { toast } from "sonner";
 import { useArticles, Article } from "@/data/articles";
 import { useAuth } from "@/hooks/useAuth";
 import { useLog } from "@/contexts/LogContext";
-import { Html5Qrcode } from "html5-qrcode"; // Import Html5Qrcode from the main package
+import { Html5Qrcode } from "html5-qrcode";
 import { Html5QrcodeScanner } from "html5-qrcode/esm/html5-qrcode-scanner";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useShelfRacks, ShelfRack } from "@/data/shelfRacks";
+import { useShelfRacks } from "@/data/shelfRacks";
 import { useTranslation } from "react-i18next";
 
 interface ShelfDetails {
-  rackId: string;
-  shelfNumber: string;
-  storeId: string;
+  rack_id: string;
+  shelf_number: string;
+  store_id: string;
 }
 
 const MassAddArticlesPage: React.FC = () => {
   const { userStoreId, user } = useAuth();
-  const { addArticle, updateArticle, getArticleById } = useArticles();
+  const { articles, addArticle, updateArticle } = useArticles();
   const { addLogEntry } = useLog();
   const { shelfRacks } = useShelfRacks();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  const getArticleById = (articleNumber: string, storeId: string) => {
+    return articles.find(a => a.article_number === articleNumber && a.store_id === storeId);
+  };
+
   const [shelfDetails, setShelfDetails] = useState<ShelfDetails>({
-    rackId: "",
-    shelfNumber: "",
-    storeId: userStoreId || "",
+    rack_id: "",
+    shelf_number: "",
+    store_id: userStoreId || "",
   });
   const [isShelfDetailsLocked, setIsShelfDetailsLocked] = useState(false);
-  const [articlesToProcess, setArticlesToProcess] = useState<Article[]>([]);
+  const [articlesToProcess, setArticlesToProcess] = useState<Partial<Article>[]>([]);
   const [manualArticleId, setManualArticleId] = useState("");
   const [manualArticleQuantity, setManualArticleQuantity] = useState<number>(1);
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
@@ -47,56 +51,35 @@ const MassAddArticlesPage: React.FC = () => {
   const [selectedShelfNumber, setSelectedShelfNumber] = useState<string>("");
 
   useEffect(() => {
-    const scannerId = "reader-mass-add"; // Unique ID for this scanner
+    const scannerId = "reader-mass-add";
     
     const startScanner = async () => {
-      if (!isScannerActive || scannerRef.current) return; // Only start if active and not already running
+      if (!isScannerActive || scannerRef.current) return;
 
       try {
         const devices = await Html5Qrcode.getVideoDevices();
         if (devices && devices.length) {
-          const rearCamera = devices.find(device => device.label.toLowerCase().includes("back") || device.label.toLowerCase().includes("rear"));
-          const cameraId = rearCamera ? rearCamera.id : devices[0].id; // Use rear camera if found, otherwise first available
-
-          scannerRef.current = new Html5QrcodeScanner(
-            scannerId,
-            { 
-              fps: 10, 
-              qrbox: { width: 250, height: 250 },
-              // Use cameraId directly in start() method
-            },
-            false
-          );
-
+          scannerRef.current = new Html5QrcodeScanner(scannerId, { fps: 10, qrbox: { width: 250, height: 250 } }, false);
           const onScanSuccess = (decodedText: string) => {
             toast.success(t("common.scannedBarcode", { decodedText }));
             addLogEntry(t("common.barcodeScannedMassAdd"), { scannedCode: decodedText, shelfDetails, quantity: manualArticleQuantity }, user?.email);
             addArticleToProcess(decodedText, manualArticleQuantity);
           };
-
-          const onScanError = (errorMessage: string) => {
-            // console.warn(`Chyba skenování: ${errorMessage}`);
-          };
-          
-          // Render with specific camera
-          scannerRef.current.render(onScanSuccess, onScanError);
-
+          scannerRef.current.render(onScanSuccess, () => {});
         } else {
           toast.error(t("common.noCameraFound"));
-          setIsScannerActive(false); // Turn off scanner toggle if no camera
+          setIsScannerActive(false);
         }
       } catch (err) {
         console.error("Error accessing camera:", err);
         toast.error(t("common.cameraAccessError"));
-        setIsScannerActive(false); // Turn off scanner toggle on error
+        setIsScannerActive(false);
       }
     };
 
     const stopScanner = () => {
       if (scannerRef.current) {
-        scannerRef.current.clear().catch((error) => {
-          console.error("Failed to clear html5QrcodeScanner", error);
-        });
+        scannerRef.current.clear().catch(console.error);
         scannerRef.current = null;
       }
     };
@@ -107,24 +90,22 @@ const MassAddArticlesPage: React.FC = () => {
       stopScanner();
     }
 
-    return () => {
-      stopScanner();
-    };
+    return () => stopScanner();
   }, [isScannerActive, shelfDetails, user?.email, manualArticleQuantity, t]);
 
   useEffect(() => {
-    const currentRack = shelfRacks.find(rack => rack.id === selectedRackId && rack.storeId === userStoreId);
+    const currentRack = shelfRacks.find(rack => rack.id === selectedRackId && rack.store_id === userStoreId);
     if (currentRack) {
       setShelfDetails({
-        rackId: currentRack.id,
-        shelfNumber: selectedShelfNumber,
-        storeId: currentRack.storeId,
+        rack_id: currentRack.id,
+        shelf_number: selectedShelfNumber,
+        store_id: currentRack.store_id,
       });
     } else {
       setShelfDetails({
-        rackId: "",
-        shelfNumber: "",
-        storeId: userStoreId || "",
+        rack_id: "",
+        shelf_number: "",
+        store_id: userStoreId || "",
       });
     }
   }, [selectedRackId, selectedShelfNumber, shelfRacks, userStoreId]);
@@ -161,24 +142,25 @@ const MassAddArticlesPage: React.FC = () => {
       return;
     }
 
-    const existingArticle = getArticleById(articleId.trim().toUpperCase(), userStoreId);
-    const newArticleData: Article = {
-      id: articleId.trim().toUpperCase(),
-      name: existingArticle?.name || `${t("common.unknownArticle")} ${articleId.trim().toUpperCase()}`,
+    const articleNumber = articleId.trim().toUpperCase();
+    const existingArticle = getArticleById(articleNumber, userStoreId || '');
+    const newArticleData: Partial<Article> = {
+      article_number: articleNumber,
+      name: existingArticle?.name || `${t("common.unknownArticle")} ${articleNumber}`,
       status: existingArticle?.status || "21",
       quantity: quantity,
       ...shelfDetails,
     };
 
-    if (articlesToProcess.some(a => a.id === newArticleData.id && a.storeId === newArticleData.storeId)) {
-      toast.warning(t("common.articleAlreadyInList", { articleId: newArticleData.id }));
+    if (articlesToProcess.some(a => a.article_number === newArticleData.article_number && a.store_id === newArticleData.store_id)) {
+      toast.warning(t("common.articleAlreadyInList", { articleId: newArticleData.article_number }));
       return;
     }
 
     setArticlesToProcess((prev) => [...prev, newArticleData]);
     setManualArticleId("");
     setManualArticleQuantity(1);
-    toast.success(t("common.articleAddedToList", { articleId: newArticleData.id }));
+    toast.success(t("common.articleAddedToList", { articleId: newArticleData.article_number }));
   };
 
   const handleManualAddArticle = () => {
@@ -186,7 +168,7 @@ const MassAddArticlesPage: React.FC = () => {
   };
 
   const handleRemoveArticleFromList = (idToRemove: string) => {
-    setArticlesToProcess((prev) => prev.filter(article => article.id !== idToRemove));
+    setArticlesToProcess((prev) => prev.filter(article => article.article_number !== idToRemove));
     toast.info(t("common.articleRemovedFromList", { articleId: idToRemove }));
   };
 
@@ -197,13 +179,13 @@ const MassAddArticlesPage: React.FC = () => {
     }
 
     articlesToProcess.forEach(article => {
-      const existing = getArticleById(article.id, article.storeId);
+      const existing = getArticleById(article.article_number!, article.store_id!);
       if (existing) {
-        updateArticle(article);
-        addLogEntry(t("common.articleUpdatedMassAdd"), { articleId: article.id, newRackId: article.rackId, newShelfNumber: article.shelfNumber, storeId: article.storeId, quantity: article.quantity }, user?.email);
+        updateArticle({ ...existing, ...article });
+        addLogEntry(t("common.articleUpdatedMassAdd"), { articleId: article.article_number, newRackId: article.rack_id, newShelfNumber: article.shelf_number, storeId: article.store_id, quantity: article.quantity }, user?.email);
       } else {
-        addArticle(article);
-        addLogEntry(t("common.articleAddedMassAdd"), { articleId: article.id, rackId: article.rackId, shelfNumber: article.shelfNumber, storeId: article.storeId, quantity: article.quantity }, user?.email);
+        addArticle(article as any);
+        addLogEntry(t("common.articleAddedMassAdd"), { articleId: article.article_number, rackId: article.rack_id, shelfNumber: article.shelf_number, storeId: article.store_id, quantity: article.quantity }, user?.email);
       }
     });
 
@@ -216,7 +198,7 @@ const MassAddArticlesPage: React.FC = () => {
   };
 
   const availableShelves = selectedRackId
-    ? shelfRacks.find(r => r.id === selectedRackId && r.storeId === userStoreId)?.shelves || []
+    ? shelfRacks.find(r => r.id === selectedRackId && r.store_id === userStoreId)?.shelves || []
     : [];
 
   return (
@@ -232,7 +214,6 @@ const MassAddArticlesPage: React.FC = () => {
           <div className="w-full sm:w-auto"></div>
         </div>
 
-        {/* Shelf Details Section */}
         <Card className="mb-4 sm:mb-6">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("common.shelfDetails")}</CardTitle>
@@ -245,9 +226,9 @@ const MassAddArticlesPage: React.FC = () => {
                   <SelectValue placeholder={t("common.selectRack")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {shelfRacks.filter(rack => !userStoreId || rack.storeId === userStoreId).map((rack) => (
+                  {shelfRacks.filter(rack => !userStoreId || rack.store_id === userStoreId).map((rack) => (
                     <SelectItem key={rack.id} value={rack.id}>
-                      {rack.rowId}-{rack.rackId} ({rack.shelves.map(s => s.description).join(', ')}) - {rack.storeId}
+                      {rack.row_id}-{rack.rack_id} ({rack.shelves.map(s => s.description).join(', ')}) - {rack.store_id}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -270,7 +251,7 @@ const MassAddArticlesPage: React.FC = () => {
             </div>
             <div>
               <Label htmlFor="storeId">{t("common.storeId")}</Label>
-              <Input id="storeId" value={shelfDetails.storeId} readOnly className="mt-1 bg-gray-100 dark:bg-gray-700" />
+              <Input id="storeId" value={shelfDetails.store_id} readOnly className="mt-1 bg-gray-100 dark:bg-gray-700" />
             </div>
             <div className="md:col-span-2 flex justify-end">
               <Button onClick={handleLockShelfDetails} disabled={isShelfDetailsLocked || !selectedRackId || !selectedShelfNumber} className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
@@ -288,21 +269,17 @@ const MassAddArticlesPage: React.FC = () => {
         {isShelfDetailsLocked && (
           <>
             <Separator className="my-4 sm:my-6" />
-
-            {/* Article Input Section */}
             <Card className="mb-4 sm:mb-6">
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("common.addArticle")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Barcode Scanner */}
                 <div className="flex flex-col items-center space-y-2">
                   <Button onClick={() => setIsScannerActive(prev => !prev)} className="w-full sm:w-auto bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
                     <Scan className="h-4 w-4 mr-2" /> {isScannerActive ? t("common.stopScanning") : t("common.startScanning")}
                   </Button>
                   {isScannerActive && (
                     <div id="reader-mass-add" className="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center text-muted-foreground mt-4">
-                      {/* QR Code Scanner will render here */}
                     </div>
                   )}
                 </div>
@@ -333,7 +310,6 @@ const MassAddArticlesPage: React.FC = () => {
 
             <Separator className="my-4 sm:my-6" />
 
-            {/* Articles to Process List */}
             <Card className="mb-4 sm:mb-6 flex flex-col flex-grow">
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("common.articlesToSave")} ({articlesToProcess.length})</CardTitle>
@@ -345,9 +321,9 @@ const MassAddArticlesPage: React.FC = () => {
                   <ScrollArea className="h-full max-h-[300px] w-full rounded-md border p-4">
                     <div className="space-y-2">
                       {articlesToProcess.map((article) => (
-                        <div key={article.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                          <span className="font-medium text-sm sm:text-base">{article.id} - {article.name} ({t("common.quantity")}: {article.quantity})</span>
-                          <Button variant="ghost" size="sm" onClick={() => handleRemoveArticleFromList(article.id)}>
+                        <div key={article.article_number} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
+                          <span className="font-medium text-sm sm:text-base">{article.article_number} - {article.name} ({t("common.quantity")}: {article.quantity})</span>
+                          <Button variant="ghost" size="sm" onClick={() => handleRemoveArticleFromList(article.article_number!)}>
                             <XCircle className="h-4 w-4 text-destructive" />
                           </Button>
                         </div>

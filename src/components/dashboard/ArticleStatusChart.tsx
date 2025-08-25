@@ -8,17 +8,17 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF"];
 
 export const ArticleStatusChart: React.FC = () => {
   const { t } = useTranslation();
-  const { allArticles } = useArticles();
+  const { articles } = useArticles();
 
   const chartData = useMemo(() => {
-    const statusCounts = allArticles.reduce((acc, article) => {
+    const statusCounts = articles.reduce((acc, article) => {
       const status = article.status || "N/A";
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
     return Object.entries(statusCounts).map(([name, value]) => ({ name, value }));
-  }, [allArticles]);
+  }, [articles]);
 
   return (
     <Card>

@@ -25,8 +25,8 @@ interface ArticleCopyDialogProps {
 
 export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, onClose }) => {
   const { stores } = useStores();
-  const { allArticles, addArticle } = useArticles();
-  const { allShelfRacks } = useShelfRacks();
+  const { articles, addArticle } = useArticles();
+  const { shelfRacks } = useShelfRacks();
   const { user, hasPermission } = useAuth();
   const { t } = useTranslation();
 
@@ -56,7 +56,7 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
       return;
     }
 
-    const articlesToCopy = allArticles.filter(article => article.storeId === sourceStoreId);
+    const articlesToCopy = articles.filter(article => article.store_id === sourceStoreId);
     if (articlesToCopy.length === 0) {
       toast.info(t("common.noArticlesToCopy", { storeId: sourceStoreId }));
       onClose();
@@ -67,8 +67,8 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
     let skippedCount = 0;
 
     articlesToCopy.forEach(sourceArticle => {
-      const existingArticleInTarget = allArticles.find(
-        a => a.id === sourceArticle.id && a.storeId === targetStoreId
+      const existingArticleInTarget = articles.find(
+        a => a.article_number === sourceArticle.article_number && a.store_id === targetStoreId
       );
 
       if (existingArticleInTarget && !overwriteExisting) {
@@ -76,7 +76,7 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
         return;
       }
 
-      const targetStoreRacks = allShelfRacks.filter(rack => rack.storeId === targetStoreId);
+      const targetStoreRacks = shelfRacks.filter(rack => rack.store_id === targetStoreId);
       let targetRackId = "N/A";
       let targetShelfNumber = "N/A";
 
@@ -87,16 +87,13 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
 
       const newArticle = {
         ...sourceArticle,
-        storeId: targetStoreId,
-        rackId: targetRackId,
-        shelfNumber: targetShelfNumber,
+        store_id: targetStoreId,
+        rack_id: targetRackId,
+        shelf_number: targetShelfNumber,
       };
+      delete newArticle.id; // Remove old UUID to allow DB to generate a new one
 
-      if (existingArticleInTarget && overwriteExisting) {
-        addArticle(newArticle);
-      } else {
-        addArticle(newArticle);
-      }
+      addArticle(newArticle as any);
       copiedCount++;
     });
 

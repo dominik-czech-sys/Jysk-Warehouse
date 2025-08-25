@@ -14,8 +14,8 @@ import { useTranslation } from "react-i18next";
 
 const ExportDataPage: React.FC = () => {
   const { stores } = useStores();
-  const { allArticles } = useArticles();
-  const { allShelfRacks } = useShelfRacks();
+  const { articles } = useArticles();
+  const { shelfRacks } = useShelfRacks();
   const { t } = useTranslation();
 
   const [exportFormat, setExportFormat] = useState<"csv" | "json">("csv");
@@ -39,7 +39,7 @@ const ExportDataPage: React.FC = () => {
         if (typeof value === 'string' && value.includes(',')) {
           return `"${value.replace(/"/g, '""')}"`;
         }
-        if (Array.isArray(value)) {
+        if (Array.isArray(value) || typeof value === 'object') {
           return `"${JSON.stringify(value).replace(/"/g, '""')}"`;
         }
         return value;
@@ -84,14 +84,14 @@ const ExportDataPage: React.FC = () => {
             headers = ["id", "name"];
             break;
           case "articles":
-            data = allArticles;
+            data = articles;
             filename = "articles";
-            headers = ["id", "name", "rackId", "shelfNumber", "storeId", "status", "quantity"];
+            headers = ["id", "article_number", "name", "rack_id", "shelf_number", "store_id", "status", "quantity", "min_quantity", "has_shop_floor_stock", "shop_floor_stock", "replenishment_trigger"];
             break;
           case "racks":
-            data = allShelfRacks;
+            data = shelfRacks;
             filename = "racks";
-            headers = ["id", "rowId", "rackId", "shelves", "storeId"];
+            headers = ["id", "rack_identifier", "row_id", "rack_id", "shelves", "store_id"];
             break;
           default:
             return;

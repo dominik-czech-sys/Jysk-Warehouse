@@ -17,8 +17,8 @@ const fetchUserCount = async () => {
 export const StatisticsOverview: React.FC = () => {
   const { t } = useTranslation();
   const { stores } = useStores();
-  const { allArticles } = useArticles();
-  const { allShelfRacks } = useShelfRacks();
+  const { articles } = useArticles();
+  const { shelfRacks } = useShelfRacks();
   const { data: userCount, isLoading } = useQuery({
     queryKey: ["userCount"],
     queryFn: fetchUserCount,
@@ -50,7 +50,7 @@ export const StatisticsOverview: React.FC = () => {
           <Package className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{allArticles.length}</div>
+          <div className="text-2xl font-bold">{articles.length}</div>
         </CardContent>
       </Card>
       <Card>
@@ -59,7 +59,7 @@ export const StatisticsOverview: React.FC = () => {
           <Warehouse className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{allShelfRacks.length}</div>
+          <div className="text-2xl font-bold">{shelfRacks.length}</div>
         </CardContent>
       </Card>
     </div>

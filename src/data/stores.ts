@@ -1,104 +1,89 @@
-import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/useAuth";
-import { useLog } from "@/contexts/LogContext";
-import { useArticles, Article } from "./articles"; // Import useArticles and Article
-import { useGlobalArticles } from "./globalArticles"; // Import useGlobalArticles
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
 export interface Store {
-  id: string; // Unique ID for the store (e.g., "Sklad 1", "T508", "Kozomín")
-  name: string; // Display name of the store
+  id: string;
+  name: string;
 }
 
-const initialStores: Store[] = []; // Nastaveno na prázdné pole
+// Funkce pro načtení obchodů
+const fetchStores = async (): Promise<Store[]> => {
+  const { data, error } = await supabase.from("stores").select("*");
+  if (error) throw new Error(error.message);
+  return data;
+};
+
+// Funkce pro přidání obchodu
+const addStoreToDb = async (newStore: Omit<Store, ''>) => {
+  const { data, error } = await supabase.from("stores").insert(newStore).select();
+  if (error) throw new Error(error.message);
+  return data;
+};
+
+// Funkce pro úpravu obchodu
+const updateStoreInDb = async (updatedStore: Store) => {
+  const { data, error } = await supabase.from("stores").update(updatedStore).eq("id", updatedStore.id).select();
+  if (error) throw new Error(error.message);
+  return data;
+};
+
+// Funkce pro smazání obchodu
+const deleteStoreFromDb = async (storeId: string) => {
+  const { error } = await supabase.from("stores").delete().eq("id", storeId);
+  if (error) throw new Error(error.message);
+  return storeId;
+};
 
 export const useStores = () => {
-  const { user, isAdmin } = useAuth();
-  const { addLogEntry } = useLog();
-  const { addArticle } = useArticles(); // Use addArticle from useArticles hook
-  const { globalArticles } = useGlobalArticles(); // Use global articles
-  const { t } = useTranslation(); // Initialize useTranslation
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
-  const [stores, setStores] = useState<Store[]>(() => {
-    const storedStores = localStorage.getItem("stores");
-    return storedStores ? JSON.parse(storedStores) : initialStores;
+  const { data: stores, isLoading, error } = useQuery<Store[]>({
+    queryKey: ["stores"],
+    queryFn: fetchStores,
   });
 
-  useEffect(() => {
-    localStorage.setItem("stores", JSON.stringify(stores));
-    console.log("Stores updated in localStorage:", stores); // Debugging log
-  }, [stores]);
+  const addStoreMutation = useMutation({
+    mutationFn: addStoreToDb,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stores"] });
+      toast.success(t("common.storeAddedSuccess"));
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
-  const getStoreById = (id: string) => stores.find((store) => store.id === id);
+  const updateStoreMutation = useMutation({
+    mutationFn: updateStoreInDb,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stores"] });
+      toast.success(t("common.storeUpdatedSuccess"));
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
-  const addStore = (newStore: Store, addDefaultArticles: boolean = false) => {
-    if (!isAdmin) {
-      toast.error(t("common.noPermissionToAddStores"));
-      return false;
-    }
-    if (stores.some(s => s.id === newStore.id)) {
-      toast.error(t("common.storeExists", { storeId: newStore.id }));
-      addLogEntry(t("common.attemptToAddExistingStore"), { storeId: newStore.id }, user?.email);
-      return false;
-    }
-    setStores((prev) => {
-      const updatedStores = [...prev, newStore];
-      console.log("Adding store, new state:", updatedStores); // Debugging log
-      return updatedStores;
-    });
-    toast.success(t("common.storeAddedSuccess", { storeName: newStore.name, storeId: newStore.id }));
-    addLogEntry(t("common.storeAdded"), { storeId: newStore.id, storeName: newStore.name }, user?.email);
+  const deleteStoreMutation = useMutation({
+    mutationFn: deleteStoreFromDb,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stores"] });
+      toast.success(t("common.storeDeletedSuccess"));
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
-    if (addDefaultArticles) {
-      globalArticles.forEach(defaultArticle => { // Use globalArticles here
-        const newArticle: Article = {
-          id: defaultArticle.id,
-          name: defaultArticle.name,
-          status: defaultArticle.status,
-          rackId: "N/A", // Placeholder
-          shelfNumber: "N/A", // Placeholder
-          storeId: newStore.id,
-          quantity: 1, // Default quantity for default articles
-        };
-        addArticle(newArticle);
-      });
-      toast.info(t("common.defaultArticlesAddedToStore", { storeId: newStore.id }));
-      addLogEntry(t("common.defaultArticlesAddedToStore"), { storeId: newStore.id, articlesCount: globalArticles.length }, user?.email);
-    }
-    return true;
+  return {
+    stores: stores || [],
+    isLoading,
+    error,
+    addStore: addStoreMutation.mutateAsync,
+    updateStore: updateStoreMutation.mutateAsync,
+    deleteStore: deleteStoreMutation.mutateAsync,
   };
-
-  const updateStore = (updatedStore: Store) => {
-    if (!isAdmin) {
-      toast.error(t("common.noPermissionToEditStores"));
-      return false;
-    }
-    setStores((prev) => {
-      const updatedStores = prev.map((s) => (s.id === updatedStore.id ? updatedStore : s));
-      console.log("Updating store, new state:", updatedStores); // Debugging log
-      return updatedStores;
-    });
-    toast.success(t("common.storeUpdatedSuccess", { storeName: updatedStore.name, storeId: updatedStore.id }));
-    addLogEntry(t("common.storeUpdated"), { storeId: updatedStore.id, storeName: updatedStore.name }, user?.email);
-    return true;
-  };
-
-  const deleteStore = (id: string) => {
-    if (!isAdmin) {
-      toast.error(t("common.noPermissionToDeleteStores"));
-      return false;
-    }
-    setStores((prev) => {
-      const updatedStores = prev.filter((s) => s.id !== id);
-      console.log("Deleting store, new state:", updatedStores); // Debugging log
-      return updatedStores;
-    });
-    toast.success(t("common.storeDeletedSuccess", { storeId: id }));
-    addLogEntry(t("common.storeDeleted"), { storeId: id }, user?.email);
-    // TODO: Also delete all articles and racks associated with this store
-    return true;
-  };
-
-  return { stores, getStoreById, addStore, updateStore, deleteStore };
 };

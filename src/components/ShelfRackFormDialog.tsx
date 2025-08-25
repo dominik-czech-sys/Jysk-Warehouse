@@ -19,7 +19,7 @@ import { useTranslation } from "react-i18next";
 interface ShelfRackFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (rack: ShelfRack) => boolean;
+  onSubmit: (rack: Partial<ShelfRack>) => boolean;
   rack?: ShelfRack | null;
 }
 
@@ -32,12 +32,12 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
   const { userStoreId } = useAuth();
   const { t } = useTranslation();
 
-  const [formData, setFormData] = useState<ShelfRack>({
-    id: "",
-    rowId: "",
-    rackId: "",
+  const [formData, setFormData] = useState<Partial<ShelfRack>>({
+    rack_identifier: "",
+    row_id: "",
+    rack_id: "",
     shelves: [{ shelfNumber: "1", description: "" }],
-    storeId: userStoreId || "",
+    store_id: userStoreId || "",
   });
 
   useEffect(() => {
@@ -45,11 +45,11 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
       setFormData(rack);
     } else {
       setFormData({
-        id: "",
-        rowId: "",
-        rackId: "",
+        rack_identifier: "",
+        row_id: "",
+        rack_id: "",
         shelves: [{ shelfNumber: "1", description: "" }],
-        storeId: userStoreId || "",
+        store_id: userStoreId || "",
       });
     }
   }, [rack, isOpen, userStoreId]);
@@ -60,23 +60,23 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
   };
 
   const handleShelfDescriptionChange = (index: number, value: string) => {
-    const updatedShelves = formData.shelves.map((s, i) =>
+    const updatedShelves = formData.shelves?.map((s, i) =>
       i === index ? { ...s, description: value } : s
     );
     setFormData((prev) => ({ ...prev, shelves: updatedShelves }));
   };
 
   const handleAddShelf = () => {
-    const newShelfNumber = (formData.shelves.length + 1).toString();
+    const newShelfNumber = ((formData.shelves?.length || 0) + 1).toString();
     setFormData((prev) => ({
       ...prev,
-      shelves: [...prev.shelves, { shelfNumber: newShelfNumber, description: "" }],
+      shelves: [...(prev.shelves || []), { shelfNumber: newShelfNumber, description: "" }],
     }));
   };
 
   const handleRemoveShelf = (index: number) => {
-    const updatedShelves = formData.shelves.filter((_, i) => i !== index);
-    const renumberedShelves = updatedShelves.map((s, i) => ({
+    const updatedShelves = formData.shelves?.filter((_, i) => i !== index);
+    const renumberedShelves = updatedShelves?.map((s, i) => ({
       ...s,
       shelfNumber: (i + 1).toString(),
     }));
@@ -85,13 +85,13 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.rowId || !formData.rackId || !formData.storeId || formData.shelves.length === 0 || formData.shelves.some(s => !s.description.trim())) {
+    if (!formData.row_id || !formData.rack_id || !formData.store_id || !formData.shelves || formData.shelves.length === 0 || formData.shelves.some(s => !s.description.trim())) {
       toast.error(t("common.fillAllRackFields"));
       return;
     }
     const finalFormData = {
       ...formData,
-      id: rack ? formData.id : `${formData.rowId}-${formData.rackId}`.toUpperCase(),
+      rack_identifier: `${formData.row_id}-${formData.rack_id}`.toUpperCase(),
     };
 
     if (onSubmit(finalFormData)) {
@@ -110,12 +110,12 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="rowId" className="sm:text-right">
+            <Label htmlFor="row_id" className="sm:text-right">
               {t("common.rowId")}
             </Label>
             <Input
-              id="rowId"
-              value={formData.rowId}
+              id="row_id"
+              value={formData.row_id}
               onChange={handleChange}
               className="col-span-3"
               readOnly={!!rack}
@@ -123,12 +123,12 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="rackId" className="sm:text-right">
+            <Label htmlFor="rack_id" className="sm:text-right">
               {t("common.rackId")}
             </Label>
             <Input
-              id="rackId"
-              value={formData.rackId}
+              id="rack_id"
+              value={formData.rack_id}
               onChange={handleChange}
               className="col-span-3"
               readOnly={!!rack}
@@ -136,12 +136,12 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="storeId" className="sm:text-right">
+            <Label htmlFor="store_id" className="sm:text-right">
               {t("common.storeId")}
             </Label>
             <Input
-              id="storeId"
-              value={formData.storeId}
+              id="store_id"
+              value={formData.store_id}
               onChange={handleChange}
               className="col-span-3"
               readOnly={!!userStoreId}
@@ -151,7 +151,7 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
 
           <div className="col-span-full">
             <Label className="text-base font-semibold mb-2 block">{t("common.shelvesAndDescription")}</Label>
-            {formData.shelves.map((shelf, index) => (
+            {formData.shelves?.map((shelf, index) => (
               <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-2">
                 <Label className="w-full sm:w-16 sm:text-right">{t("common.shelf")} {shelf.shelfNumber}:</Label>
                 <Input
@@ -160,7 +160,7 @@ export const ShelfRackFormDialog: React.FC<ShelfRackFormDialogProps> = ({
                   placeholder={t("common.descriptionForShelf", { shelfNumber: shelf.shelfNumber })}
                   className="flex-grow"
                 />
-                {formData.shelves.length > 1 && (
+                {formData.shelves && formData.shelves.length > 1 && (
                   <Button
                     type="button"
                     variant="destructive"

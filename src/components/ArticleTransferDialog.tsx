@@ -25,7 +25,7 @@ interface ArticleTransferDialogProps {
 
 export const ArticleTransferDialog: React.FC<ArticleTransferDialogProps> = ({ isOpen, onClose }) => {
   const { stores } = useStores();
-  const { allArticles, getArticleById, updateArticle, addArticle } = useArticles();
+  const { articles, updateArticle, addArticle } = useArticles();
   const { user, hasPermission } = useAuth();
   const { t } = useTranslation();
 
@@ -33,6 +33,10 @@ export const ArticleTransferDialog: React.FC<ArticleTransferDialogProps> = ({ is
   const [targetStoreId, setTargetStoreId] = useState<string>("");
   const [articleIdToTransfer, setArticleIdToTransfer] = useState<string>("");
   const [transferQuantity, setTransferQuantity] = useState<number>(1);
+
+  const getArticleById = (articleNumber: string, storeId: string) => {
+    return articles.find(a => a.article_number === articleNumber && a.store_id === storeId);
+  };
 
   useEffect(() => {
     if (!isOpen) {
@@ -82,12 +86,13 @@ export const ArticleTransferDialog: React.FC<ArticleTransferDialogProps> = ({ is
       // Add new article to target store
       const newArticle = {
         ...sourceArticle,
-        storeId: targetStoreId,
+        store_id: targetStoreId,
         quantity: transferQuantity,
-        rackId: "N/A", // Default to N/A, user can update later
-        shelfNumber: "N/A", // Default to N/A, user can update later
+        rack_id: "N/A", // Default to N/A, user can update later
+        shelf_number: "N/A", // Default to N/A, user can update later
       };
-      addArticle(newArticle);
+      delete newArticle.id;
+      addArticle(newArticle as any);
     }
 
     toast.success(t("common.articleTransferSuccess", { articleId: articleIdToTransfer, quantity: transferQuantity, sourceStore: sourceStoreId, targetStore: targetStoreId }));

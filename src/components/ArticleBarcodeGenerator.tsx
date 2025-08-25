@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useArticles } from "@/data/articles";
 import { useTranslation } from "react-i18next";
-import { QRCodeSVG } from "qrcode.react"; // Changed to named import QRCodeSVG
+import { QRCodeSVG } from "qrcode.react";
 import { Printer } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,11 +27,11 @@ export const ArticleBarcodeGenerator: React.FC<ArticleBarcodeGeneratorProps> = (
   articleId,
   storeId,
 }) => {
-  const { getArticleById } = useArticles();
+  const { articles } = useArticles();
   const { t } = useTranslation();
   const printRef = useRef<HTMLDivElement>(null);
 
-  const article = getArticleById(articleId, storeId);
+  const article = articles.find(a => a.article_number === articleId && a.store_id === storeId);
 
   const handlePrint = () => {
     if (printRef.current) {
@@ -65,7 +65,7 @@ export const ArticleBarcodeGenerator: React.FC<ArticleBarcodeGeneratorProps> = (
     return null; // Or show a loading/error state
   }
 
-  const qrCodeValue = JSON.stringify({ articleId: article.id, storeId: article.storeId });
+  const qrCodeValue = JSON.stringify({ articleId: article.article_number, storeId: article.store_id });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -76,10 +76,10 @@ export const ArticleBarcodeGenerator: React.FC<ArticleBarcodeGeneratorProps> = (
         </DialogHeader>
         <div className="py-4 flex flex-col items-center space-y-4">
           <div ref={printRef} className="print-container p-4 border rounded-md">
-            <div className="article-id">{article.id}</div>
+            <div className="article-id">{article.article_number}</div>
             <div className="article-name">{article.name}</div>
-            <div className="store-info">{t("common.storeId")}: {article.storeId}</div>
-            <QRCodeSVG value={qrCodeValue} size={256} level="H" includeMargin={true} /> {/* Used QRCodeSVG directly */}
+            <div className="store-info">{t("common.storeId")}: {article.store_id}</div>
+            <QRCodeSVG value={qrCodeValue} size={256} level="H" includeMargin={true} />
           </div>
         </div>
         <DialogFooter>

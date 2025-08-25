@@ -6,7 +6,9 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useStores } from "@/data/stores";
+import { useStores, Store } from "@/data/stores";
+import { useArticles, Article } from "@/data/articles";
+import { useGlobalArticles } from "@/data/globalArticles";
 import { StoreManagementSection } from "@/components/dashboard/StoreManagementSection";
 import { UserManagementSection } from "@/components/dashboard/UserManagementSection";
 import { HelpPostManagementSection } from "@/components/dashboard/HelpPostManagementSection";
@@ -20,7 +22,31 @@ import { ArticleStatusChart } from "@/components/dashboard/ArticleStatusChart";
 const SiteDashboard: React.FC = () => {
   const { isAdmin, hasPermission } = useAuth();
   const { stores, addStore, updateStore, deleteStore } = useStores();
+  const { globalArticles } = useGlobalArticles();
+  const { addArticle } = useArticles();
   const { t } = useTranslation();
+
+  const handleAddStore = async (newStore: Store, addDefaultArticles: boolean) => {
+    await addStore(newStore);
+    if (addDefaultArticles) {
+      for (const globalArticle of globalArticles) {
+        const newArticle: Omit<Article, 'id'> = {
+          article_number: globalArticle.id,
+          name: globalArticle.name,
+          status: globalArticle.status,
+          min_quantity: globalArticle.min_quantity,
+          store_id: newStore.id,
+          rack_id: 'N/A',
+          shelf_number: 'N/A',
+          quantity: 0,
+          has_shop_floor_stock: false,
+          shop_floor_stock: 0,
+          replenishment_trigger: 0,
+        };
+        await addArticle(newArticle);
+      }
+    }
+  };
 
   if (!isAdmin) {
     return (
@@ -72,7 +98,7 @@ const SiteDashboard: React.FC = () => {
           <TabsContent value="stores" className="mt-4">
             <StoreManagementSection
               stores={stores}
-              addStore={addStore}
+              addStore={handleAddStore}
               updateStore={updateStore}
               deleteStore={deleteStore}
               hasPermission={hasPermission}

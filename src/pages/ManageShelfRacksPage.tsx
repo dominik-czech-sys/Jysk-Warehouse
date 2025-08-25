@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, PlusCircle, Edit, Trash2, Warehouse } from "lucide-react";
+import { ArrowLeft, PlusCircle, Edit, Trash2 } from "lucide-react";
 import { ShelfRackFormDialog } from "@/components/ShelfRackFormDialog";
 import {
   AlertDialog,
@@ -20,7 +20,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useShelfRacks, ShelfRack } from "@/data/shelfRacks";
@@ -37,42 +36,40 @@ const ManageShelfRacksPage: React.FC = () => {
   const [editingRack, setEditingRack] = useState<ShelfRack | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [rackToDeleteId, setRackToDeleteId] = useState<string | null>(null);
-  const [rackToDeleteStoreId, setRackToDeleteStoreId] = useState<string | null>(null);
 
-  const handleAddShelfRack = (newRack: ShelfRack) => {
+  const handleAddShelfRack = (newRack: Partial<ShelfRack>) => {
     if (!hasPermission("rack:create")) {
       toast.error(t("common.noPermissionToAddRacks"));
       return false;
     }
-    const finalRack = isAdmin ? newRack : { ...newRack, storeId: userStoreId || newRack.storeId };
-    return addShelfRack(finalRack);
+    const finalRack = isAdmin ? newRack : { ...newRack, store_id: userStoreId || newRack.store_id };
+    addShelfRack(finalRack as any);
+    return true;
   };
 
-  const handleEditShelfRack = (updatedRack: ShelfRack) => {
+  const handleEditShelfRack = (updatedRack: Partial<ShelfRack>) => {
     if (!hasPermission("rack:update")) {
       toast.error(t("common.noPermissionToEditRacks"));
       return false;
     }
-    const finalRack = isAdmin ? updatedRack : { ...updatedRack, storeId: userStoreId || updatedRack.storeId };
-    updateShelfRack(finalRack);
+    const finalRack = isAdmin ? updatedRack : { ...updatedRack, store_id: userStoreId || updatedRack.store_id };
+    updateShelfRack(finalRack as ShelfRack);
     return true;
   };
 
-  const handleDeleteShelfRack = (id: string, storeId: string) => {
+  const handleDeleteShelfRack = (id: string) => {
     if (!hasPermission("rack:delete")) {
       toast.error(t("common.noPermissionToDeleteRacks"));
       return;
     }
     setRackToDeleteId(id);
-    setRackToDeleteStoreId(storeId);
     setIsDeleteDialogOpen(true);
   };
 
   const confirmDeleteShelfRack = () => {
-    if (rackToDeleteId && rackToDeleteStoreId) {
-      deleteShelfRack(rackToDeleteId, rackToDeleteStoreId);
+    if (rackToDeleteId) {
+      deleteShelfRack(rackToDeleteId);
       setRackToDeleteId(null);
-      setRackToDeleteStoreId(null);
     }
     setIsDeleteDialogOpen(false);
   };
@@ -108,14 +105,14 @@ const ManageShelfRacksPage: React.FC = () => {
             </TableHeader>
             <TableBody>
               {shelfRacks.map((rack) => (
-                <TableRow key={`${rack.id}-${rack.storeId}`}>
-                  <TableCell className="font-medium">{rack.id}</TableCell>
-                  <TableCell>{rack.rowId}</TableCell>
-                  <TableCell>{rack.rackId}</TableCell>
+                <TableRow key={`${rack.id}-${rack.store_id}`}>
+                  <TableCell className="font-medium">{rack.rack_identifier}</TableCell>
+                  <TableCell>{rack.row_id}</TableCell>
+                  <TableCell>{rack.rack_id}</TableCell>
                   <TableCell>
                     {rack.shelves.map(s => `${t("common.shelf")} ${s.shelfNumber}: ${s.description}`).join('; ')}
                   </TableCell>
-                  {isAdmin && <TableCell>{rack.storeId}</TableCell>}
+                  {isAdmin && <TableCell>{rack.store_id}</TableCell>}
                   <TableCell className="text-right">
                     {hasPermission("rack:update") && (
                       <Button
@@ -134,7 +131,7 @@ const ManageShelfRacksPage: React.FC = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDeleteShelfRack(rack.id, rack.storeId)}
+                        onClick={() => handleDeleteShelfRack(rack.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -174,7 +171,7 @@ const ManageShelfRacksPage: React.FC = () => {
             <AlertDialogTitle>{t("common.confirmDeleteRackTitle")}</AlertDialogTitle>
             <AlertDialogDescription
               dangerouslySetInnerHTML={{
-                __html: t("common.confirmDeleteRackDescription", { rackId: rackToDeleteId, storeId: rackToDeleteStoreId }),
+                __html: t("common.confirmDeleteRackDescription", { rackId: rackToDeleteId, storeId: '' }),
               }}
             />
           </AlertDialogHeader>

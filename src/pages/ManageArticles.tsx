@@ -21,7 +21,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
@@ -30,7 +29,7 @@ import { useArticles, Article } from "@/data/articles";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArticleBarcodeGenerator } from "@/components/ArticleBarcodeGenerator"; // <-- Opravený import
+import { ArticleBarcodeGenerator } from "@/components/ArticleBarcodeGenerator";
 
 const ManageArticles = () => {
   const { articles, addArticle, updateArticle, deleteArticle } = useArticles();
@@ -64,7 +63,8 @@ const ManageArticles = () => {
       const lowerCaseSearchTerm = searchTerm.toLowerCase();
       currentFilteredArticles = currentFilteredArticles.filter(
         (article) =>
-          article.id.toLowerCase().includes(lowerCaseSearchTerm) ||
+          (article as Article).article_number?.toLowerCase().includes(lowerCaseSearchTerm) ||
+          (article as GlobalArticle).id?.toLowerCase().includes(lowerCaseSearchTerm) ||
           article.name.toLowerCase().includes(lowerCaseSearchTerm) ||
           article.status.toLowerCase().includes(lowerCaseSearchTerm)
       );
@@ -80,25 +80,27 @@ const ManageArticles = () => {
     // Apply min quantity filter
     if (minQuantityFilter !== '' && minQuantityFilter >= 0) {
       currentFilteredArticles = currentFilteredArticles.filter(
-        (article) => (article.minQuantity || 0) >= minQuantityFilter
+        (article) => (article.min_quantity || 0) >= minQuantityFilter
       );
     }
 
     // Apply sorting
     currentFilteredArticles.sort((a, b) => {
+      const aId = (a as Article).article_number || (a as GlobalArticle).id;
+      const bId = (b as Article).article_number || (b as GlobalArticle).id;
       switch (sortBy) {
         case "id-asc":
-          return a.id.localeCompare(b.id);
+          return aId.localeCompare(bId);
         case "id-desc":
-          return b.id.localeCompare(a.id);
+          return bId.localeCompare(aId);
         case "name-asc":
           return a.name.localeCompare(b.name);
         case "name-desc":
           return b.name.localeCompare(a.name);
         case "quantity-asc":
-          return (a as Article).quantity - (b as Article).quantity;
+          return ((a as Article).quantity || 0) - ((b as Article).quantity || 0);
         case "quantity-desc":
-          return (b as Article).quantity - (a as Article).quantity;
+          return ((b as Article).quantity || 0) - ((a as Article).quantity || 0);
         case "status-asc":
           return a.status.localeCompare(b.status);
         case "status-desc":
@@ -122,19 +124,17 @@ const ManageArticles = () => {
         return;
       }
       addGlobalArticle(newArticle as GlobalArticle);
-      toast.success(t("common.globalArticleAddedSuccess", { articleId: newArticle.id }));
     } else {
       if (!hasPermission("article:create")) {
         toast.error(t("common.noPermissionToAddArticles"));
         return;
       }
-      const finalArticle = { ...(newArticle as Article), storeId: userStoreId || (newArticle as Article).storeId };
-      if (articles.some(article => article.id === finalArticle.id && article.storeId === finalArticle.storeId)) {
-        toast.error(t("common.articleExistsInStore", { articleId: finalArticle.id }));
+      const finalArticle = { ...(newArticle as Article), store_id: userStoreId || (newArticle as Article).store_id };
+      if (articles.some(article => article.article_number === finalArticle.article_number && article.store_id === finalArticle.store_id)) {
+        toast.error(t("common.articleExistsInStore", { articleId: finalArticle.article_number }));
         return;
       }
-      addArticle(finalArticle);
-      toast.success(t("common.articleAddedSuccess", { articleId: finalArticle.id }));
+      addArticle(finalArticle as any);
     }
   };
 
@@ -145,15 +145,13 @@ const ManageArticles = () => {
         return;
       }
       updateGlobalArticle(updatedArticle as GlobalArticle);
-      toast.success(t("common.globalArticleUpdatedSuccess", { articleId: updatedArticle.id }));
     } else {
       if (!hasPermission("article:update")) {
         toast.error(t("common.noPermissionToEditArticles"));
         return;
       }
-      const finalArticle = { ...(updatedArticle as Article), storeId: userStoreId || (updatedArticle as Article).storeId };
+      const finalArticle = { ...(updatedArticle as Article), store_id: userStoreId || (updatedArticle as Article).store_id };
       updateArticle(finalArticle);
-      toast.success(t("common.articleUpdatedSuccess", { articleId: finalArticle.id }));
     }
   };
 
@@ -178,10 +176,11 @@ const ManageArticles = () => {
     if (articleToDeleteId) {
       if (isAdmin && articleToDeleteStoreId === "GLOBAL") {
         deleteGlobalArticle(articleToDeleteId);
-        toast.success(t("common.globalArticleDeletedSuccess", { articleId: articleToDeleteId }));
       } else if (articleToDeleteStoreId) {
-        deleteArticle(articleToDeleteId, articleToDeleteStoreId);
-        toast.success(t("common.articleDeletedSuccess", { articleId: articleToDeleteId }));
+        const articleInStore = articles.find(a => a.article_number === articleToDeleteId && a.store_id === articleToDeleteStoreId);
+        if (articleInStore) {
+          deleteArticle(articleInStore.id);
+        }
       }
       setArticleToDeleteId(null);
       setArticleToDeleteStoreId(null);
@@ -329,15 +328,15 @@ const ManageArticles = () => {
             </TableHeader>
             <TableBody>
               {filteredAndSortedArticles.map((article) => (
-                <TableRow key={`${article.id}-${isAdmin ? "GLOBAL" : (article as Article).storeId}`}>
-                  <TableCell className="font-medium">{article.id}</TableCell>
+                <TableRow key={`${article.id}-${isAdmin ? "GLOBAL" : (article as Article).store_id}`}>
+                  <TableCell className="font-medium">{(article as Article).article_number || article.id}</TableCell>
                   <TableCell>{article.name}</TableCell>
-                  {!isAdmin && <TableCell>{(article as Article).rackId}</TableCell>}
-                  {!isAdmin && <TableCell>{(article as Article).shelfNumber}</TableCell>}
+                  {!isAdmin && <TableCell>{(article as Article).rack_id}</TableCell>}
+                  {!isAdmin && <TableCell>{(article as Article).shelf_number}</TableCell>}
                   <TableCell>{article.status}</TableCell>
                   {!isAdmin && <TableCell>{(article as Article).quantity}</TableCell>}
-                  <TableCell>{article.minQuantity || 0}</TableCell>
-                  {!isAdmin && <TableCell>{(article as Article).storeId}</TableCell>}
+                  <TableCell>{article.min_quantity || 0}</TableCell>
+                  {!isAdmin && <TableCell>{(article as Article).store_id}</TableCell>}
                   <TableCell className="text-right">
                     {((isAdmin && hasPermission("default_articles:manage")) || (!isAdmin && hasPermission("article:update"))) && (
                       <Button
@@ -357,7 +356,7 @@ const ManageArticles = () => {
                         variant="ghost"
                         size="sm"
                         className="mr-2"
-                        onClick={() => handleDeleteArticle(article.id, isAdmin ? "GLOBAL" : (article as Article).storeId)}
+                        onClick={() => handleDeleteArticle((article as Article).article_number || article.id, isAdmin ? "GLOBAL" : (article as Article).store_id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -365,7 +364,7 @@ const ManageArticles = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleGenerateBarcode(article.id, isAdmin ? "GLOBAL" : (article as Article).storeId)}
+                      onClick={() => handleGenerateBarcode((article as Article).article_number || article.id, isAdmin ? "GLOBAL" : (article as Article).store_id)}
                     >
                       <QrCode className="h-4 w-4" />
                     </Button>

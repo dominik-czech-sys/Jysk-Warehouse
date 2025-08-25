@@ -12,8 +12,8 @@ export const ArticleOverviewWidget: React.FC<ArticleOverviewWidgetProps> = ({ id
   const { articles } = useArticles();
   const { t } = useTranslation();
 
-  const totalArticles = articles.filter(article => article.storeId !== "GLOBAL").length;
-  const totalGlobalArticles = articles.filter(article => article.storeId === "GLOBAL").length;
+  const totalArticles = articles.filter(article => article.store_id !== "GLOBAL").length;
+  const totalGlobalArticles = articles.filter(article => article.store_id === "GLOBAL").length;
 
   return (
     <DashboardWidget id={id} title="common.articleOverview">
