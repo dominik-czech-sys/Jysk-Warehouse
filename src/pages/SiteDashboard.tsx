@@ -78,10 +78,11 @@ const SiteDashboard: React.FC = () => {
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-6">
             <TabsTrigger value="overview">{t("common.overview")}</TabsTrigger>
             <TabsTrigger value="stores">{t("common.storeManagement")}</TabsTrigger>
             <TabsTrigger value="users">{t("common.userManagement")}</TabsTrigger>
+            <TabsTrigger value="audits">{t("common.audit.management")}</TabsTrigger>
             <TabsTrigger value="system">{t("common.system")}</TabsTrigger>
             <TabsTrigger value="todo">{t("common.todoList")}</TabsTrigger>
           </TabsList>
@@ -113,6 +114,18 @@ const SiteDashboard: React.FC = () => {
 
           <TabsContent value="users" className="mt-4">
             <UserManagementSection />
+          </TabsContent>
+
+          <TabsContent value="audits" className="mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("common.audit.templateManagement")}</CardTitle>
+                <CardDescription>{t("common.audit.templateManagementDescription")}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>{t("common.audit.comingSoon")}</p>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="system" className="mt-4 space-y-6">

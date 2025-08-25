@@ -368,7 +368,16 @@
         "create": "Vytvořit úkol",
         "update": "Upravit úkol",
         "delete": "Smazat úkol"
+      },
+      "audit": {
+        "manage_templates": "Spravovat šablony auditů"
       }
+    },
+    "audit": {
+      "management": "Audity",
+      "templateManagement": "Správa šablon auditů",
+      "templateManagementDescription": "Vytvářejte a spravujte šablony pro audity prodejen a další kontroly.",
+      "comingSoon": "Tato funkce se připravuje."
     }
   }
 }
