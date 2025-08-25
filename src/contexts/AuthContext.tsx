@@ -44,30 +44,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const { addLogEntry } = useLog();
   const { t } = useTranslation();
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
+  };
+
   useEffect(() => {
     const getSessionAndProfile = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      if (session?.user) {
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-        
-        if (error) {
-          console.error("Chyba při načítání profilu:", error);
-        } else if (profile) {
-          if (!profile.is_approved) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+
+        if (session?.user) {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          if (error || !profile) {
+            console.error("Error or missing profile for active session, signing out:", error);
+            toast.error(t("common.sessionError"));
+            await handleSignOut();
+          } else if (!profile.is_approved) {
             toast.error(t("common.accountNotApproved"));
-            await supabase.auth.signOut();
-            setSession(null);
+            await handleSignOut();
           } else {
             setUser({ ...session.user, ...profile });
           }
         }
+      } catch (e) {
+        console.error("Critical error during session validation, signing out:", e);
+        toast.error(t("common.sessionError"));
+        await handleSignOut();
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     getSessionAndProfile();
@@ -82,24 +95,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             .eq('id', session.user.id)
             .single();
           
-          if (error) {
-            console.error("Chyba při načítání profilu po změně stavu:", error);
+          if (error || !profile) {
+            console.error("Profile error on auth state change, signing out:", error);
             setUser(null);
-          } else if (profile) {
-            if (!profile.is_approved) {
-              if (_event === 'SIGNED_IN') {
-                toast.error(t("common.accountNotApproved"));
-                await supabase.auth.signOut();
-              }
-              setUser(null);
-              setSession(null);
-            } else {
-              const fullUser = { ...session.user, ...profile };
-              setUser(fullUser);
-              if (_event === 'SIGNED_IN') {
-                toast.success(t("common.welcomeUser", { username: fullUser.email }));
-                addLogEntry(t("common.userLoggedIn"), { username: fullUser.email, role: fullUser.role, storeId: fullUser.store_id }, fullUser.email);
-              }
+          } else if (!profile.is_approved) {
+            if (_event === 'SIGNED_IN') {
+              toast.error(t("common.accountNotApproved"));
+              await handleSignOut();
+            }
+            setUser(null);
+            setSession(null);
+          } else {
+            const fullUser = { ...session.user, ...profile };
+            setUser(fullUser);
+            if (_event === 'SIGNED_IN') {
+              toast.success(t("common.welcomeUser", { username: fullUser.email }));
+              addLogEntry(t("common.userLoggedIn"), { username: fullUser.email, role: fullUser.role, storeId: fullUser.store_id }, fullUser.email);
             }
           }
         } else {
@@ -124,7 +135,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } else {
       toast.info(t("common.loggedOut"));
     }
-    // The onAuthStateChange listener will automatically handle setting user and session to null.
+    setUser(null);
+    setSession(null);
   };
 
   const hasPermission = (permission: Permission): boolean => {

@@ -473,7 +473,7 @@
     "noPermissionToTransferArticles": "Nemáte oprávnění převádět artikly.",
     "fillAllTransferFields": "Vyplňte prosím všechna polia pro převod artiklů.",
     "articleNotFoundInSource": "Artikl {articleId} nebyl nalezen ve zdrojovém obchodě {storeId}.",
-    "insufficientQuantity": "Nedostatečné množství artiklu {articleId} ve zdrojovém obchodě. K dispozici: {available}, požadováno: {requested}.",
+    "insufficientQuantity": "Nedostatečné množství artiklu {articleId} v zdrojovém obchodě. K dispozici: {available}, požadováno: {requested}.",
     "articleTransferSuccess": "Úspěšně převedeno {quantity} ks artiklu {articleId} z obchodu {sourceStore} do obchodu {targetStore}.",
     "dashboard": "Dashboard",
     "warehouse": "Sklad",
@@ -498,6 +498,7 @@
     "approve": "Schválit",
     "errorFetchingUsers": "Chyba při načítání uživatelů.",
     "errorApprovingUser": "Chyba při schvalování uživatele.",
-    "userApprovedSuccess": "Uživatel byl úspěšně schválen."
+    "userApprovedSuccess": "Uživatel byl úspěšně schválen.",
+    "sessionError": "Došlo k chybě s vaší session. Prosím, přihlaste se znovu."
   }
 }

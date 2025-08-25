@@ -498,6 +498,7 @@
     "approve": "Schváliť",
     "errorFetchingUsers": "Chyba pri načítavaní používateľov.",
     "errorApprovingUser": "Chyba pri schvaľovaní používateľa.",
-    "userApprovedSuccess": "Používateľ bol úspešne schválený."
+    "userApprovedSuccess": "Používateľ bol úspešne schválený.",
+    "sessionError": "Vyskytla sa chyba s vašou reláciou. Prosím, prihláste sa znova."
   }
 }
