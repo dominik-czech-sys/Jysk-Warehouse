@@ -109,8 +109,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const fullUser = { ...session.user, ...profile };
             setUser(fullUser);
             if (_event === 'SIGNED_IN') {
-              toast.success(t("common.welcomeUser", { username: fullUser.email }));
-              addLogEntry(t("common.userLoggedIn"), { username: fullUser.email, role: fullUser.role, storeId: fullUser.store_id }, fullUser.email);
+              toast.success(t("common.welcomeUser", { username: fullUser.username || fullUser.email }));
+              addLogEntry(t("common.userLoggedIn"), { username: fullUser.username, role: fullUser.role, storeId: fullUser.store_id }, fullUser.email);
             }
           }
         } else {
@@ -126,7 +126,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     if (user) {
-      addLogEntry(t("common.userLoggedOut"), { username: user.email, storeId: user.store_id }, user.email);
+      addLogEntry(t("common.userLoggedOut"), { username: user.username, storeId: user.store_id }, user.email);
     }
     const { error } = await supabase.auth.signOut();
     if (error) {
