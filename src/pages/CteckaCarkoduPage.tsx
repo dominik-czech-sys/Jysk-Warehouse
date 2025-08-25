@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Html5Qrcode } from "html5-qrcode";
-import { Html5QrcodeScanner } from "html5-qrcode/esm/html5-qrcode-scanner"; // Corrected import path
+import { Html5Qrcode } from "html5-qrcode"; // Import Html5Qrcode from the main package
+import { Html5QrcodeScanner } from "html5-qrcode/esm/html5-qrcode-scanner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";

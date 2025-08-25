@@ -9,7 +9,8 @@ import { toast } from "sonner";
 import { useArticles, Article } from "@/data/articles";
 import { useAuth } from "@/hooks/useAuth";
 import { useLog } from "@/contexts/LogContext";
-import { Html5Qrcode, Html5QrcodeScanner } from "html5-qrcode/esm/html5-qrcode-scanner"; // Corrected import path
+import { Html5Qrcode } from "html5-qrcode"; // Import Html5Qrcode from the main package
+import { Html5QrcodeScanner } from "html5-qrcode/esm/html5-qrcode-scanner";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
