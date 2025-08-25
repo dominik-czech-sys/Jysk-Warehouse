@@ -19,7 +19,8 @@ import ManageHelpPostsPage from "./pages/ManageHelpPostsPage";
 import TaskManagementPage from "./pages/TaskManagementPage";
 import ManageAuditTemplatesPage from "./pages/ManageAuditTemplatesPage";
 import AuditListPage from "./pages/AuditListPage";
-import PerformAuditPage from "./pages/PerformAuditPage"; // Import
+import PerformAuditPage from "./pages/PerformAuditPage";
+import AuditDetailPage from "./pages/AuditDetailPage"; // Import
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
@@ -76,6 +77,7 @@ const AppContent = () => {
         <Route path="/admin/audit-templates" element={<PrivateRoute requiredPermission="audit:manage_templates"><ManageAuditTemplatesPage /></PrivateRoute>} />
         <Route path="/audity" element={<PrivateRoute requiredPermission="audit:view_results"><AuditListPage /></PrivateRoute>} />
         <Route path="/audity/provadet" element={<PrivateRoute requiredPermission="audit:perform"><PerformAuditPage /></PrivateRoute>} />
+        <Route path="/audity/:auditId" element={<PrivateRoute requiredPermission="audit:view_results"><AuditDetailPage /></PrivateRoute>} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

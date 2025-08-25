@@ -34,6 +34,17 @@ export interface AuditResult {
     notes?: string;
 }
 
+export interface AuditDetail extends CompletedAudit {
+    audit_results: {
+        result: string;
+        notes: string | null;
+        audit_template_items: {
+            question: string;
+            item_order: number;
+        } | null;
+    }[];
+}
+
 type NewAuditTemplate = Omit<AuditTemplate, 'id' | 'created_at' | 'audit_template_items'> & {
   audit_template_items: Omit<AuditTemplateItem, 'id' | 'template_id'>[];
 };
@@ -127,7 +138,6 @@ const fetchCompletedAudits = async (): Promise<CompletedAudit[]> => {
 };
 
 const submitAuditToDb = async ({ template_id, store_id, user_id, results }: { template_id: string; store_id: string; user_id: string; results: AuditResult[] }) => {
-    // 1. Create the main audit record
     const { data: auditData, error: auditError } = await supabase
         .from('audits')
         .insert({ template_id, store_id, user_id })
@@ -136,7 +146,6 @@ const submitAuditToDb = async ({ template_id, store_id, user_id, results }: { te
 
     if (auditError) throw auditError;
 
-    // 2. Prepare and insert the results
     const resultsToInsert = results.map(result => ({
         audit_id: auditData.id,
         ...result
@@ -147,12 +156,31 @@ const submitAuditToDb = async ({ template_id, store_id, user_id, results }: { te
         .insert(resultsToInsert);
 
     if (resultsError) {
-        // Clean up if results fail
         await supabase.from('audits').delete().eq('id', auditData.id);
         throw resultsError;
     }
 
     return auditData;
+};
+
+const fetchAuditDetail = async (auditId: string): Promise<AuditDetail | null> => {
+    const { data, error } = await supabase
+        .from('audits')
+        .select(`
+            *,
+            audit_templates ( name, description ),
+            profiles ( username ),
+            audit_results (
+                result,
+                notes,
+                audit_template_items ( question, item_order )
+            )
+        `)
+        .eq('id', auditId)
+        .single();
+
+    if (error) throw new Error(error.message);
+    return data as AuditDetail;
 };
 
 export const useAuditTemplates = () => {
@@ -224,5 +252,19 @@ export const useCompletedAudits = () => {
         isLoading,
         error,
         submitAudit: submitAuditMutation.mutateAsync,
+    };
+};
+
+export const useAuditDetail = (auditId: string) => {
+    const { data, isLoading, error } = useQuery<AuditDetail | null>({
+        queryKey: ["auditDetail", auditId],
+        queryFn: () => fetchAuditDetail(auditId),
+        enabled: !!auditId,
+    });
+
+    return {
+        audit: data,
+        isLoading,
+        error,
     };
 };

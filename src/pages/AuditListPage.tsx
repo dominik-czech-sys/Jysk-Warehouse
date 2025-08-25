@@ -62,9 +62,11 @@ const AuditListPage: React.FC = () => {
                       <TableCell>{audit.profiles?.username || t("common.unknown")}</TableCell>
                       <TableCell>{format(new Date(audit.completed_at), "d. M. yyyy HH:mm", { locale: cs })}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" disabled>
-                            <Eye className="h-4 w-4 mr-2" /> {t("common.viewDetails")}
-                        </Button>
+                        <Link to={`/audity/${audit.id}`}>
+                            <Button variant="ghost" size="sm">
+                                <Eye className="h-4 w-4 mr-2" /> {t("common.viewDetails")}
+                            </Button>
+                        </Link>
                       </TableCell>
                     </TableRow>
                   ))

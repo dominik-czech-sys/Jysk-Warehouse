@@ -421,7 +421,10 @@
       "submitting": "Odesílám...",
       "submitSuccess": "Audit byl úspěšně odeslán.",
       "submitErrorGeneric": "Při odesílání auditu došlo k chybě.",
-      "allQuestionsRequiredError": "Prosím, odpovězte na všechny otázky."
+      "allQuestionsRequiredError": "Prosím, odpovězte na všechny otázky.",
+      "auditDetail": "Detail auditu",
+      "completedOn": "Dokončeno dne {{date}}",
+      "errorLoadingDetail": "Při načítání detailu auditu došlo k chybě."
     }
   }
 }
