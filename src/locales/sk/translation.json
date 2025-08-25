@@ -499,6 +499,16 @@
     "errorFetchingUsers": "Chyba pri načítavaní používateľov.",
     "errorApprovingUser": "Chyba pri schvaľovaní používateľa.",
     "userApprovedSuccess": "Používateľ bol úspešne schválený.",
-    "sessionError": "Vyskytla sa chyba s vašou reláciou. Prosím, prihláste sa znova."
+    "sessionError": "Vyskytla sa chyba s vašou reláciou. Prosím, prihláste sa znova.",
+    "errorBoundaryTitle": "Niečo sa pokazilo",
+    "errorBoundaryMessage": "Ospravedlňujeme sa, ale aplikácia narazila na neočakávanú chybu.",
+    "errorBoundaryDescription": "Najčastejšie je to spôsobené nekonzistentnými dátami po aktualizácii. Kliknutím na tlačidlo nižšie vymažete dáta aplikácie a obnovíte stránku.",
+    "errorBoundaryButton": "Vymazať dáta a skúsiť znova",
+    "overview": "Prehľad",
+    "system": "Systém",
+    "statistics": "Štatistiky",
+    "usersPerStore": "Používatelia podľa obchodu",
+    "articleStatusDistribution": "Rozloženie artiklov podľa stavu",
+    "totalActiveUsers": "Celkom aktívnych používateľov"
   }
 }
