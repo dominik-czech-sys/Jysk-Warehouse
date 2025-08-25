@@ -294,6 +294,7 @@
       "searchArticleLocation": "Vyhledat Umístění Artiklu",
       "articleLocation": "Umístění Artiklu",
       "viewArticleLocation": "Zde se zobrazí umístění hledaného artiklu."
-    }
+    },
+    "sessionExpired": "Vaše přihlášení vypršelo z důvodu neaktivity."
   }
 }

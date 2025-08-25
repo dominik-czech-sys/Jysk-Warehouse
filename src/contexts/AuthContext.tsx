@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useState, useEffect, ReactNode, useRef } from "react";
 import { Session, User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Permission, defaultPermissions } from "@/data/users";
@@ -43,6 +43,50 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const { addLogEntry } = useLog();
   const { t } = useTranslation();
+  const inactivityTimer = useRef<number | null>(null);
+
+  const logout = async () => {
+    if (inactivityTimer.current) {
+      clearTimeout(inactivityTimer.current);
+    }
+    if (user) {
+      addLogEntry(t("common.userLoggedOut"), { username: user.username, storeId: user.store_id }, user.email);
+    }
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error logging out:", error);
+      toast.error("Chyba při odhlašování.");
+    } else {
+      toast.info(t("common.loggedOut"));
+      window.location.href = '/prihlaseni';
+    }
+  };
+
+  const resetInactivityTimer = () => {
+    if (inactivityTimer.current) {
+      clearTimeout(inactivityTimer.current);
+    }
+    inactivityTimer.current = window.setTimeout(() => {
+      toast.info(t("common.sessionExpired"));
+      logout();
+    }, 5 * 60 * 1000); // 5 minutes
+  };
+
+  useEffect(() => {
+    const isAuthenticated = !!session?.user && !!user;
+    if (isAuthenticated) {
+      const events = ['mousemove', 'keydown', 'click', 'scroll'];
+      resetInactivityTimer();
+      events.forEach(event => window.addEventListener(event, resetInactivityTimer));
+
+      return () => {
+        if (inactivityTimer.current) {
+          clearTimeout(inactivityTimer.current);
+        }
+        events.forEach(event => window.removeEventListener(event, resetInactivityTimer));
+      };
+    }
+  }, [session, user]);
 
   useEffect(() => {
     setLoading(true);
@@ -88,20 +132,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       subscription.unsubscribe();
     };
   }, [addLogEntry, t]);
-
-  const logout = async () => {
-    if (user) {
-      addLogEntry(t("common.userLoggedOut"), { username: user.username, storeId: user.store_id }, user.email);
-    }
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error("Error logging out:", error);
-      toast.error("Chyba při odhlašování.");
-    } else {
-      toast.info(t("common.loggedOut"));
-      window.location.href = '/prihlaseni';
-    }
-  };
 
   const hasPermission = (permission: Permission): boolean => {
     if (!user) return false;
