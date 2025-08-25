@@ -1,22 +1,25 @@
-import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
+import React, { createContext, useContext, ReactNode } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 
 export interface AppNotification {
   id: string;
-  timestamp: number;
+  created_at: string;
   type: "info" | "warning" | "error" | "success";
   message: string;
-  isRead: boolean;
-  link?: string; // Optional link for the notification
+  is_read: boolean;
+  link?: string;
 }
 
 interface NotificationContextType {
   notifications: AppNotification[];
-  addNotification: (type: AppNotification['type'], message: string, link?: string) => void;
   markAsRead: (id: string) => void;
   deleteNotification: (id: string) => void;
   clearAllNotifications: () => void;
   unreadCount: number;
+  isLoading: boolean;
 }
 
 export const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -25,66 +28,69 @@ interface NotificationProviderProps {
   children: ReactNode;
 }
 
+const fetchNotifications = async (userId: string): Promise<AppNotification[]> => {
+  if (!userId) return [];
+  const { data, error } = await supabase
+    .from("notifications")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return data;
+};
+
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
-  const [notifications, setNotifications] = useState<AppNotification[]>(() => {
-    try {
-      const storedNotifications = localStorage.getItem("appNotifications");
-      if (storedNotifications) {
-        return JSON.parse(storedNotifications);
-      }
-    } catch (error) {
-      console.error("Failed to parse notifications from localStorage", error);
-      localStorage.removeItem("appNotifications");
-    }
-    return [];
-  });
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
 
-  useEffect(() => {
-    try {
-      localStorage.setItem("appNotifications", JSON.stringify(notifications));
-    } catch (error) {
-      console.error("Failed to save notifications to localStorage", error);
-    }
-  }, [notifications]);
+  const { data: notifications = [], isLoading } = useQuery<AppNotification[]>({
+    queryKey: ["notifications", user?.id],
+    queryFn: () => fetchNotifications(user!.id),
+    enabled: !!user,
+  });
 
-  const addNotification = (type: AppNotification['type'], message: string, link?: string) => {
-    const newNotification: AppNotification = {
-      id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
-      timestamp: Date.now(),
-      type,
-      message: t(message), // Translate the message
-      isRead: false,
-      link,
-    };
-    setNotifications((prev) => [newNotification, ...prev]); // Add new notifications to the top
-  };
+  const markAsReadMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("notifications").update({ is_read: true }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+    },
+  });
 
-  const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((notif) => (notif.id === id ? { ...notif, isRead: true } : notif))
-    );
-  };
+  const deleteNotificationMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("notifications").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+    },
+  });
 
-  const deleteNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((notif) => notif.id !== id));
-  };
+  const clearAllNotificationsMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("notifications").delete().eq("user_id", user!.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+    },
+  });
 
-  const clearAllNotifications = () => {
-    setNotifications([]);
-  };
-
-  const unreadCount = notifications.filter(notif => !notif.isRead).length;
+  const unreadCount = notifications.filter(notif => !notif.is_read).length;
 
   return (
     <NotificationContext.Provider
       value={{
         notifications,
-        addNotification,
-        markAsRead,
-        deleteNotification,
-        clearAllNotifications,
+        markAsRead: markAsReadMutation.mutate,
+        deleteNotification: deleteNotificationMutation.mutate,
+        clearAllNotifications: clearAllNotificationsMutation.mutate,
         unreadCount,
+        isLoading,
       }}
     >
       {children}

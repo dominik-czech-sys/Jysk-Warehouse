@@ -26,14 +26,34 @@ const fetchTasks = async (): Promise<Task[]> => {
 };
 
 const addTaskToDb = async (newTask: NewTask) => {
-  const { data, error } = await supabase.from("tasks").insert(newTask).select();
+  const { data, error } = await supabase.from("tasks").insert(newTask).select().single();
   if (error) throw new Error(error.message);
+
+  if (data && data.assigned_to_user_id) {
+    await supabase.from("notifications").insert({
+      user_id: data.assigned_to_user_id,
+      type: 'info',
+      message: `Byl vám přiřazen nový úkol: ${data.title}`,
+      link: '/ukoly'
+    });
+  }
   return data;
 };
 
 const updateTaskInDb = async (updatedTask: Partial<Task> & { id: string }) => {
-  const { data, error } = await supabase.from("tasks").update(updatedTask).eq("id", updatedTask.id).select();
+  const { data: originalTask } = await supabase.from("tasks").select("assigned_to_user_id").eq("id", updatedTask.id).single();
+  
+  const { data, error } = await supabase.from("tasks").update(updatedTask).eq("id", updatedTask.id).select().single();
   if (error) throw new Error(error.message);
+
+  if (data && data.assigned_to_user_id && data.assigned_to_user_id !== originalTask?.assigned_to_user_id) {
+     await supabase.from("notifications").insert({
+      user_id: data.assigned_to_user_id,
+      type: 'info',
+      message: `Byl vám přiřazen úkol: ${data.title}`,
+      link: '/ukoly'
+    });
+  }
   return data;
 };
 

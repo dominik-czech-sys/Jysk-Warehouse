@@ -26,8 +26,23 @@ const fetchAnnouncements = async (): Promise<Announcement[]> => {
 };
 
 const addAnnouncementToDb = async (newAnnouncement: NewAnnouncement) => {
-  const { data, error } = await supabase.from("announcements").insert(newAnnouncement).select();
+  const { data, error } = await supabase.from("announcements").insert(newAnnouncement).select().single();
   if (error) throw new Error(error.message);
+  
+  // Create notifications for all users
+  const { data: users, error: usersError } = await supabase.from("profiles").select("id");
+  if (usersError) {
+    console.error("Error fetching users for notification:", usersError);
+  } else {
+    const notifications = users.map(user => ({
+      user_id: user.id,
+      type: 'info',
+      message: `Nové oznámení: ${data.title}`,
+      link: '/oznameni'
+    }));
+    await supabase.from("notifications").insert(notifications);
+  }
+
   return data;
 };
 

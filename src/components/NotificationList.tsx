@@ -82,20 +82,16 @@ export const NotificationList: React.FC = () => {
             notifications.map((notification) => (
               <DropdownMenuItem
                 key={notification.id}
-                className={`flex items-start space-x-2 py-2 cursor-pointer ${notification.isRead ? "opacity-70" : "font-semibold"}`}
+                className={`flex items-start space-x-2 py-2 cursor-pointer ${notification.is_read ? "opacity-70" : "font-semibold"}`}
                 onClick={() => {
                   markAsRead(notification.id);
-                  if (notification.link) {
-                    // Programmatically navigate if there's a link
-                    // This needs to be handled outside of the dropdown menu item click if it closes the menu
-                  }
                 }}
               >
                 {getIconForNotificationType(notification.type)}
                 <div className="flex-grow">
                   <p className="text-sm leading-snug">{notification.message}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {format(new Date(notification.timestamp), "dd.MM.yyyy HH:mm", { locale: currentLocale })}
+                    {format(new Date(notification.created_at), "dd.MM.yyyy HH:mm", { locale: currentLocale })}
                   </p>
                   {notification.link && (
                     <Link to={notification.link} className="text-xs text-jyskBlue-dark dark:text-jyskBlue-light hover:underline mt-1 block" onClick={() => setIsDropdownOpen(false)}>

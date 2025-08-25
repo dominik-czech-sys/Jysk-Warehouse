@@ -41,6 +41,21 @@ const SignUpPage: React.FC = () => {
     } else if (data.user) {
       toast.success(t("common.signUpSuccessTitle"));
       toast.info(t("common.signUpSuccessMessage"));
+      
+      // Notify admins
+      const { data: admins, error: adminError } = await supabase.from("profiles").select("id").eq("role", "admin");
+      if (adminError) {
+        console.error("Error fetching admins for notification:", adminError);
+      } else {
+        const notifications = admins.map(admin => ({
+          user_id: admin.id,
+          type: 'info',
+          message: `Nový uživatel '${username}' čeká na schválení.`,
+          link: '/admin/site-dashboard' // Direct link to user management tab would be better
+        }));
+        await supabase.from("notifications").insert(notifications);
+      }
+
       navigate("/prihlaseni");
     }
     setLoading(false);
