@@ -134,9 +134,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       toast.error("Chyba při odhlašování.");
     } else {
       toast.info(t("common.loggedOut"));
+      // Force a full page reload to the login page to ensure clean state
+      window.location.href = '/prihlaseni';
     }
-    setUser(null);
-    setSession(null);
   };
 
   const hasPermission = (permission: Permission): boolean => {

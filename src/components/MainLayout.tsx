@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -23,11 +23,9 @@ import { NotificationList } from "@/components/NotificationList";
 const MainLayout: React.FC = () => {
   const { user, isAdmin, hasPermission, logout } = useAuth();
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/prihlaseni", { replace: true });
+  const handleLogout = () => {
+    logout();
   };
 
   const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
