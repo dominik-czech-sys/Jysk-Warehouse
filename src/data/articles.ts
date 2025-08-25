@@ -72,19 +72,19 @@ export const useArticles = () => {
 
   const addArticle = (newArticle: Article) => {
     setArticles((prev) => [...prev, newArticle]);
-    addLogEntry(t("common.articleAdded"), { articleId: newArticle.id, name: newArticle.name, rackId: newArticle.rackId, shelfNumber: newArticle.shelfNumber, storeId: newArticle.storeId, quantity: newArticle.quantity, minQuantity: newArticle.minQuantity }, user?.username);
+    addLogEntry(t("common.articleAdded"), { articleId: newArticle.id, name: newArticle.name, rackId: newArticle.rackId, shelfNumber: newArticle.shelfNumber, storeId: newArticle.storeId, quantity: newArticle.quantity, minQuantity: newArticle.minQuantity }, user?.email);
   };
 
   const updateArticle = (updatedArticle: Article) => {
     setArticles((prev) =>
       prev.map((article) => (article.id === updatedArticle.id && article.storeId === updatedArticle.storeId ? updatedArticle : article))
     );
-    addLogEntry(t("common.articleUpdated"), { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, storeId: updatedArticle.storeId, quantity: updatedArticle.quantity, minQuantity: updatedArticle.minQuantity }, user?.username);
+    addLogEntry(t("common.articleUpdated"), { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, storeId: updatedArticle.storeId, quantity: updatedArticle.quantity, minQuantity: updatedArticle.minQuantity }, user?.email);
   };
 
   const deleteArticle = (id: string, storeId: string) => {
     setArticles((prev) => prev.filter((article) => !(article.id === id && article.storeId === storeId)));
-    addLogEntry(t("common.articleDeleted"), { articleId: id, storeId }, user?.username);
+    addLogEntry(t("common.articleDeleted"), { articleId: id, storeId }, user?.email);
   };
 
   const getArticlesByStoreId = (storeId: string) => {

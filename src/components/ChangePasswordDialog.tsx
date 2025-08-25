@@ -20,16 +20,14 @@ interface ChangePasswordDialogProps {
 }
 
 export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({ isOpen, onClose }) => {
-  const { user, changeUserPassword } = useAuth();
+  const { changePassword } = useAuth();
   const { t } = useTranslation();
 
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
   useEffect(() => {
     if (!isOpen) {
-      setCurrentPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
     }
@@ -38,12 +36,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({ isOp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user) {
-      toast.error(t("common.notLoggedIn"));
-      return;
-    }
-
-    if (!currentPassword || !newPassword || !confirmNewPassword) {
+    if (!newPassword || !confirmNewPassword) {
       toast.error(t("common.fillAllPasswordFields"));
       return;
     }
@@ -58,7 +51,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({ isOp
       return;
     }
 
-    const success = await changeUserPassword(user.username, currentPassword, newPassword);
+    const success = await changePassword(newPassword);
 
     if (success) {
       onClose();
@@ -75,19 +68,6 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({ isOp
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <Label htmlFor="currentPassword" className="sm:text-right">
-              {t("common.currentPassword")}
-            </Label>
-            <Input
-              id="currentPassword"
-              type="password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              className="col-span-3"
-              required
-            />
-          </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="newPassword" className="sm:text-right">
               {t("common.newPassword")}

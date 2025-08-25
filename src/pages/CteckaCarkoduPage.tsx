@@ -42,7 +42,7 @@ const CteckaCarkoduPage: React.FC = () => {
             html5QrcodeScanner?.clear();
             setScanResult(decodedText);
             toast.success(t("common.scannedBarcode", { decodedText }));
-            addLogEntry(t("common.barcodeScanned"), { scannedCode: decodedText, storeId: userStoreId }, user?.username);
+            addLogEntry(t("common.barcodeScanned"), { scannedCode: decodedText, storeId: userStoreId }, user?.email);
             navigate(`/?articleId=${decodedText}`);
           };
 
@@ -70,7 +70,7 @@ const CteckaCarkoduPage: React.FC = () => {
         console.error("Failed to clear html5QrcodeScanner", error);
       });
     };
-  }, [navigate, addLogEntry, user?.username, userStoreId, t]);
+  }, [navigate, addLogEntry, user?.email, userStoreId, t]);
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-2 sm:p-4">

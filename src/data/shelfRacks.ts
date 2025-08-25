@@ -48,12 +48,12 @@ export const useShelfRacks = () => {
   const addShelfRack = (newRack: ShelfRack) => {
     if (shelfRacks.some(r => r.id === newRack.id && r.storeId === newRack.storeId)) {
       toast.error(t("common.rackExists", { rackId: newRack.id }));
-      addLogEntry(t("common.attemptToAddExistingRack"), { rackId: newRack.id, storeId: newRack.storeId }, user?.username);
+      addLogEntry(t("common.attemptToAddExistingRack"), { rackId: newRack.id, storeId: newRack.storeId }, user?.email);
       return false;
     }
     setShelfRacks((prev) => [...prev, newRack]);
     toast.success(t("common.rackAddedSuccess", { rackId: newRack.id }));
-    addLogEntry(t("common.rackAdded"), { rackId: newRack.id, storeId: newRack.storeId, shelves: newRack.shelves.map(s => s.description) }, user?.username);
+    addLogEntry(t("common.rackAdded"), { rackId: newRack.id, storeId: newRack.storeId, shelves: newRack.shelves.map(s => s.description) }, user?.email);
     return true;
   };
 
@@ -62,13 +62,13 @@ export const useShelfRacks = () => {
       prev.map((r) => (r.id === updatedRack.id && r.storeId === updatedRack.storeId ? updatedRack : r))
     );
     toast.success(t("common.rackUpdatedSuccess", { rackId: updatedRack.id }));
-    addLogEntry(t("common.rackUpdated"), { rackId: updatedRack.id, storeId: updatedRack.storeId, shelves: updatedRack.shelves.map(s => s.description) }, user?.username);
+    addLogEntry(t("common.rackUpdated"), { rackId: updatedRack.id, storeId: updatedRack.storeId, shelves: updatedRack.shelves.map(s => s.description) }, user?.email);
   };
 
   const deleteShelfRack = (id: string, storeId: string) => {
     setShelfRacks((prev) => prev.filter((r) => !(r.id === id && r.storeId === storeId)));
     toast.success(t("common.rackDeletedSuccess", { rackId: id }));
-    addLogEntry(t("common.rackDeleted"), { rackId: id, storeId }, user?.username);
+    addLogEntry(t("common.rackDeleted"), { rackId: id, storeId }, user?.email);
   };
 
   const getShelfRacksByStoreId = (storeId: string) => {

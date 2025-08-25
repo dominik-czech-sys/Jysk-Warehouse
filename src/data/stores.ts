@@ -39,7 +39,7 @@ export const useStores = () => {
     }
     if (stores.some(s => s.id === newStore.id)) {
       toast.error(t("common.storeExists", { storeId: newStore.id }));
-      addLogEntry(t("common.attemptToAddExistingStore"), { storeId: newStore.id }, user?.username);
+      addLogEntry(t("common.attemptToAddExistingStore"), { storeId: newStore.id }, user?.email);
       return false;
     }
     setStores((prev) => {
@@ -48,7 +48,7 @@ export const useStores = () => {
       return updatedStores;
     });
     toast.success(t("common.storeAddedSuccess", { storeName: newStore.name, storeId: newStore.id }));
-    addLogEntry(t("common.storeAdded"), { storeId: newStore.id, storeName: newStore.name }, user?.username);
+    addLogEntry(t("common.storeAdded"), { storeId: newStore.id, storeName: newStore.name }, user?.email);
 
     if (addDefaultArticles) {
       globalArticles.forEach(defaultArticle => { // Use globalArticles here
@@ -64,7 +64,7 @@ export const useStores = () => {
         addArticle(newArticle);
       });
       toast.info(t("common.defaultArticlesAddedToStore", { storeId: newStore.id }));
-      addLogEntry(t("common.defaultArticlesAddedToStore"), { storeId: newStore.id, articlesCount: globalArticles.length }, user?.username);
+      addLogEntry(t("common.defaultArticlesAddedToStore"), { storeId: newStore.id, articlesCount: globalArticles.length }, user?.email);
     }
     return true;
   };
@@ -80,7 +80,7 @@ export const useStores = () => {
       return updatedStores;
     });
     toast.success(t("common.storeUpdatedSuccess", { storeName: updatedStore.name, storeId: updatedStore.id }));
-    addLogEntry(t("common.storeUpdated"), { storeId: updatedStore.id, storeName: updatedStore.name }, user?.username);
+    addLogEntry(t("common.storeUpdated"), { storeId: updatedStore.id, storeName: updatedStore.name }, user?.email);
     return true;
   };
 
@@ -95,7 +95,7 @@ export const useStores = () => {
       return updatedStores;
     });
     toast.success(t("common.storeDeletedSuccess", { storeId: id }));
-    addLogEntry(t("common.storeDeleted"), { storeId: id }, user?.username);
+    addLogEntry(t("common.storeDeleted"), { storeId: id }, user?.email);
     // TODO: Also delete all articles and racks associated with this store
     return true;
   };

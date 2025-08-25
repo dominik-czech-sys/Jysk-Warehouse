@@ -70,7 +70,7 @@ const MassAddArticlesPage: React.FC = () => {
 
           const onScanSuccess = (decodedText: string) => {
             toast.success(t("common.scannedBarcode", { decodedText }));
-            addLogEntry(t("common.barcodeScannedMassAdd"), { scannedCode: decodedText, shelfDetails, quantity: manualArticleQuantity }, user?.username);
+            addLogEntry(t("common.barcodeScannedMassAdd"), { scannedCode: decodedText, shelfDetails, quantity: manualArticleQuantity }, user?.email);
             addArticleToProcess(decodedText, manualArticleQuantity);
           };
 
@@ -110,7 +110,7 @@ const MassAddArticlesPage: React.FC = () => {
     return () => {
       stopScanner();
     };
-  }, [isScannerActive, shelfDetails, user?.username, manualArticleQuantity, t]);
+  }, [isScannerActive, shelfDetails, user?.email, manualArticleQuantity, t]);
 
   useEffect(() => {
     const currentRack = shelfRacks.find(rack => rack.id === selectedRackId && rack.storeId === userStoreId);
@@ -200,10 +200,10 @@ const MassAddArticlesPage: React.FC = () => {
       const existing = getArticleById(article.id, article.storeId);
       if (existing) {
         updateArticle(article);
-        addLogEntry(t("common.articleUpdatedMassAdd"), { articleId: article.id, newRackId: article.rackId, newShelfNumber: article.shelfNumber, storeId: article.storeId, quantity: article.quantity }, user?.username);
+        addLogEntry(t("common.articleUpdatedMassAdd"), { articleId: article.id, newRackId: article.rackId, newShelfNumber: article.shelfNumber, storeId: article.storeId, quantity: article.quantity }, user?.email);
       } else {
         addArticle(article);
-        addLogEntry(t("common.articleAddedMassAdd"), { articleId: article.id, rackId: article.rackId, shelfNumber: article.shelfNumber, storeId: article.storeId, quantity: article.quantity }, user?.username);
+        addLogEntry(t("common.articleAddedMassAdd"), { articleId: article.id, rackId: article.rackId, shelfNumber: article.shelfNumber, storeId: article.storeId, quantity: article.quantity }, user?.email);
       }
     });
 

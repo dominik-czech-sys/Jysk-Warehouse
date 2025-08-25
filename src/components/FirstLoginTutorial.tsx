@@ -13,13 +13,13 @@ interface FirstLoginTutorialProps {
 }
 
 const FirstLoginTutorial: React.FC<FirstLoginTutorialProps> = ({ onComplete }) => {
-  const { user, changePasswordOnFirstLogin } = useAuth();
+  const { user, completeFirstLogin } = useAuth();
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
-  if (!user) {
+  if (!user || !user.first_login) {
     return null;
   }
 
@@ -30,7 +30,7 @@ const FirstLoginTutorial: React.FC<FirstLoginTutorialProps> = ({ onComplete }) =
     }
     if (!user) return;
 
-    const success = await changePasswordOnFirstLogin(user.username, newPassword);
+    const success = await completeFirstLogin(newPassword);
     if (success) {
       setCurrentStep(1);
     } else {
@@ -132,7 +132,7 @@ const FirstLoginTutorial: React.FC<FirstLoginTutorialProps> = ({ onComplete }) =
           <CardDescription className="mt-2 text-sm sm:text-base">{t("common.firstLoginTutorialDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 sm:space-y-6">
-          {user.firstLogin && currentStep === 0 && (
+          {user.first_login && currentStep === 0 && (
             <div className="space-y-4">
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200">{t("common.firstLoginTutorialStep1")}</h2>
               <div className="grid gap-4">
@@ -163,7 +163,7 @@ const FirstLoginTutorial: React.FC<FirstLoginTutorialProps> = ({ onComplete }) =
             </div>
           )}
 
-          {user.firstLogin && currentStep > 0 && currentStep <= tutorialContent.length && (
+          {user.first_login && currentStep > 0 && currentStep <= tutorialContent.length && (
             <div className="space-y-4">
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200">{t("common.firstLoginTutorialStep2")}</h2>
               <Card className="border-jyskBlue-dark dark:border-jyskBlue-light">
@@ -186,7 +186,7 @@ const FirstLoginTutorial: React.FC<FirstLoginTutorialProps> = ({ onComplete }) =
             </div>
           )}
 
-          {user.firstLogin && currentStep > tutorialContent.length && (
+          {user.first_login && currentStep > tutorialContent.length && (
             <div className="text-center space-y-4">
               <h2 className="text-xl sm:text-2xl font-semibold text-green-600 dark:text-green-400 flex items-center justify-center">
                 <Check className="h-6 w-6 mr-2" /> {t("common.tutorialComplete")}

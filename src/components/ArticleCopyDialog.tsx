@@ -104,7 +104,7 @@ export const ArticleCopyDialog: React.FC<ArticleCopyDialogProps> = ({ isOpen, on
     onClose();
   };
 
-  const availableStores = stores.filter(s => s.id !== user?.storeId);
+  const availableStores = stores.filter(s => s.id !== user?.store_id);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

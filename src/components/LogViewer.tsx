@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { format } from "date-fns";
 import { cs, enUS, sk } from "date-fns/locale";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "@/hooks/useAuth"; // Import useAuth
 import { useStores } from "@/data/stores"; // Import useStores
 
 interface LogViewerProps {
@@ -66,7 +65,6 @@ const logCategoryTranslationKeys: Record<keyof typeof logCategories, string> = {
 export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
   const { logEntries, clearLog } = useLog();
   const { t, i18n } = useTranslation();
-  const { allUsers } = useAuth(); // Get all users for filtering
   const { stores } = useStores(); // Get all stores for filtering
 
   const [selectedFilter, setSelectedFilter] = useState<keyof typeof logCategories>("Full Log");
@@ -138,20 +136,6 @@ export const LogViewer: React.FC<LogViewerProps> = ({ isOpen, onClose }) => {
                 {Object.keys(logCategories).map(category => (
                   <SelectItem key={category} value={category}>
                     {t(logCategoryTranslationKeys[category])}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select onValueChange={setFilterByUser} value={filterByUser}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder={t("common.filterByUser")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("common.allUsers")}</SelectItem>
-                {allUsers.map(user => (
-                  <SelectItem key={user.username} value={user.username}>
-                    {user.username}
                   </SelectItem>
                 ))}
               </SelectContent>

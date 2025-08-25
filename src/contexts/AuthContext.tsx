@@ -6,17 +6,15 @@ import { useLog } from "@/contexts/LogContext";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-// Definice tvaru našeho vlastního uživatelského profilu
 interface UserProfile {
   id: string;
   first_name: string;
   last_name: string;
   role: "admin" | "vedouci_skladu" | "store_manager" | "deputy_store_manager" | "ar_assistant_of_sale" | "skladnik";
   store_id: string;
-  // Zde můžeme přidat další pole specifická pro naši aplikaci
+  first_login: boolean;
 }
 
-// Kombinace Supabase uživatele a našeho profilu pro objekt 'user' v kontextu
 export type User = SupabaseUser & UserProfile;
 
 interface AuthContextType {
@@ -27,7 +25,8 @@ interface AuthContextType {
   isAdmin: boolean;
   userStoreId: string | undefined;
   hasPermission: (permission: Permission) => boolean;
-  // Zastaralé funkce pro správu uživatelů jsou odstraněny a budou nahrazeny
+  changePassword: (newPassword: string) => Promise<boolean>;
+  completeFirstLogin: (newPassword: string) => Promise<boolean>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -114,6 +113,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return userPermissions.includes(permission);
   };
 
+  const changePassword = async (newPassword: string): Promise<boolean> => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      toast.error(error.message);
+      return false;
+    }
+    toast.success(t("common.passwordChangedSuccess"));
+    addLogEntry(t("common.userPasswordChanged"), {}, user?.email);
+    return true;
+  };
+
+  const completeFirstLogin = async (newPassword: string): Promise<boolean> => {
+    if (!user) return false;
+    const passwordChanged = await changePassword(newPassword);
+    if (passwordChanged) {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ first_login: false })
+        .eq('id', user.id);
+
+      if (error) {
+        toast.error(error.message);
+        return false;
+      }
+      // Manually update user state to reflect the change immediately
+      setUser(prevUser => prevUser ? { ...prevUser, first_login: false } : null);
+      return true;
+    }
+    return false;
+  };
+
   const isAuthenticated = !!session?.user;
   const isAdmin = user?.role === "admin";
   const userStoreId = user?.store_id;
@@ -126,6 +156,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAdmin,
     userStoreId,
     hasPermission,
+    changePassword,
+    completeFirstLogin,
   };
 
   return (

@@ -141,7 +141,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
     ? stores
     : stores.filter(s => s.id === currentUserStoreId);
 
-  const isRoleSelectDisabled = !isAdmin && user?.username === currentUser?.username;
+  const isRoleSelectDisabled = !isAdmin && user?.username === currentUser?.email;
 
   const isStoreSelectDisabled = !isAdmin && !!currentUserStoreId && formData.role !== "admin";
 

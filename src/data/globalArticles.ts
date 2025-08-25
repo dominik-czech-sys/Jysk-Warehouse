@@ -42,12 +42,12 @@ export const useGlobalArticles = () => {
   const addGlobalArticle = (newArticle: GlobalArticle) => {
     if (globalArticles.some(article => article.id === newArticle.id)) {
       toast.error(t("common.globalArticleExists", { articleId: newArticle.id }));
-      addLogEntry(t("common.attemptToAddExistingGlobalArticle"), { articleId: newArticle.id }, user?.username);
+      addLogEntry(t("common.attemptToAddExistingGlobalArticle"), { articleId: newArticle.id }, user?.email);
       return false;
     }
     setGlobalArticles((prev) => [...prev, newArticle]);
     toast.success(t("common.globalArticleAddedSuccess", { articleId: newArticle.id }));
-    addLogEntry(t("common.globalArticleAdded"), { articleId: newArticle.id, name: newArticle.name, status: newArticle.status, minQuantity: newArticle.minQuantity }, user?.username);
+    addLogEntry(t("common.globalArticleAdded"), { articleId: newArticle.id, name: newArticle.name, status: newArticle.status, minQuantity: newArticle.minQuantity }, user?.email);
     return true;
   };
 
@@ -56,13 +56,13 @@ export const useGlobalArticles = () => {
       prev.map((article) => (article.id === updatedArticle.id ? updatedArticle : article))
     );
     toast.success(t("common.globalArticleUpdatedSuccess", { articleId: updatedArticle.id }));
-    addLogEntry(t("common.globalArticleUpdated"), { articleId: updatedArticle.id, name: updatedArticle.name, status: updatedArticle.status, minQuantity: updatedArticle.minQuantity }, user?.username);
+    addLogEntry(t("common.globalArticleUpdated"), { articleId: updatedArticle.id, name: updatedArticle.name, status: updatedArticle.status, minQuantity: updatedArticle.minQuantity }, user?.email);
   };
 
   const deleteGlobalArticle = (id: string) => {
     setGlobalArticles((prev) => prev.filter((article) => article.id !== id));
     toast.success(t("common.globalArticleDeletedSuccess", { articleId: id }));
-    addLogEntry(t("common.globalArticleDeleted"), { articleId: id }, user?.username);
+    addLogEntry(t("common.globalArticleDeleted"), { articleId: id }, user?.email);
   };
 
   return { globalArticles, getGlobalArticleById, addGlobalArticle, updateGlobalArticle, deleteGlobalArticle };

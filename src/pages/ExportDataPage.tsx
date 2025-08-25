@@ -6,7 +6,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Download } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
 import { useStores } from "@/data/stores";
 import { useArticles } from "@/data/articles";
 import { useShelfRacks } from "@/data/shelfRacks";
@@ -14,7 +13,6 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
 const ExportDataPage: React.FC = () => {
-  const { allUsers } = useAuth();
   const { stores } = useStores();
   const { allArticles } = useArticles();
   const { allShelfRacks } = useShelfRacks();
@@ -22,7 +20,6 @@ const ExportDataPage: React.FC = () => {
 
   const [exportFormat, setExportFormat] = useState<"csv" | "json">("csv");
   const [dataToExport, setDataToExport] = useState({
-    users: false,
     stores: false,
     articles: false,
     racks: false,
@@ -81,11 +78,6 @@ const ExportDataPage: React.FC = () => {
         let headers: string[] = [];
 
         switch (dataType) {
-          case "users":
-            data = allUsers.map(({ password, ...rest }) => rest);
-            filename = "users";
-            headers = ["username", "role", "storeId", "permissions", "firstLogin"];
-            break;
           case "stores":
             data = stores;
             filename = "stores";
