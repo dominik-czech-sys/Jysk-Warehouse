@@ -21,6 +21,8 @@ export interface Article {
 // Typ pro vkládání nového artiklu (bez id generovaného databází)
 type NewArticle = Omit<Article, 'id'>;
 
+export const articleStatuses = ["active", "promo", "clearance", "discontinued"];
+
 const fetchArticles = async (): Promise<Article[]> => {
   const { data, error } = await supabase.from("articles").select("*");
   if (error) throw new Error(error.message);

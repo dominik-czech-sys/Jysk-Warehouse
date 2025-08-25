@@ -20,6 +20,7 @@ import { UserDistributionChart } from "@/components/dashboard/charts/UserDistrib
 import { ScrapeDataSection } from "@/components/dashboard/ScrapeDataSection";
 import { AnnouncementManagementSection } from "@/components/dashboard/AnnouncementManagementSection";
 import { AuditScoresChart } from "@/components/dashboard/charts/AuditScoresChart";
+import { ArticleStatusChart } from "@/components/dashboard/ArticleStatusChart";
 
 const SiteDashboard: React.FC = () => {
   const { isAdmin, hasPermission } = useAuth();
@@ -110,6 +111,7 @@ const SiteDashboard: React.FC = () => {
           <TabsContent value="analytics" className="mt-4">
             <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
                 <AuditScoresChart />
+                <ArticleStatusChart />
             </div>
           </TabsContent>
 

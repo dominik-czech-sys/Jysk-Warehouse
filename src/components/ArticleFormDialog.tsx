@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Article } from "@/data/articles";
+import { Article, articleStatuses } from "@/data/articles";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -52,8 +52,8 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
       }
     } else {
       const initialData: Partial<Article | GlobalArticle> = isGlobalAdminContext
-        ? { id: "", name: "", status: "", min_quantity: 0 }
-        : { article_number: "", name: "", status: "", rack_id: "", shelf_number: "", store_id: userStoreId || "", quantity: 1, min_quantity: 0, has_shop_floor_stock: false, shop_floor_stock: 0, replenishment_trigger: 0 };
+        ? { id: "", name: "", status: "active", min_quantity: 0 }
+        : { article_number: "", name: "", status: "active", rack_id: "", shelf_number: "", store_id: userStoreId || "", quantity: 1, min_quantity: 0, has_shop_floor_stock: false, shop_floor_stock: 0, replenishment_trigger: 0 };
       setFormData(initialData);
       setSelectedRackId("");
       setSelectedShelfNumber("");
@@ -76,6 +76,10 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
       ...prev,
       [id]: type === "number" ? parseInt(value, 10) || 0 : value,
     }));
+  };
+
+  const handleStatusChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, status: value }));
   };
 
   const handleCheckboxChange = (checked: boolean) => {
@@ -204,13 +208,18 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
             <Label htmlFor="status" className="sm:text-right">
               {t("common.itemStatus")}
             </Label>
-            <Input
-              id="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="col-span-3"
-              placeholder="Např. 21"
-            />
+            <Select onValueChange={handleStatusChange} value={formData.status}>
+              <SelectTrigger className="col-span-3">
+                <SelectValue placeholder={t("common.selectStatus")} />
+              </SelectTrigger>
+              <SelectContent>
+                {articleStatuses.map(status => (
+                  <SelectItem key={status} value={status}>
+                    {t(`common.status.${status}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {!isGlobalAdminContext && (

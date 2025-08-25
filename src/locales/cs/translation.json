@@ -492,6 +492,13 @@
       "quantityMustBePositive": "Množství musí být větší než nula.",
       "notEnoughStock": "Ve skladu není dostatek kusů (dostupné: {{available}}).",
       "success": "{{quantity}} ks artiklu {{articleId}} bylo úspěšně přesunuto na prodejnu."
-    }
+    },
+    "status": {
+      "active": "Aktivní",
+      "promo": "V akci",
+      "clearance": "Výprodej",
+      "discontinued": "Ukončený prodej"
+    },
+    "selectStatus": "Vyberte status"
   }
 }
