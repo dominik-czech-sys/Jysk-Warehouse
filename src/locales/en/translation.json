@@ -373,6 +373,7 @@
         "delete": "Delete Articles",
         "scan": "Scan Articles",
         "massAdd": "Mass Add Articles",
+        "transfer": "Transfer Articles",
         "copyFromStore": "Copy Articles from Other Stores"
       },
       "log": {
@@ -450,6 +451,14 @@
     "articleOverview": "Article Overview",
     "totalStoreArticles": "Total Store Articles",
     "totalGlobalArticles": "Total Global Articles",
-    "noLowStockAlerts": "No low stock alerts."
+    "noLowStockAlerts": "No low stock alerts.",
+    "transferArticles": "Transfer Articles",
+    "transferArticlesDescription": "Transfer articles from one store to another. Quantities will be adjusted in both stores.",
+    "transfer": "Transfer",
+    "noPermissionToTransferArticles": "You do not have permission to transfer articles.",
+    "fillAllTransferFields": "Please fill in all fields for article transfer.",
+    "articleNotFoundInSource": "Article {articleId} not found in source store {storeId}.",
+    "insufficientQuantity": "Insufficient quantity of article {articleId} in source store. Available: {available}, Requested: {requested}.",
+    "articleTransferSuccess": "Successfully transferred {quantity} pcs of article {articleId} from store {sourceStore} to store {targetStore}."
   }
 }

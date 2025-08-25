@@ -9,10 +9,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Copy, Users as UsersIcon, Package, Warehouse as WarehouseIcon, Download, LifeBuoy, BookOpen, LayoutGrid, Plus } from "lucide-react"; // Added LayoutGrid, Plus icons
+import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Copy, Users as UsersIcon, Package, Warehouse as WarehouseIcon, Download, LifeBuoy, BookOpen, LayoutGrid, Plus, ArrowRightLeft } from "lucide-react"; // Added ArrowRightLeft icon
 import { UserFormDialog } from "@/components/UserFormDialog";
 import { StoreFormDialog } from "@/components/StoreFormDialog";
 import { ArticleCopyDialog } from "@/components/ArticleCopyDialog";
+import { ArticleTransferDialog } from "@/components/ArticleTransferDialog"; // Import ArticleTransferDialog
 import { AdminFAQDialog } from "@/components/AdminFAQDialog";
 import { toast } from "sonner";
 import {
@@ -74,6 +75,7 @@ const SiteDashboard: React.FC = () => {
 
   const [isLogViewerOpen, setIsLogViewerOpen] = useState(false);
   const [isArticleCopyDialogOpen, setIsArticleCopyDialogOpen] = useState(false);
+  const [isArticleTransferDialogOpen, setIsArticleTransferDialogOpen] = useState(false); // State for ArticleTransferDialog
   const [isAdminFAQDialogOpen, setIsAdminFAQDialogOpen] = useState(false);
 
   // Statistics
@@ -222,6 +224,11 @@ const SiteDashboard: React.FC = () => {
                 {hasPermission("article:copy_from_store") && (
                   <Button onClick={() => setIsArticleCopyDialogOpen(true)} variant="outline" className="flex items-center w-full">
                     <Copy className="h-4 w-4 mr-2" /> {t("common.copyArticles")}
+                  </Button>
+                )}
+                {hasPermission("article:transfer") && (
+                  <Button onClick={() => setIsArticleTransferDialogOpen(true)} variant="outline" className="flex items-center w-full">
+                    <ArrowRightLeft className="h-4 w-4 mr-2" /> {t("common.transferArticles")}
                   </Button>
                 )}
               </div>
@@ -480,6 +487,11 @@ const SiteDashboard: React.FC = () => {
       <ArticleCopyDialog
         isOpen={isArticleCopyDialogOpen}
         onClose={() => setIsArticleCopyDialogOpen(false)}
+      />
+
+      <ArticleTransferDialog
+        isOpen={isArticleTransferDialogOpen}
+        onClose={() => setIsArticleTransferDialogOpen(false)}
       />
 
       <LogViewer isOpen={isLogViewerOpen} onClose={() => setIsLogViewerOpen(false)} />

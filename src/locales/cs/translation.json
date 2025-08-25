@@ -48,7 +48,7 @@
     "username": "Uživatelské jméno",
     "enterUsername": "Zadejte uživatelské jméno",
     "password": "Heslo",
-    "enterPassword": "Zadajte heslo",
+    "enterPassword": "Zadejte heslo",
     "login": "Přihlásit se",
     "viewExternalContent": "Zobrazit externí obsah",
     "scanBarcodeTitle": "Skenovat čárový kód",
@@ -373,6 +373,7 @@
         "delete": "Smazat artikl",
         "scan": "Skenovat artikly",
         "massAdd": "Hromadně přidávat artikly",
+        "transfer": "Převádět artikly",
         "copyFromStore": "Kopírovat artikly z jiných obchodů"
       },
       "log": {
@@ -401,7 +402,7 @@
       "themeLanguageTitle": "Jak změnit téma a jazyk?",
       "themeLanguageContent": "Téma aplikace (světlé, tmavé, systémové) a jazyk rozhraní můžete změnit pomocí přepínačů v záhlaví aplikace nebo v mobilním menu. Změny se projeví okamžitě.",
       "externalLinksTitle": "Jak přistupovat k externím odkazům (MyJYSK, StoreFront)?",
-      "externalLinksContent": "Na hlavní stránce a na přihlašovací stránce najdete tlačítka pro rychlý přístup k MyJYSK a StoreFront. Kliknutím na ně se otevře externí webová stránka v překryvném okně, takže nemusíte opouštět aplikaci.",
+      "externalLinksContent": "Na hlavní stránce a na přihlašovací stránce najdete tlačítka pro rychlý přístup k MyJYSK a StoreFront. Kliknutím na ně se otevře externí webová stránka v překryvném okně, takže nemusíte opustit aplikaci.",
       "lowStockAlertsTitle": "Co jsou upozornění na nízký stav zásob?",
       "lowStockAlertsContent": "Upozornění na nízký stav zásob se zobrazují na hlavní stránce, pokud množství artiklu v konkrétním obchodě klesne pod jeho nastavené minimální množství. Tato upozornění vám pomohou rychle identifikovat artikly, které je třeba doplnit.",
       "barcodeGeneratorTitle": "Jak generovat a tisknout čárové kódy?",
@@ -450,6 +451,14 @@
     "articleOverview": "Přehled artiklů",
     "totalStoreArticles": "Celkem artiklů v obchodech",
     "totalGlobalArticles": "Celkem globálních artiklů",
-    "noLowStockAlerts": "Žádná upozornění na nízký stav zásob."
+    "noLowStockAlerts": "Žádná upozornění na nízký stav zásob.",
+    "transferArticles": "Převést artikly",
+    "transferArticlesDescription": "Převádějte artikly z jednoho obchodu do druhého. Množství bude upraveno v obou obchodech.",
+    "transfer": "Převést",
+    "noPermissionToTransferArticles": "Nemáte oprávnění převádět artikly.",
+    "fillAllTransferFields": "Vyplňte prosím všechna pole pro převod artiklů.",
+    "articleNotFoundInSource": "Artikl {articleId} nebyl nalezen ve zdrojovém obchodě {storeId}.",
+    "insufficientQuantity": "Nedostatečné množství artiklu {articleId} ve zdrojovém obchodě. K dispozici: {available}, požadováno: {requested}.",
+    "articleTransferSuccess": "Úspěšně převedeno {quantity} ks artiklu {articleId} z obchodu {sourceStore} do obchodu {targetStore}."
   }
 }

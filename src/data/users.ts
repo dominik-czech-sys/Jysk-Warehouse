@@ -19,6 +19,7 @@ export type Permission =
   | "article:delete"
   | "article:scan"
   | "article:mass_add"
+  | "article:transfer" // NEW: Permission for transferring articles between stores
   | "log:view"
   | "default_articles:manage" // New permission for managing default articles
   | "article:copy_from_store" // New permission for copying articles from other stores
@@ -38,7 +39,8 @@ export const defaultPermissions: Record<User['role'], Permission[]> = {
   "admin": [
     "user:view", "user:create", "user:update", "user:delete",
     "store:view", "store:create", "store:update", "store:delete",
-    "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add",
+    "rack:view", "rack:create", "rack:update", "rack:delete",
+    "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add", "article:transfer", // Added article:transfer
     "log:view",
     "default_articles:manage", // Admin can manage global articles
     "article:copy_from_store",
@@ -47,14 +49,14 @@ export const defaultPermissions: Record<User['role'], Permission[]> = {
   "vedouci_skladu": [
     "user:view", "user:create", "user:update", "user:delete", // Can manage users in their store
     "rack:view", "rack:create", "rack:update", "rack:delete",
-    "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add",
+    "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add", "article:transfer", // Added article:transfer
     "log:view",
     "article:copy_from_store",
   ],
   "store_manager": [
     "user:view", "user:update", // Can view and update users in their store
     "rack:view", "rack:update",
-    "article:view", "article:create", "article:update", "article:scan", "article:mass_add",
+    "article:view", "article:create", "article:update", "article:scan", "article:mass_add", "article:transfer", // Added article:transfer
     "log:view",
   ],
   "deputy_store_manager": [

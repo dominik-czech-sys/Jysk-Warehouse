@@ -22,7 +22,7 @@ const allPermissions: Permission[] = [
   "user:view", "user:create", "user:update", "user:delete",
   "store:view", "store:create", "store:update", "store:delete",
   "rack:view", "rack:create", "rack:update", "rack:delete",
-  "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add",
+  "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add", "article:transfer", // Added article:transfer
   "log:view",
   "default_articles:manage",
   "article:copy_from_store",
@@ -48,6 +48,7 @@ const permissionDescriptions: Record<Permission, string> = {
   "article:delete": "permission.article.delete",
   "article:scan": "permission.article.scan",
   "article:mass_add": "permission.article.massAdd",
+  "article:transfer": "permission.article.transfer", // Added description for article:transfer
   "log:view": "permission.log.view",
   "default_articles:manage": "permission.defaultArticles.manage",
   "article:copy_from_store": "permission.article.copyFromStore",

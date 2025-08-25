@@ -373,6 +373,7 @@
         "delete": "Zmazať artikle",
         "scan": "Skenovať artikle",
         "massAdd": "Hromadné pridávanie artiklov",
+        "transfer": "Prevod artiklov",
         "copyFromStore": "Kopírovať artikle z iných obchodov"
       },
       "log": {
@@ -450,6 +451,14 @@
     "articleOverview": "Prehľad artiklov",
     "totalStoreArticles": "Celkom artiklov v obchodoch",
     "totalGlobalArticles": "Celkom globálnych artiklov",
-    "noLowStockAlerts": "Žiadne upozornenia na nízky stav zásob."
+    "noLowStockAlerts": "Žiadne upozornenia na nízky stav zásob.",
+    "transferArticles": "Prevod artiklov",
+    "transferArticlesDescription": "Prevod artiklov z jedného obchodu do druhého. Množstvo bude upravené v oboch obchodoch.",
+    "transfer": "Prevod",
+    "noPermissionToTransferArticles": "Nemáte oprávnenie prevádzať artikle.",
+    "fillAllTransferFields": "Vyplňte prosím všetky polia pre prevod artiklov.",
+    "articleNotFoundInSource": "Artikul {articleId} nebol nájdený v zdrojovom obchode {storeId}.",
+    "insufficientQuantity": "Nedostatočné množstvo artiklu {articleId} v zdrojovom obchode. K dispozícii: {available}, požadované: {requested}.",
+    "articleTransferSuccess": "Úspešne prevedených {quantity} ks artiklu {articleId} z obchodu {sourceStore} do obchodu {targetStore}."
   }
 }
