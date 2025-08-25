@@ -18,6 +18,7 @@ import { ExportDataSection } from "@/components/dashboard/ExportDataSection";
 import { StatisticsOverview } from "@/components/dashboard/StatisticsOverview";
 import { UserDistributionChart } from "@/components/dashboard/UserDistributionChart";
 import { ArticleStatusChart } from "@/components/dashboard/ArticleStatusChart";
+import { ScrapeDataSection } from "@/components/dashboard/ScrapeDataSection"; // Import
 
 const SiteDashboard: React.FC = () => {
   const { isAdmin, hasPermission } = useAuth();
@@ -110,6 +111,7 @@ const SiteDashboard: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="system" className="mt-4 space-y-6">
+            <ScrapeDataSection />
             <HelpPostManagementSection hasPermission={hasPermission} />
             <AdminTutorialsSection isAdmin={isAdmin} />
             <LogViewerSection hasPermission={hasPermission} />
