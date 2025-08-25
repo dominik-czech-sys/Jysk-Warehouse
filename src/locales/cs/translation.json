@@ -481,6 +481,17 @@
       "title": "Analytika"
     },
     "loading": "Načítání",
-    "view": "Zobrazit"
+    "view": "Zobrazit",
+    "replenishment": {
+      "replenish": "Doplnit",
+      "dialogTitle": "Doplnit artikl {{articleId}}",
+      "dialogDescription": "Zadejte množství, které přesouváte ze skladu na prodejnu.",
+      "warehouseStock": "Stav ve skladu",
+      "quantityToMove": "Množství k přesunu",
+      "confirm": "Potvrdit doplnění",
+      "quantityMustBePositive": "Množství musí být větší než nula.",
+      "notEnoughStock": "Ve skladu není dostatek kusů (dostupné: {{available}}).",
+      "success": "{{quantity}} ks artiklu {{articleId}} bylo úspěšně přesunuto na prodejnu."
+    }
   }
 }
