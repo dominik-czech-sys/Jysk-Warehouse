@@ -398,7 +398,7 @@
       "rackManagementContent": "Na stránce 'Správa regálů' můžete přidávat nové regály, upravovat jejich řady, čísla a popisy polic, nebo stávající regály mazat. Každý regál musí být přiřazen k obchodu. Tato funkce pomáhá udržovat přehled o skladových pozicích.",
       "changePasswordTitle": "Jak změnit heslo?",
       "changePasswordContent": "Své heslo můžete změnit na stránce 'Nastavení účtu' v sekci 'Zabezpečení'. Zadejte své aktuální heslo a poté dvakrát nové heslo. Pro bezpečnost doporučujeme používat silná hesla s kombinací velkých a malých písmen, čísel a speciálních znaků.",
-      "themeLanguageTitle": "Jak změnit téma a jazyk?",
+      "themeLanguageTitle": "Jak změnit tému a jazyk?",
       "themeLanguageContent": "Téma aplikace (světlé, tmavé, systémové) a jazyk rozhraní můžete změnit pomocí přepínačů v záhlaví aplikace nebo v mobilním menu. Změny se projeví okamžitě.",
       "externalLinksTitle": "Jak přistupovat k externím odkazům (MyJYSK, StoreFront)?",
       "externalLinksContent": "Na hlavní stránce a na přihlašovací stránce najdete tlačítka pro rychlý přístup k MyJYSK a StoreFront. Kliknutím na ně se otevře externí webová stránka v překryvném okně, takže nemusíte opouštět aplikaci.",
@@ -437,6 +437,12 @@
       "categoryArticleManagement": "Správa artiklů",
       "categoryHelpManagement": "Správa nápovědy",
       "categoryDataManagement": "Správa dat"
-    }
+    },
+    "viewNotifications": "Zobrazit upozornění",
+    "notifications": "Upozornění",
+    "clearAll": "Vymazat vše",
+    "noNewNotifications": "Žádná nová upozornění.",
+    "viewDetails": "Zobrazit detaily",
+    "lowStockNotification": "Nízký stav zásob: Artiklu {articleId} (množství: {quantity}, min: {minQuantity}) v obchodě {storeId} dochází zásoby."
   }
 }

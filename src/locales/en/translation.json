@@ -437,6 +437,12 @@
       "categoryArticleManagement": "Article Management",
       "categoryHelpManagement": "Help Management",
       "categoryDataManagement": "Data Management"
-    }
+    },
+    "viewNotifications": "View Notifications",
+    "notifications": "Notifications",
+    "clearAll": "Clear All",
+    "noNewNotifications": "No new notifications.",
+    "viewDetails": "View Details",
+    "lowStockNotification": "Low stock: Article {articleId} (quantity: {quantity}, min: {minQuantity}) in store {storeId} is running low."
   }
 }

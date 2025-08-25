@@ -18,6 +18,7 @@ import HelpCenterPage from "./pages/HelpCenterPage"; // Import HelpCenterPage
 import ManageHelpPostsPage from "./pages/ManageHelpPostsPage"; // Import ManageHelpPostsPage
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
+import { NotificationProvider } from "./contexts/NotificationContext"; // Import NotificationProvider
 import { useContext } from "react";
 import { Permission } from "./data/users"; // Import Permission type
 import { ThemeProvider } from "./contexts/ThemeContext"; // Import ThemeProvider
@@ -154,8 +155,10 @@ const App = () => (
         <LogProvider>
           <AuthProvider>
             <ThemeProvider>
-              <I18nextProvider i18n={i18n}> {/* Wrap AppContent with I18nextProvider */}
-                <AppContent />
+              <I18nextProvider i18n={i18n}>
+                <NotificationProvider> {/* Wrap AppContent with NotificationProvider */}
+                  <AppContent />
+                </NotificationProvider>
               </I18nextProvider>
             </ThemeProvider>
           </AuthProvider>

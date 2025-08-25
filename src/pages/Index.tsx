@@ -9,9 +9,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { LogOut, Scan, Users, KeyRound, Settings } from "lucide-react";
 import { IframeViewer } from "@/components/IframeViewer";
 import { useLog } from "@/contexts/LogContext";
+import { useNotifications } from "@/contexts/NotificationContext"; // Import useNotifications
 import { ManagementMenu } from "@/components/ManagementMenu";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { NotificationList } from "@/components/NotificationList"; // Import NotificationList
 import { useTranslation } from "react-i18next";
 import FirstLoginTutorial from "@/components/FirstLoginTutorial";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
@@ -23,6 +25,7 @@ const Index = () => {
   const [foundArticle, setFoundArticle] = useState<Article | null>(null);
   const { logout, isAdmin, user, userStoreId, hasPermission, updateUser } = useAuth();
   const { addLogEntry } = useLog();
+  const { addNotification } = useNotifications(); // Use addNotification
   const [searchParams] = useSearchParams();
   const [iframeSrc, setIframeSrc] = useState<string | null>(null);
   const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] = useState(false);
@@ -34,6 +37,24 @@ const Index = () => {
       handleSearch(articleIdFromUrl);
     }
   }, [searchParams, articles, user?.username, t]);
+
+  // Add notifications for low stock articles
+  useEffect(() => {
+    const lowStockArticles = articles.filter(article =>
+      article.minQuantity !== undefined &&
+      article.quantity < article.minQuantity &&
+      article.storeId !== "GLOBAL"
+    );
+
+    lowStockArticles.forEach(article => {
+      addNotification(
+        "warning",
+        t("common.lowStockNotification", { articleId: article.id, quantity: article.quantity, minQuantity: article.minQuantity, storeId: article.storeId }),
+        `/spravovat-artikly?articleId=${article.id}`
+      );
+    });
+  }, [articles, addNotification, t]);
+
 
   const handleSearch = (articleId: string) => {
     const article = getArticleById(articleId, userStoreId);
@@ -94,6 +115,7 @@ const Index = () => {
             </Link>
           )}
           {(hasPermission("article:view") || hasPermission("rack:view")) && <ManagementMenu />}
+          <NotificationList /> {/* Add NotificationList here */}
           <ThemeToggle />
           <LanguageSwitcher />
           <Link to="/account-settings" className="w-full sm:w-auto">
