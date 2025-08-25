@@ -49,7 +49,12 @@ const MassAddArticlesPage: React.FC = () => {
     if (isScannerActive && !scannerRef.current) {
       scannerRef.current = new Html5QrcodeScanner(
         "reader",
-        { fps: 10, qrbox: { width: 250, height: 250 } },
+        { 
+          fps: 10, 
+          qrbox: { width: 250, height: 250 },
+          // Prefer rear camera
+          facingMode: { exact: "environment" }
+        },
         false
       );
 

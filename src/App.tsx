@@ -14,6 +14,7 @@ import MassAddArticlesPage from "./pages/MassAddArticlesPage";
 import ManageShelfRacksPage from "./pages/ManageShelfRacksPage";
 import ExportDataPage from "./pages/ExportDataPage"; // Import ExportDataPage
 import AccountSettingsPage from "./pages/AccountSettingsPage"; // Import AccountSettingsPage
+import HelpCenterPage from "./pages/HelpCenterPage"; // Import HelpCenterPage
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { useContext } from "react";
@@ -118,6 +119,14 @@ const AppContent = () => {
         element={
           <PrivateRoute>
             <AccountSettingsPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/help-center"
+        element={
+          <PrivateRoute>
+            <HelpCenterPage />
           </PrivateRoute>
         }
       />

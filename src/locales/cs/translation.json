@@ -285,7 +285,15 @@
     "role": "Role",
     "security": "Zabezpečení",
     "securityDescription": "Spravujte nastavení zabezpečení vašeho účtu.",
-    "pleaseLoginToAccess": "Pro přístup k této stránce se prosím přihlaste."
+    "pleaseLoginToAccess": "Pro přístup k této stránce se prosím přihlaste.",
+    "helpCenter": "Centrum nápovědy",
+    "searchHelp": "Vyhledat nápovědu",
+    "searchHelpDescription": "Zadejte klíčová slova pro nalezení relevantních článků nápovědy.",
+    "enterKeywords": "Zadejte klíčová slova...",
+    "helpPosts": "Články nápovědy",
+    "noHelpPostsFound": "Nebyly nalezeny žádné články nápovědy.",
+    "category": "Kategorie",
+    "keywords": "Klíčová slova"
   },
   "permission": {
     "user": {

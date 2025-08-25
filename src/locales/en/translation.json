@@ -285,7 +285,15 @@
     "role": "Role",
     "security": "Security",
     "securityDescription": "Manage your account security settings.",
-    "pleaseLoginToAccess": "Please log in to access this page."
+    "pleaseLoginToAccess": "Please log in to access this page.",
+    "helpCenter": "Help Center",
+    "searchHelp": "Search Help",
+    "searchHelpDescription": "Enter keywords to find relevant help articles.",
+    "enterKeywords": "Enter keywords...",
+    "helpPosts": "Help Articles",
+    "noHelpPostsFound": "No help articles found.",
+    "category": "Category",
+    "keywords": "Keywords"
   },
   "permission": {
     "user": {
