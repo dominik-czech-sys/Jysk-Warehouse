@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, ReactNode, useRef } from "react";
+import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { Session, User as SupabaseUser } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Permission, defaultPermissions } from "@/data/users";
@@ -43,53 +43,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const { addLogEntry } = useLog();
   const { t } = useTranslation();
-  const inactivityTimer = useRef<number | null>(null);
-
-  const logout = async () => {
-    if (inactivityTimer.current) {
-      clearTimeout(inactivityTimer.current);
-    }
-    if (user) {
-      addLogEntry(t("common.userLoggedOut"), { username: user.username, storeId: user.store_id }, user.email);
-    }
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error("Error logging out:", error);
-      toast.error("Chyba při odhlašování.");
-    } else {
-      toast.info(t("common.loggedOut"));
-      window.location.href = '/prihlaseni';
-    }
-  };
-
-  const resetInactivityTimer = () => {
-    if (inactivityTimer.current) {
-      clearTimeout(inactivityTimer.current);
-    }
-    inactivityTimer.current = window.setTimeout(() => {
-      toast.info(t("common.sessionExpired"));
-      logout();
-    }, 5 * 60 * 1000); // 5 minutes
-  };
 
   useEffect(() => {
-    const isAuthenticated = !!session?.user && !!user;
-    if (isAuthenticated) {
-      const events = ['mousemove', 'keydown', 'click', 'scroll'];
-      resetInactivityTimer();
-      events.forEach(event => window.addEventListener(event, resetInactivityTimer));
+    const fetchInitialSession = async () => {
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
 
-      return () => {
-        if (inactivityTimer.current) {
-          clearTimeout(inactivityTimer.current);
+      if (session?.user) {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (error || !profile || !profile.is_approved) {
+          await supabase.auth.signOut();
+          setUser(null);
+          setSession(null);
+        } else {
+          const fullUser = { ...session.user, ...profile };
+          setUser(fullUser);
+          setSession(session);
         }
-        events.forEach(event => window.removeEventListener(event, resetInactivityTimer));
-      };
-    }
-  }, [session, user]);
+      }
+      setLoading(false);
+    };
 
-  useEffect(() => {
-    setLoading(true);
+    fetchInitialSession();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (session?.user) {
@@ -99,15 +80,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             .eq('id', session.user.id)
             .single();
 
-          if (error || !profile) {
-            console.error("Profile error on auth state change, signing out:", error);
-            await supabase.auth.signOut();
-            setUser(null);
-            setSession(null);
-          } else if (!profile.is_approved) {
-            if (_event === 'SIGNED_IN') {
-              toast.error(t("common.accountNotApproved"));
-            }
+          if (error || !profile || !profile.is_approved) {
             await supabase.auth.signOut();
             setUser(null);
             setSession(null);
@@ -124,7 +97,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(null);
           setSession(null);
         }
-        setLoading(false);
       }
     );
 
@@ -132,6 +104,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       subscription.unsubscribe();
     };
   }, [addLogEntry, t]);
+
+  const logout = async () => {
+    if (user) {
+      addLogEntry(t("common.userLoggedOut"), { username: user.username, storeId: user.store_id }, user.email);
+    }
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error logging out:", error);
+      toast.error("Chyba při odhlašování.");
+    } else {
+      toast.info(t("common.loggedOut"));
+      window.location.href = '/prihlaseni';
+    }
+  };
 
   const hasPermission = (permission: Permission): boolean => {
     if (!user) return false;
