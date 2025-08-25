@@ -15,6 +15,7 @@ import {
   Settings,
   Globe,
   ClipboardList,
+  FileCheck,
 } from "lucide-react";
 import { MobileSidebar } from "@/components/MobileSidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -58,6 +59,12 @@ const MainLayout: React.FC = () => {
       </NavLink>
       
       <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.warehouse")}</h3>
+      {hasPermission("audit:view_results") && (
+        <NavLink to="/audity" className={navLinkClasses}>
+          <FileCheck className="h-4 w-4" />
+          {t("common.audit.audits")}
+        </NavLink>
+      )}
       <NavLink to="/doplnovani" className={navLinkClasses}>
         <RefreshCw className="h-4 w-4" />
         {t("common.replenishment")}

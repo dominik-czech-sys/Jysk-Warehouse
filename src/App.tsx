@@ -17,7 +17,8 @@ import AccountSettingsPage from "./pages/AccountSettingsPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
 import ManageHelpPostsPage from "./pages/ManageHelpPostsPage";
 import TaskManagementPage from "./pages/TaskManagementPage";
-import ManageAuditTemplatesPage from "./pages/ManageAuditTemplatesPage"; // Import
+import ManageAuditTemplatesPage from "./pages/ManageAuditTemplatesPage";
+import AuditListPage from "./pages/AuditListPage"; // Import
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
@@ -72,6 +73,7 @@ const AppContent = () => {
         <Route path="/doplnovani" element={<PrivateRoute><ReplenishmentPage /></PrivateRoute>} />
         <Route path="/ukoly" element={<PrivateRoute requiredPermission="task:view"><TaskManagementPage /></PrivateRoute>} />
         <Route path="/admin/audit-templates" element={<PrivateRoute requiredPermission="audit:manage_templates"><ManageAuditTemplatesPage /></PrivateRoute>} />
+        <Route path="/audity" element={<PrivateRoute requiredPermission="audit:view_results"><AuditListPage /></PrivateRoute>} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

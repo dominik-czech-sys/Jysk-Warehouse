@@ -370,7 +370,9 @@
         "delete": "Smazat úkol"
       },
       "audit": {
-        "manage_templates": "Spravovat šablony auditů"
+        "manage_templates": "Spravovat šablony auditů",
+        "perform": "Provádět audity",
+        "view_results": "Zobrazit výsledky auditů"
       }
     },
     "audit": {
@@ -399,7 +401,14 @@
       "templateUpdatedSuccess": "Šablona auditu byla úspěšně aktualizována.",
       "templateDeletedSuccess": "Šablona auditu byla úspěšně smazána.",
       "confirmDeleteTitle": "Opravdu chcete smazat tuto šablonu?",
-      "confirmDeleteDescription": "Tato akce je nevratná. Šablona '{{templateName}}' a všechny její otázky budou trvale odstraněny."
+      "confirmDeleteDescription": "Tato akce je nevratná. Šablona '{{templateName}}' a všechny její otázky budou trvale odstraněny.",
+      "audits": "Audity",
+      "startNewAudit": "Spustit nový audit",
+      "completedAudits": "Dokončené audity",
+      "completedAuditsDescription": "Historie všech provedených auditů ve vašem obchodě.",
+      "completedBy": "Dokončil",
+      "completionDate": "Datum dokončení",
+      "loadingAudits": "Načítání auditů..."
     }
   }
 }

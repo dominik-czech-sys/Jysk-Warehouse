@@ -26,7 +26,9 @@ export type Permission =
   | "task:create"
   | "task:update"
   | "task:delete"
-  | "audit:manage_templates";
+  | "audit:manage_templates"
+  | "audit:perform"
+  | "audit:view_results";
 
 export interface User {
   id?: string;
@@ -52,7 +54,7 @@ export const defaultPermissions: Record<User['role'], Permission[]> = {
     "article:copy_from_store",
     "help_posts:manage",
     "task:view", "task:create", "task:update", "task:delete",
-    "audit:manage_templates",
+    "audit:manage_templates", "audit:perform", "audit:view_results",
   ],
   "vedouci_skladu": [
     "user:view", "user:create", "user:update", "user:delete",
@@ -61,6 +63,7 @@ export const defaultPermissions: Record<User['role'], Permission[]> = {
     "log:view",
     "article:copy_from_store",
     "task:view", "task:create", "task:update", "task:delete",
+    "audit:perform", "audit:view_results",
   ],
   "store_manager": [
     "user:view", "user:update",
@@ -68,19 +71,23 @@ export const defaultPermissions: Record<User['role'], Permission[]> = {
     "article:view", "article:create", "article:update", "article:scan", "article:mass_add", "article:transfer",
     "log:view",
     "task:view", "task:create", "task:update", "task:delete",
+    "audit:perform", "audit:view_results",
   ],
   "deputy_store_manager": [
     "rack:view",
     "article:view", "article:create", "article:update", "article:scan", "article:mass_add",
     "task:view", "task:create", "task:update",
+    "audit:perform", "audit:view_results",
   ],
   "ar_assistant_of_sale": [
     "article:view", "article:scan",
     "task:view",
+    "audit:perform", "audit:view_results",
   ],
   "skladnik": [
     "article:view", "article:scan", "article:mass_add", "article:create", "article:update",
     "rack:view",
     "task:view",
+    "audit:perform", "audit:view_results",
   ],
 };

@@ -20,6 +20,14 @@ export interface AuditTemplate {
   audit_template_items: AuditTemplateItem[];
 }
 
+export interface CompletedAudit {
+  id: string;
+  completed_at: string;
+  store_id: string;
+  audit_templates: { name: string } | null;
+  profiles: { username: string } | null;
+}
+
 type NewAuditTemplate = Omit<AuditTemplate, 'id' | 'created_at' | 'audit_template_items'> & {
   audit_template_items: Omit<AuditTemplateItem, 'id' | 'template_id'>[];
 };
@@ -33,7 +41,6 @@ const fetchAuditTemplates = async (): Promise<AuditTemplate[]> => {
 };
 
 const addAuditTemplateToDb = async (newTemplate: NewAuditTemplate) => {
-  // Insert the template first
   const { data: templateData, error: templateError } = await supabase
     .from("audit_templates")
     .insert({
@@ -43,30 +50,23 @@ const addAuditTemplateToDb = async (newTemplate: NewAuditTemplate) => {
     })
     .select()
     .single();
-
   if (templateError) throw templateError;
 
-  // Then insert the items with the new template's ID
   const itemsToInsert = newTemplate.audit_template_items.map(item => ({
     ...item,
     template_id: templateData.id,
   }));
-
   const { error: itemsError } = await supabase
     .from("audit_template_items")
     .insert(itemsToInsert);
-
   if (itemsError) {
-    // Clean up the created template if items fail to insert
     await supabase.from("audit_templates").delete().eq("id", templateData.id);
     throw itemsError;
   }
-
   return templateData;
 };
 
 const updateAuditTemplateInDb = async (updatedTemplate: AuditTemplate) => {
-  // Update the template details
   const { error: templateError } = await supabase
     .from("audit_templates")
     .update({
@@ -74,15 +74,12 @@ const updateAuditTemplateInDb = async (updatedTemplate: AuditTemplate) => {
       description: updatedTemplate.description,
     })
     .eq("id", updatedTemplate.id);
-
   if (templateError) throw templateError;
 
-  // Simple approach: delete all old items and insert the new ones
   const { error: deleteError } = await supabase
     .from("audit_template_items")
     .delete()
     .eq("template_id", updatedTemplate.id);
-
   if (deleteError) throw deleteError;
 
   const itemsToInsert = updatedTemplate.audit_template_items.map(item => ({
@@ -91,14 +88,12 @@ const updateAuditTemplateInDb = async (updatedTemplate: AuditTemplate) => {
     item_type: item.item_type,
     item_order: item.item_order,
   }));
-
   if (itemsToInsert.length > 0) {
     const { error: insertError } = await supabase
       .from("audit_template_items")
       .insert(itemsToInsert);
     if (insertError) throw insertError;
   }
-
   return updatedTemplate;
 };
 
@@ -106,6 +101,22 @@ const deleteAuditTemplateFromDb = async (templateId: string) => {
   const { error } = await supabase.from("audit_templates").delete().eq("id", templateId);
   if (error) throw new Error(error.message);
   return templateId;
+};
+
+const fetchCompletedAudits = async (): Promise<CompletedAudit[]> => {
+    const { data, error } = await supabase
+    .from("audits")
+    .select(`
+      id,
+      completed_at,
+      store_id,
+      audit_templates ( name ),
+      profiles ( username )
+    `)
+    .order('completed_at', { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return data as unknown as CompletedAudit[];
 };
 
 export const useAuditTemplates = () => {
@@ -152,4 +163,17 @@ export const useAuditTemplates = () => {
     updateTemplate: updateTemplateMutation.mutateAsync,
     deleteTemplate: deleteTemplateMutation.mutateAsync,
   };
+};
+
+export const useCompletedAudits = () => {
+    const { data: audits, isLoading, error } = useQuery<CompletedAudit[]>({
+        queryKey: ["completedAudits"],
+        queryFn: fetchCompletedAudits,
+    });
+
+    return {
+        audits: audits || [],
+        isLoading,
+        error,
+    };
 };

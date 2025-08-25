@@ -18,6 +18,7 @@ import {
   Settings,
   Globe,
   ClipboardList,
+  FileCheck,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
@@ -66,6 +67,12 @@ export const MobileSidebar: React.FC = () => {
       </NavLink>
 
       <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.warehouse")}</h3>
+      {hasPermission("audit:view_results") && (
+        <NavLink to="/audity" className={navLinkClasses} onClick={closeSheet}>
+          <FileCheck className="h-5 w-5" />
+          {t("common.audit.audits")}
+        </NavLink>
+      )}
       <NavLink to="/doplnovani" className={navLinkClasses} onClick={closeSheet}>
         <RefreshCw className="h-5 w-5" />
         {t("common.replenishment")}

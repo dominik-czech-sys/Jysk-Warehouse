@@ -28,7 +28,7 @@ const allPermissions: Permission[] = [
   "article:copy_from_store",
   "help_posts:manage",
   "task:view", "task:create", "task:update", "task:delete",
-  "audit:manage_templates",
+  "audit:manage_templates", "audit:perform", "audit:view_results",
 ];
 
 const permissionDescriptions: Record<Permission, string> = {
@@ -60,6 +60,8 @@ const permissionDescriptions: Record<Permission, string> = {
   "task:update": "permission.task.update",
   "task:delete": "permission.task.delete",
   "audit:manage_templates": "permission.audit.manage_templates",
+  "audit:perform": "permission.audit.perform",
+  "audit:view_results": "permission.audit.view_results",
 };
 
 interface UserFormDialogProps {
