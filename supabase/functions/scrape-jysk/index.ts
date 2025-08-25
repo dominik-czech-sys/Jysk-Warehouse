@@ -20,77 +20,51 @@ async function getCategoryUrls(): Promise<string[]> {
 
   const categoryLinks = doc.querySelectorAll('a.list-item.link');
   const urls = Array.from(categoryLinks)
-    .map(link => (link as Element).getAttribute('href')) // OPRAVA: Přidána typová kontrola
+    .map(link => (link as Element).getAttribute('href'))
     .filter(href => href && !href.startsWith('/vsechny-produkty'))
     .map(href => `${BASE_URL}${href}`);
   
   console.log(`Found ${urls.length} category URLs.`);
-  return [...new Set(urls)]; // Odstranění duplicit
+  return [...new Set(urls)];
 }
 
-// Krok 2: Získání URL adres všech produktů z dané kategorie (včetně stránkování)
-async function getProductUrlsFromCategory(categoryUrl: string): Promise<string[]> {
-  let page = 1;
-  const productUrls = new Set<string>();
-  console.log(`Scraping category: ${categoryUrl}`);
-
-  while (true) {
-    const url = `${categoryUrl}?page=${page}`;
-    const response = await fetch(url);
-    if (!response.ok) break;
-    const html = await response.text();
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    if (!doc) break;
-
-    const productLinks = doc.querySelectorAll('a.product-card__link');
-    if (productLinks.length === 0) {
-      console.log(`No more products found on page ${page}. Moving to next category.`);
-      break; // Konec stránkování
-    }
-
-    productLinks.forEach(link => {
-      const href = (link as Element).getAttribute('href'); // OPRAVA: Přidána typová kontrola
-      if (href) productUrls.add(`${BASE_URL}${href}`);
-    });
-
-    console.log(`Found ${productLinks.length} products on page ${page}. Total for category: ${productUrls.size}`);
-    page++;
-    if (page > 100) { // Pojistka proti nekonečné smyčce
-        console.log("Page limit reached for category, stopping.");
-        break;
-    }
-  }
-  return Array.from(productUrls);
-}
-
-// Krok 3: Extrakce detailů z stránky jednoho produktu
-async function getProductDetails(productUrl: string): Promise<any | null> {
+// Krok 2: Extrakce produktů z jedné stránky kategorie
+async function getProductsFromCategoryPage(pageUrl: string): Promise<any[]> {
   try {
-    const response = await fetch(productUrl);
-    if (!response.ok) return null;
+    const response = await fetch(pageUrl);
+    if (!response.ok) {
+      console.warn(`Could not fetch ${pageUrl}, status: ${response.status}`);
+      return [];
+    }
     const html = await response.text();
     const doc = new DOMParser().parseFromString(html, "text/html");
-    if (!doc) return null;
+    if (!doc) return [];
 
-    const name = doc.querySelector('h1[data-testid="pdp-title"]')?.textContent.trim();
-    const articleNoRaw = doc.querySelector('span[data-testid="pdp-article-number"]')?.textContent.trim();
+    const productElements = doc.querySelectorAll('.product-card');
+    const products = [];
 
-    if (name && articleNoRaw) {
-      const articleNo = articleNoRaw.replace("Art. č.:", "").trim();
-      return {
-        id: articleNo,
-        name: name,
-        category: "Neznámá",
-        status: "21",
-        min_quantity: 0,
-      };
+    for (const element of productElements) {
+      const name = (element as Element).querySelector('[data-testid="product-card-name"]')?.textContent.trim();
+      const articleNoRaw = (element as Element).querySelector('[data-testid="product-card-article-number"]')?.textContent.trim();
+
+      if (name && articleNoRaw) {
+        const articleNo = articleNoRaw.replace("Art. č.:", "").trim();
+        products.push({
+          id: articleNo,
+          name: name,
+          category: "Neznámá", // Kategorie není na kartě snadno dostupná
+          status: "21",
+          min_quantity: 0,
+        });
+      }
     }
-    return null;
+    return products;
   } catch (e) {
-    console.error(`Error fetching details for ${productUrl}:`, e.message);
-    return null;
+    console.error(`Error processing page ${pageUrl}:`, e.message);
+    return [];
   }
 }
+
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -107,14 +81,29 @@ serve(async (req) => {
     let allProducts = [];
 
     for (const catUrl of categoryUrls) {
-      const productUrls = await getProductUrlsFromCategory(catUrl);
-      const productPromises = productUrls.map(prodUrl => getProductDetails(prodUrl));
-      const productsFromCategory = (await Promise.all(productPromises)).filter(p => p !== null);
-      allProducts.push(...productsFromCategory);
-      console.log(`Finished category ${catUrl}. Total products found so far: ${allProducts.length}`);
+      let page = 1;
+      console.log(`Scraping category: ${catUrl}`);
+      while (true) {
+        const pageUrl = `${catUrl}?page=${page}`;
+        const productsFromPage = await getProductsFromCategoryPage(pageUrl);
+
+        if (productsFromPage.length === 0) {
+          console.log(`No more products found on page ${page} for this category. Moving on.`);
+          break; // Žádné další produkty, přechod na další kategorii
+        }
+
+        allProducts.push(...productsFromPage);
+        console.log(`Found ${productsFromPage.length} products on page ${page}. Total products so far: ${allProducts.length}`);
+        page++;
+
+        if (page > 50) { // Pojistka proti nekonečným smyčkám
+          console.log("Page limit reached for this category, moving on.");
+          break;
+        }
+      }
     }
     
-    // Odstranění duplicitních produktů podle ID
+    // Odstranění duplicit na základě ID produktu
     const uniqueProducts = Array.from(new Map(allProducts.map(item => [item.id, item])).values());
     console.log(`Found ${uniqueProducts.length} unique products in total. Upserting to database...`);
 

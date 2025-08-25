@@ -20,12 +20,6 @@
     },
     "types": ["vite/client"]
   },
-  "include": [
-    "src",
-    "vite.config.ts",
-    "postcss.config.js",
-    "tailwind.config.ts",
-    "eslint.config.js"
-  ],
-  "exclude": ["node_modules", "supabase"]
+  "include": ["src"],
+  "exclude": ["supabase"]
 }

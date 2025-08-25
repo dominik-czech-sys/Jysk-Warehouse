@@ -10,8 +10,6 @@ export default [
     // Globální ignorování pro všechny nástroje
     ignores: ["dist/", "node_modules/", "supabase/"],
   },
-  // Konfigurace pro JavaScript soubory
-  pluginJs.configs.recommended,
   // Konfigurace pro TypeScript a React soubory (POUZE VE SLOŽCE `src`)
   {
     files: ["src/**/*.{ts,tsx}"],
@@ -28,6 +26,7 @@ export default [
       },
     },
     rules: {
+      ...pluginJs.configs.recommended.rules,
       ...tseslint.configs.recommended.rules,
       ...pluginReactConfig.rules,
       ...hooksPlugin.configs.recommended.rules,
