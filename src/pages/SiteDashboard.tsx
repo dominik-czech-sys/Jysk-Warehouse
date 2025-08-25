@@ -22,6 +22,7 @@ import { ScrapeDataSection } from "@/components/dashboard/ScrapeDataSection";
 import { AnnouncementManagementSection } from "@/components/dashboard/AnnouncementManagementSection";
 import { AuditScoresChart } from "@/components/dashboard/charts/AuditScoresChart";
 import { ArticleStatusChart } from "@/components/dashboard/ArticleStatusChart";
+import { TaskStatusChart } from "@/components/dashboard/charts/TaskStatusChart";
 
 const SiteDashboard: React.FC = () => {
   const { isAdmin, hasPermission } = useAuth();
@@ -110,9 +111,10 @@ const SiteDashboard: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="analytics" className="mt-4">
-            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
                 <AuditScoresChart />
                 <ArticleStatusChart />
+                <TaskStatusChart />
             </div>
           </TabsContent>
 

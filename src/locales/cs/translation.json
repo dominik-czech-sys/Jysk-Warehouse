@@ -643,6 +643,8 @@
       "totalRacks": "Celkem Regálů",
       "usersPerStore": "Uživatelé dle Obchodu",
       "articleStatusDistribution": "Rozložení Statusů Artiků",
+      "taskStatusDistribution": "Rozložení stavu úkolů",
+      "taskStatusDistributionDescription": "Přehled úkolů podle jejich aktuálního stavu.",
       "todoList": "Seznam Úkolů",
       "todoListDescription": "Funkce ve vývoji nebo vyžadující pozornost."
     },
