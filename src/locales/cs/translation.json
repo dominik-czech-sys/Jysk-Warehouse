@@ -294,6 +294,81 @@
       "searchArticleLocation": "Vyhledat Umístění Artiklu",
       "articleLocation": "Umístění Artiklu",
       "viewArticleLocation": "Zde se zobrazí umístění hledaného artiklu."
+    },
+    "task": {
+      "taskManagement": "Správa úkolů",
+      "addTask": "Přidat úkol",
+      "editTask": "Upravit úkol",
+      "taskList": "Seznam úkolů",
+      "loadingTasks": "Načítání úkolů...",
+      "title": "Název",
+      "description": "Popis",
+      "status": "Stav",
+      "priority": "Priorita",
+      "dueDate": "Termín splnění",
+      "assignedTo": "Přiřazeno",
+      "statusNew": "Nový",
+      "statusInProgress": "V řešení",
+      "statusCompleted": "Dokončeno",
+      "priorityLow": "Nízká",
+      "priorityMedium": "Střední",
+      "priorityHigh": "Vysoká",
+      "selectUser": "Vyberte uživatele",
+      "pickDate": "Vyberte datum",
+      "editTaskDescription": "Upravte detaily existujícího úkolu.",
+      "addTaskDescription": "Vyplňte detaily pro vytvoření nového úkolu.",
+      "titleRequired": "Název úkolu je povinný.",
+      "addSuccess": "Úkol byl úspěšně přidán.",
+      "updateSuccess": "Úkol byl úspěšně aktualizován.",
+      "deleteSuccess": "Úkol byl úspěšně smazán.",
+      "confirmDeleteTitle": "Opravdu chcete smazat tento úkol?",
+      "confirmDeleteDescription": "Tato akce je nevratná. Úkol '{{taskTitle}}' bude trvale odstraněn.",
+      "errorFetchingUsers": "Nepodařilo se načíst uživatele z obchodu."
+    },
+    "permission": {
+      "user": {
+        "view": "Zobrazit uživatele",
+        "create": "Vytvořit uživatele",
+        "update": "Upravit uživatele",
+        "delete": "Smazat uživatele"
+      },
+      "store": {
+        "view": "Zobrazit obchody",
+        "create": "Vytvořit obchod",
+        "update": "Upravit obchod",
+        "delete": "Smazat obchod"
+      },
+      "rack": {
+        "view": "Zobrazit regály",
+        "create": "Vytvořit regál",
+        "update": "Upravit regál",
+        "delete": "Smazat regál"
+      },
+      "article": {
+        "view": "Zobrazit artikly",
+        "create": "Vytvořit artikl",
+        "update": "Upravit artikl",
+        "delete": "Smazat artikl",
+        "scan": "Skenovat artikly",
+        "massAdd": "Hromadně přidávat artikly",
+        "transfer": "Přesouvat artikly",
+        "copyFromStore": "Kopírovat artikly z obchodu"
+      },
+      "log": {
+        "view": "Zobrazit logy"
+      },
+      "defaultArticles": {
+        "manage": "Spravovat globální artikly"
+      },
+      "helpPosts": {
+        "manage": "Spravovat články nápovědy"
+      },
+      "task": {
+        "view": "Zobrazit úkoly",
+        "create": "Vytvořit úkol",
+        "update": "Upravit úkol",
+        "delete": "Smazat úkol"
+      }
     }
   }
 }

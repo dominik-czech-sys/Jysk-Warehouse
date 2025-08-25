@@ -16,6 +16,7 @@ import ExportDataPage from "./pages/ExportDataPage";
 import AccountSettingsPage from "./pages/AccountSettingsPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
 import ManageHelpPostsPage from "./pages/ManageHelpPostsPage";
+import TaskManagementPage from "./pages/TaskManagementPage"; // Import
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
@@ -68,6 +69,7 @@ const AppContent = () => {
         <Route path="/help-center" element={<PrivateRoute><HelpCenterPage /></PrivateRoute>} />
         <Route path="/admin/help-posts" element={<PrivateRoute requiredPermission="help_posts:manage"><ManageHelpPostsPage /></PrivateRoute>} />
         <Route path="/doplnovani" element={<PrivateRoute><ReplenishmentPage /></PrivateRoute>} />
+        <Route path="/ukoly" element={<PrivateRoute requiredPermission="task:view"><TaskManagementPage /></PrivateRoute>} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

@@ -14,6 +14,7 @@ import {
   RefreshCw,
   Settings,
   Globe,
+  ClipboardList,
 } from "lucide-react";
 import { MobileSidebar } from "@/components/MobileSidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -63,6 +64,12 @@ const MainLayout: React.FC = () => {
       </NavLink>
 
       <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.management")}</h3>
+      {hasPermission("task:view") && (
+        <NavLink to="/ukoly" className={navLinkClasses}>
+          <ClipboardList className="h-4 w-4" />
+          {t("common.task.taskManagement")}
+        </NavLink>
+      )}
       {hasPermission("article:view") && (
         <NavLink to="/spravovat-artikly" className={navLinkClasses}>
           <Boxes className="h-4 w-4" />

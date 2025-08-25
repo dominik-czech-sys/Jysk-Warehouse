@@ -17,6 +17,7 @@ import {
   RefreshCw,
   Settings,
   Globe,
+  ClipboardList,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
@@ -71,6 +72,12 @@ export const MobileSidebar: React.FC = () => {
       </NavLink>
 
       <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.management")}</h3>
+      {hasPermission("task:view") && (
+        <NavLink to="/ukoly" className={navLinkClasses} onClick={closeSheet}>
+          <ClipboardList className="h-5 w-5" />
+          {t("common.task.taskManagement")}
+        </NavLink>
+      )}
       {hasPermission("article:view") && (
         <NavLink to="/spravovat-artikly" className={navLinkClasses} onClick={closeSheet}>
           <Boxes className="h-5 w-5" />

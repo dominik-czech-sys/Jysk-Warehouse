@@ -22,11 +22,12 @@ const allPermissions: Permission[] = [
   "user:view", "user:create", "user:update", "user:delete",
   "store:view", "store:create", "store:update", "store:delete",
   "rack:view", "rack:create", "rack:update", "rack:delete",
-  "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add", "article:transfer", // Added article:transfer
+  "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add", "article:transfer",
   "log:view",
   "default_articles:manage",
   "article:copy_from_store",
-  "help_posts:manage", // New permission
+  "help_posts:manage",
+  "task:view", "task:create", "task:update", "task:delete",
 ];
 
 const permissionDescriptions: Record<Permission, string> = {
@@ -48,11 +49,15 @@ const permissionDescriptions: Record<Permission, string> = {
   "article:delete": "permission.article.delete",
   "article:scan": "permission.article.scan",
   "article:mass_add": "permission.article.massAdd",
-  "article:transfer": "permission.article.transfer", // Added description for article:transfer
+  "article:transfer": "permission.article.transfer",
   "log:view": "permission.log.view",
   "default_articles:manage": "permission.defaultArticles.manage",
   "article:copy_from_store": "permission.article.copyFromStore",
-  "help_posts:manage": "permission.helpPosts.manage", // New permission description
+  "help_posts:manage": "permission.helpPosts.manage",
+  "task:view": "permission.task.view",
+  "task:create": "permission.task.create",
+  "task:update": "permission.task.update",
+  "task:delete": "permission.task.delete",
 };
 
 interface UserFormDialogProps {
