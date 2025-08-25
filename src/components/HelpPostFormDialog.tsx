@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea"; // Correct import for Texta
 import { HelpPost } from "@/data/helpPosts";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Import Select components
 
 interface HelpPostFormDialogProps {
   isOpen: boolean;
@@ -36,6 +37,7 @@ export const HelpPostFormDialog: React.FC<HelpPostFormDialogProps> = ({
     content: "",
     keywords: [],
     category: "",
+    targetAudience: "all", // Default for new posts
   });
   const [keywordsInput, setKeywordsInput] = useState("");
 
@@ -50,6 +52,7 @@ export const HelpPostFormDialog: React.FC<HelpPostFormDialogProps> = ({
         content: "",
         keywords: [],
         category: "",
+        targetAudience: "all", // Default for new posts
       });
       setKeywordsInput("");
     }
@@ -62,6 +65,10 @@ export const HelpPostFormDialog: React.FC<HelpPostFormDialogProps> = ({
 
   const handleKeywordsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setKeywordsInput(e.target.value);
+  };
+
+  const handleTargetAudienceChange = (value: "all" | "admin") => {
+    setFormData((prev) => ({ ...prev, targetAudience: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -149,6 +156,20 @@ export const HelpPostFormDialog: React.FC<HelpPostFormDialogProps> = ({
               className="col-span-3"
               placeholder="Klíčová slova oddělená čárkou (např. vyhledat, artikl, sklad)"
             />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="targetAudience" className="sm:text-right">
+              {t("common.targetAudience")}
+            </Label>
+            <Select onValueChange={handleTargetAudienceChange} value={formData.targetAudience} >
+              <SelectTrigger className="col-span-3">
+                <SelectValue placeholder={t("common.selectTargetAudience")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("common.audienceAllUsers")}</SelectItem>
+                <SelectItem value="admin">{t("common.audienceAdminOnly")}</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <DialogFooter className="col-span-full mt-4">

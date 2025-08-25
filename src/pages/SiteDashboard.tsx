@@ -9,10 +9,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Copy, Users as UsersIcon, Package, Warehouse as WarehouseIcon, Download, LifeBuoy } from "lucide-react";
+import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Copy, Users as UsersIcon, Package, Warehouse as WarehouseIcon, Download, LifeBuoy, BookOpen } from "lucide-react"; // Added BookOpen icon
 import { UserFormDialog } from "@/components/UserFormDialog";
 import { StoreFormDialog } from "@/components/StoreFormDialog";
 import { ArticleCopyDialog } from "@/components/ArticleCopyDialog";
+import { AdminFAQDialog } from "@/components/AdminFAQDialog"; // Import AdminFAQDialog
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -56,6 +57,7 @@ const SiteDashboard: React.FC = () => {
 
   const [isLogViewerOpen, setIsLogViewerOpen] = useState(false);
   const [isArticleCopyDialogOpen, setIsArticleCopyDialogOpen] = useState(false);
+  const [isAdminFAQDialogOpen, setIsAdminFAQDialogOpen] = useState(false); // New state for Admin FAQ
 
   // Statistics
   const totalUsers = allUsers.length;
@@ -354,6 +356,20 @@ const SiteDashboard: React.FC = () => {
 
         <Separator className="my-6 sm:my-8" />
 
+        {/* Admin Tutorials Section */}
+        {isAdmin && ( // Only show for admins
+          <div className="mb-6 sm:mb-8 w-full animate-fade-in">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("common.adminFaq.adminTutorialsTitle")}</h2>
+              <Button onClick={() => setIsAdminFAQDialogOpen(true)} className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
+                <BookOpen className="h-4 w-4 mr-2" /> {t("common.adminFaq.viewTutorials")}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <Separator className="my-6 sm:my-8" />
+
         {/* Log Viewer Section */}
         {hasPermission("log:view") && (
           <div className="mb-6 sm:mb-8 w-full animate-fade-in">
@@ -455,6 +471,8 @@ const SiteDashboard: React.FC = () => {
       />
 
       <LogViewer isOpen={isLogViewerOpen} onClose={() => setIsLogViewerOpen(false)} />
+
+      <AdminFAQDialog isOpen={isAdminFAQDialogOpen} onClose={() => setIsAdminFAQDialogOpen(false)} />
     </div>
   );
 };
