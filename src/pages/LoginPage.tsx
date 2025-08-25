@@ -30,6 +30,7 @@ const LoginPage: React.FC = () => {
             appearance={{ theme: ThemeSupa }}
             providers={[]}
             view="sign_in"
+            showLinks={false} // This will hide the "Don't have an account? Sign up" link
             localization={{
               variables: {
                 sign_in: {
