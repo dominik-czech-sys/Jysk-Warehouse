@@ -1,14 +1,12 @@
-import { Article } from "@/data/articles"; // Import Article type
-
 export type Permission =
   | "user:view"
   | "user:create"
   | "user:update"
   | "user:delete"
-  | "store:view" // New permission for viewing stores
-  | "store:create" // New permission for creating stores
-  | "store:update" // New permission for updating stores
-  | "store:delete" // New permission for deleting stores
+  | "store:view"
+  | "store:create"
+  | "store:update"
+  | "store:delete"
   | "rack:view"
   | "rack:create"
   | "rack:update"
@@ -19,44 +17,43 @@ export type Permission =
   | "article:delete"
   | "article:scan"
   | "article:mass_add"
-  | "article:transfer" // NEW: Permission for transferring articles between stores
+  | "article:transfer"
   | "log:view"
-  | "default_articles:manage" // New permission for managing default articles
-  | "article:copy_from_store" // New permission for copying articles from other stores
-  | "help_posts:manage"; // New permission for managing help posts
+  | "default_articles:manage"
+  | "article:copy_from_store"
+  | "help_posts:manage";
 
 export interface User {
   username: string;
-  password: string; // This will now store hashed passwords
-  role: "admin" | "vedouci_skladu" | "store_manager" | "deputy_store_manager" | "ar_assistant_of_sale" | "skladnik"; // admin or store-specific roles
-  storeId?: string; // Which store this user belongs to
-  permissions: Permission[]; // Array of specific permissions
-  firstLogin: boolean; // New field to track if it's the user's first login
+  password: string;
+  role: "admin" | "vedouci_skladu" | "store_manager" | "deputy_store_manager" | "ar_assistant_of_sale" | "skladnik";
+  storeId?: string;
+  permissions: Permission[];
+  firstLogin: boolean;
 }
 
-// Default permissions for each role
 export const defaultPermissions: Record<User['role'], Permission[]> = {
   "admin": [
     "user:view", "user:create", "user:update", "user:delete",
     "store:view", "store:create", "store:update", "store:delete",
     "rack:view", "rack:create", "rack:update", "rack:delete",
-    "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add", "article:transfer", // Added article:transfer
+    "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add", "article:transfer",
     "log:view",
-    "default_articles:manage", // Admin can manage global articles
+    "default_articles:manage",
     "article:copy_from_store",
-    "help_posts:manage", // Admin can manage help posts
+    "help_posts:manage",
   ],
   "vedouci_skladu": [
-    "user:view", "user:create", "user:update", "user:delete", // Can manage users in their store
+    "user:view", "user:create", "user:update", "user:delete",
     "rack:view", "rack:create", "rack:update", "rack:delete",
-    "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add", "article:transfer", // Added article:transfer
+    "article:view", "article:create", "article:update", "article:delete", "article:scan", "article:mass_add", "article:transfer",
     "log:view",
     "article:copy_from_store",
   ],
   "store_manager": [
-    "user:view", "user:update", // Can view and update users in their store
+    "user:view", "user:update",
     "rack:view", "rack:update",
-    "article:view", "article:create", "article:update", "article:scan", "article:mass_add", "article:transfer", // Added article:transfer
+    "article:view", "article:create", "article:update", "article:scan", "article:mass_add", "article:transfer",
     "log:view",
   ],
   "deputy_store_manager": [
@@ -71,14 +68,3 @@ export const defaultPermissions: Record<User['role'], Permission[]> = {
     "rack:view",
   ],
 };
-
-// Initial users - passwords will be hashed on first run or when added/updated
-export const users: User[] = [
-  {
-    username: "Dczech",
-    password: "koplkoplko1A", // This will be hashed
-    role: "admin",
-    permissions: defaultPermissions["admin"],
-    firstLogin: true,
-  }
-];

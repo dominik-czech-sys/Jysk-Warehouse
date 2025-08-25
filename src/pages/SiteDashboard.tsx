@@ -6,8 +6,6 @@ import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useStores } from "@/data/stores";
-import { useArticles } from "@/data/articles";
-import { useShelfRacks } from "@/data/shelfRacks";
 import { useDashboard } from "@/contexts/DashboardContext";
 import {
   DropdownMenu,
@@ -15,15 +13,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserManagementSection } from "@/components/dashboard/UserManagementSection.tsx";
-import { StoreManagementSection } from "@/components/dashboard/StoreManagementSection.tsx";
-import { HelpPostManagementSection } from "@/components/dashboard/HelpPostManagementSection.tsx";
-import { AdminTutorialsSection } from "@/components/dashboard/AdminTutorialsSection.tsx";
-import { LogViewerSection } from "@/components/dashboard/LogViewerSection.tsx";
-import { ExportDataSection } from "@/components/dashboard/ExportDataSection.tsx";
+import { UserManagementSection } from "@/components/dashboard/UserManagementSection";
+import { StoreManagementSection } from "@/components/dashboard/StoreManagementSection";
+import { HelpPostManagementSection } from "@/components/dashboard/HelpPostManagementSection";
+import { AdminTutorialsSection } from "@/components/dashboard/AdminTutorialsSection";
+import { LogViewerSection } from "@/components/dashboard/LogViewerSection";
+import { ExportDataSection } from "@/components/dashboard/ExportDataSection";
 import { ArticleOverviewWidget } from "@/components/widgets/ArticleOverviewWidget";
 import { LowStockAlertsWidget } from "@/components/widgets/LowStockAlertsWidget";
-import { Card, CardContent, CardTitle } from "@/components/ui/card"; // Import Card components for access denied
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 
 // Map widget component names to actual components
 const widgetComponents: { [key: string]: React.FC<{ id: string }> } = {
@@ -32,7 +30,7 @@ const widgetComponents: { [key: string]: React.FC<{ id: string }> } = {
 };
 
 const SiteDashboard: React.FC = () => {
-  const { allUsers, addUser, updateUser, deleteUser, isAdmin, hasPermission, user: currentUser } = useAuth();
+  const { isAdmin, hasPermission, user: currentUser } = useAuth();
   const { stores, addStore, updateStore, deleteStore } = useStores();
   const { t } = useTranslation();
   const { widgets, addWidget, availableWidgets } = useDashboard();
@@ -50,7 +48,7 @@ const SiteDashboard: React.FC = () => {
     }
   };
 
-  if (!hasPermission("store:view") && !hasPermission("user:view")) {
+  if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-2 sm:p-4">
         <Card className="p-4 sm:p-6 text-center">
@@ -127,15 +125,7 @@ const SiteDashboard: React.FC = () => {
 
         <Separator className="my-6 sm:my-8" />
 
-        <UserManagementSection
-          allUsers={allUsers}
-          addUser={addUser}
-          updateUser={updateUser}
-          deleteUser={deleteUser}
-          hasPermission={hasPermission}
-          isAdmin={isAdmin}
-          currentUser={currentUser}
-        />
+        <UserManagementSection />
 
         <Separator className="my-6 sm:my-8" />
 

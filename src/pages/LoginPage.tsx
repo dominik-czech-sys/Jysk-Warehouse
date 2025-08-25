@@ -1,38 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { IframeViewer } from "@/components/IframeViewer";
 import { useTranslation } from "react-i18next";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { supabase } from "@/integrations/supabase/client";
 
 const LoginPage: React.FC = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [iframeSrc, setIframeSrc] = useState<string | null>(null);
   const { t } = useTranslation();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const success = await login(username, password);
-    if (success) {
-      navigate("/");
-    } else {
-      // toast.error is already called in AuthContext
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/", { replace: true });
     }
-  };
-
-  const handleOpenIframe = (url: string) => {
-    setIframeSrc(url);
-  };
-
-  const handleCloseIframe = () => {
-    setIframeSrc(null);
-  };
+  }, [isAuthenticated, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-2 sm:p-4">
@@ -41,54 +25,34 @@ const LoginPage: React.FC = () => {
           <CardTitle className="text-3xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("common.loginTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-            <div>
-              <Label htmlFor="username">{t("common.username")}</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder={t("common.enterUsername")}
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="password">{t("common.password")}</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder={t("common.enterPassword")}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="mt-1"
-              />
-            </div>
-            <Button type="submit" className="w-full bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
-              {t("common.login")}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full mt-2 border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light"
-              onClick={() => handleOpenIframe("https://myjysk.thinktime.com/ui/dashboards/177")}
-            >
-              {t("common.goToMyJysk")}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full mt-2 border-jyskBlue-dark text-jyskBlue-dark hover:bg-jyskBlue-light hover:text-jyskBlue-foreground dark:border-jyskBlue-light dark:text-jyskBlue-light"
-              onClick={() => handleOpenIframe("http://storefront.jysk.com/")}
-            >
-              {t("common.goToStoreFront")}
-            </Button>
-          </form>
+          <Auth
+            supabaseClient={supabase}
+            appearance={{ theme: ThemeSupa }}
+            providers={[]}
+            localization={{
+              variables: {
+                sign_in: {
+                  email_label: t("common.email"),
+                  password_label: t("common.password"),
+                  button_label: t("common.login"),
+                  email_input_placeholder: t("common.enterEmail"),
+                  password_input_placeholder: t("common.enterPassword"),
+                },
+                sign_up: {
+                  email_label: t("common.email"),
+                  password_label: t("common.password"),
+                  button_label: "Registrovat se",
+                  email_input_placeholder: t("common.enterEmail"),
+                  password_input_placeholder: t("common.enterPassword"),
+                },
+                forgotten_password: {
+                  link_text: "Zapomněli jste heslo?",
+                },
+              },
+            }}
+          />
         </CardContent>
       </Card>
-      <IframeViewer src={iframeSrc} onClose={handleCloseIframe} />
     </div>
   );
 };
