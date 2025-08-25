@@ -293,7 +293,29 @@
     "helpPosts": "Help Articles",
     "noHelpPostsFound": "No help articles found.",
     "category": "Category",
-    "keywords": "Keywords"
+    "keywords": "Keywords",
+    "helpPostManagement": "Help Article Management",
+    "manageHelpPosts": "Manage Help Articles",
+    "helpPostId": "Help Article ID",
+    "helpPostTitle": "Help Article Title",
+    "content": "Content",
+    "addHelpPost": "Add Help Article",
+    "editHelpPost": "Edit Help Article",
+    "editHelpPostDescription": "Here you can edit the details of a help article.",
+    "addHelpPostDescription": "Here you can add a new help article.",
+    "fillAllHelpPostFields": "Please fill in all fields for the help article.",
+    "helpPostExists": "Help article with ID {{postId}} already exists.",
+    "attemptToAddExistingHelpPost": "Attempt to add existing help article",
+    "helpPostAddedSuccess": "Help article {{postId}} successfully added.",
+    "helpPostAdded": "Help article added",
+    "helpPostUpdatedSuccess": "Help article {{postId}} successfully updated.",
+    "helpPostUpdated": "Help article updated",
+    "helpPostDeletedSuccess": "Help article {{postId}} successfully deleted.",
+    "helpPostDeleted": "Help article deleted",
+    "confirmDeleteHelpPostTitle": "Confirm Help Article Deletion",
+    "confirmDeleteHelpPostDescription": "Are you sure you want to delete help article <strong>{{postId}}</strong>? This action cannot be undone.",
+    "noPermissionToManageHelpPosts": "You do not have permission to manage help articles.",
+    "backToAdminDashboard": "Back to Admin Dashboard"
   },
   "permission": {
     "user": {
@@ -328,6 +350,9 @@
     },
     "defaultArticles": {
       "manage": "Manage Global Articles"
+    },
+    "helpPosts": {
+      "manage": "Manage Help Articles"
     }
   },
   "logCategory": {

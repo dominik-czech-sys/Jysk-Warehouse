@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, LogOut, Users, Boxes, Warehouse, KeyRound, Settings, Home, Download } from "lucide-react";
+import { Menu, LogOut, Users, Boxes, Warehouse, KeyRound, Settings, Home, Download, LifeBuoy } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -42,9 +42,9 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({ onLogout }) => {
         <SheetHeader>
           <SheetTitle className="text-2xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("common.menu")}</SheetTitle>
         </SheetHeader>
-        <div className="flex-grow flex flex-col space-y-4 py-4">
+        <div className="flex-grow flex flex-col space-y-4 py-4 overflow-y-auto">
           {user && (
-            <div className="text-sm text-gray-700 dark:text-gray-300 mb-4">
+            <div className="text-sm text-gray-700 dark:text-gray-300 mb-4 px-3">
               <p className="font-semibold">{t("common.loggedInAs")}: {user.username}</p>
               <p>({user.role === "admin" ? t("common.admin") : t("common.warehouseWorkerStore", { storeId: userStoreId })})</p>
             </div>
@@ -90,22 +90,34 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({ onLogout }) => {
               <Settings className="h-5 w-5" />
               {t("common.accountSettings")}
             </Link>
+
+            <Link to="/help-center" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary" onClick={() => setIsOpen(false)}>
+              <LifeBuoy className="h-5 w-5" />
+              {t("common.helpCenter")}
+            </Link>
+
+            {hasPermission("help_posts:manage") && (
+              <Link to="/admin/help-posts" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary" onClick={() => setIsOpen(false)}>
+                <LifeBuoy className="h-5 w-5" />
+                {t("common.manageHelpPosts")}
+              </Link>
+            )}
           </nav>
 
           <Separator />
 
-          <div className="flex flex-col space-y-2">
-            <div className="flex items-center justify-between px-3 py-2">
+          <div className="flex flex-col space-y-2 px-3">
+            <div className="flex items-center justify-between py-2">
               <span className="text-sm font-medium text-muted-foreground">{t("common.theme")}</span>
               <ThemeToggle />
             </div>
-            <div className="flex items-center justify-between px-3 py-2">
+            <div className="flex items-center justify-between py-2">
               <span className="text-sm font-medium text-muted-foreground">{t("common.changeLanguage")}</span>
               <LanguageSwitcher />
             </div>
           </div>
         </div>
-        <div className="mt-auto flex flex-col space-y-2">
+        <div className="mt-auto flex flex-col space-y-2 p-3 border-t">
           <Button onClick={onLogout} className="w-full flex items-center bg-destructive hover:bg-destructive/90 text-destructive-foreground">
             <LogOut className="h-4 w-4 mr-2" /> {t("common.logout")}
           </Button>

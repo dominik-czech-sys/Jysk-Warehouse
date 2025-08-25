@@ -21,7 +21,8 @@ export type Permission =
   | "article:mass_add"
   | "log:view"
   | "default_articles:manage" // New permission for managing default articles
-  | "article:copy_from_store"; // New permission for copying articles from other stores
+  | "article:copy_from_store" // New permission for copying articles from other stores
+  | "help_posts:manage"; // New permission for managing help posts
 
 export interface User {
   username: string;
@@ -41,6 +42,7 @@ export const defaultPermissions: Record<User['role'], Permission[]> = {
     "log:view",
     "default_articles:manage", // Admin can manage global articles
     "article:copy_from_store",
+    "help_posts:manage", // Admin can manage help posts
   ],
   "vedouci_skladu": [
     "user:view", "user:create", "user:update", "user:delete", // Can manage users in their store

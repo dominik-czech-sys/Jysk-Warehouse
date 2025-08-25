@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Copy, Users as UsersIcon, Package, Warehouse as WarehouseIcon, Download } from "lucide-react";
+import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Copy, Users as UsersIcon, Package, Warehouse as WarehouseIcon, Download, LifeBuoy } from "lucide-react";
 import { UserFormDialog } from "@/components/UserFormDialog";
 import { StoreFormDialog } from "@/components/StoreFormDialog";
 import { ArticleCopyDialog } from "@/components/ArticleCopyDialog";
@@ -333,6 +333,22 @@ const SiteDashboard: React.FC = () => {
             {filteredUsers.length === 0 && (
               <p className="text-center text-muted-foreground mt-4">{t("common.noUsersFound")}</p>
             )}
+          </div>
+        )}
+
+        <Separator className="my-6 sm:my-8" />
+
+        {/* Help Post Management Section */}
+        {hasPermission("help_posts:manage") && (
+          <div className="mb-6 sm:mb-8 w-full animate-fade-in">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("common.helpPostManagement")}</h2>
+              <Link to="/admin/help-posts" className="w-full sm:w-auto">
+                <Button className="flex items-center bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground w-full">
+                  <LifeBuoy className="h-4 w-4 mr-2" /> {t("common.manageHelpPosts")}
+                </Button>
+              </Link>
+            </div>
           </div>
         )}
 

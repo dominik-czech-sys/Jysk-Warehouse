@@ -15,6 +15,7 @@ import ManageShelfRacksPage from "./pages/ManageShelfRacksPage";
 import ExportDataPage from "./pages/ExportDataPage"; // Import ExportDataPage
 import AccountSettingsPage from "./pages/AccountSettingsPage"; // Import AccountSettingsPage
 import HelpCenterPage from "./pages/HelpCenterPage"; // Import HelpCenterPage
+import ManageHelpPostsPage from "./pages/ManageHelpPostsPage"; // Import ManageHelpPostsPage
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { useContext } from "react";
@@ -127,6 +128,14 @@ const AppContent = () => {
         element={
           <PrivateRoute>
             <HelpCenterPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/admin/help-posts"
+        element={
+          <PrivateRoute requiredPermission="help_posts:manage">
+            <ManageHelpPostsPage />
           </PrivateRoute>
         }
       />

@@ -26,6 +26,7 @@ const allPermissions: Permission[] = [
   "log:view",
   "default_articles:manage",
   "article:copy_from_store",
+  "help_posts:manage", // New permission
 ];
 
 const permissionDescriptions: Record<Permission, string> = {
@@ -50,6 +51,7 @@ const permissionDescriptions: Record<Permission, string> = {
   "log:view": "permission.log.view",
   "default_articles:manage": "permission.defaultArticles.manage",
   "article:copy_from_store": "permission.article.copyFromStore",
+  "help_posts:manage": "permission.helpPosts.manage", // New permission description
 };
 
 interface UserFormDialogProps {
@@ -204,6 +206,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
                 onValueChange={handleStoreSelect}
                 value={formData.storeId || ""}
                 disabled={isStoreSelectDisabled}
+                key={availableStores.length} {/* Added key to force re-render */}
               >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder={t("common.selectStore")} />

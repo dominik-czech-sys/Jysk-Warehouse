@@ -293,7 +293,29 @@
     "helpPosts": "Články nápovědy",
     "noHelpPostsFound": "Nebyly nalezeny žádné články nápovědy.",
     "category": "Kategorie",
-    "keywords": "Klíčová slova"
+    "keywords": "Klíčová slova",
+    "helpPostManagement": "Správa článků nápovědy",
+    "manageHelpPosts": "Spravovat články nápovědy",
+    "helpPostId": "ID článku nápovědy",
+    "helpPostTitle": "Název článku nápovědy",
+    "content": "Obsah",
+    "addHelpPost": "Přidat článek nápovědy",
+    "editHelpPost": "Upravit článek nápovědy",
+    "editHelpPostDescription": "Zde můžete upravit detaily článku nápovědy.",
+    "addHelpPostDescription": "Zde můžete přidat nový článek nápovědy.",
+    "fillAllHelpPostFields": "Vyplňte prosím všechna pole pro článek nápovědy.",
+    "helpPostExists": "Článek nápovědy s ID {{postId}} již existuje.",
+    "attemptToAddExistingHelpPost": "Pokus o přidání existujícího článku nápovědy",
+    "helpPostAddedSuccess": "Článek nápovědy {{postId}} byl úspěšně přidán.",
+    "helpPostAdded": "Článek nápovědy přidán",
+    "helpPostUpdatedSuccess": "Článek nápovědy {{postId}} byl úspěšně aktualizován.",
+    "helpPostUpdated": "Článek nápovědy aktualizován",
+    "helpPostDeletedSuccess": "Článek nápovědy {{postId}} byl úspěšně smazán.",
+    "helpPostDeleted": "Článek nápovědy smazán",
+    "confirmDeleteHelpPostTitle": "Potvrdit smazání článku nápovědy",
+    "confirmDeleteHelpPostDescription": "Opravdu chcete smazat článek nápovědy <strong>{{postId}}</strong>? Tato akce je nevratná.",
+    "noPermissionToManageHelpPosts": "Nemáte oprávnění spravovat články nápovědy.",
+    "backToAdminDashboard": "Zpět na přehled administrace"
   },
   "permission": {
     "user": {
@@ -328,6 +350,9 @@
     },
     "defaultArticles": {
       "manage": "Spravovat globální artikly"
+    },
+    "helpPosts": {
+      "manage": "Spravovat články nápovědy"
     }
   },
   "logCategory": {

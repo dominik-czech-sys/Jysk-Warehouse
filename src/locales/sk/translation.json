@@ -109,7 +109,7 @@
     "articleAddedToList": "Článok {{articleId}} pridaný do zoznamu.",
     "articleRemovedFromList": "Článok {{articleId}} odstránený zo zoznamu.",
     "noArticlesToSave": "Nie sú žiadne články na uloženie.",
-    "articlesSavedSuccess": "Úspešne uložených {{count}} článkov.",
+    "articlesSavedSuccess": "Úspešne skopírovaných {{count}} článkov.",
     "barcodeScannedMassAdd": "Čiarový kód naskenovaný pre hromadné pridanie",
     "articleUpdatedMassAdd": "Článok aktualizovaný (hromadné pridanie)",
     "articleAddedMassAdd": "Článok pridaný (hromadné pridanie)",
@@ -293,7 +293,29 @@
     "helpPosts": "Články pomoci",
     "noHelpPostsFound": "Neboli nájdené žiadne články pomoci.",
     "category": "Kategória",
-    "keywords": "Kľúčové slová"
+    "keywords": "Kľúčové slová",
+    "helpPostManagement": "Správa článkov pomoci",
+    "manageHelpPosts": "Spravovať články pomoci",
+    "helpPostId": "ID článku pomoci",
+    "helpPostTitle": "Názov článku pomoci",
+    "content": "Obsah",
+    "addHelpPost": "Pridať článok pomoci",
+    "editHelpPost": "Upraviť článok pomoci",
+    "editHelpPostDescription": "Tu môžete upraviť detaily článku pomoci.",
+    "addHelpPostDescription": "Tu môžete pridať nový článok pomoci.",
+    "fillAllHelpPostFields": "Vyplňte prosím všetky polia pre článok pomoci.",
+    "helpPostExists": "Článok pomoci s ID {{postId}} už existuje.",
+    "attemptToAddExistingHelpPost": "Pokus o pridanie existujúceho článku pomoci",
+    "helpPostAddedSuccess": "Článok pomoci {{postId}} bol úspešne pridaný.",
+    "helpPostAdded": "Článok pomoci pridaný",
+    "helpPostUpdatedSuccess": "Článok pomoci {{postId}} bol úspešne aktualizovaný.",
+    "helpPostUpdated": "Článok pomoci aktualizovaný",
+    "helpPostDeletedSuccess": "Článok pomoci {{postId}} bol úspešne vymazaný.",
+    "helpPostDeleted": "Článok pomoci vymazaný",
+    "confirmDeleteHelpPostTitle": "Potvrdiť vymazanie článku pomoci",
+    "confirmDeleteHelpPostDescription": "Naozaj chcete vymazať článok pomoci <strong>{{postId}}</strong>? Táto akcia je nevratná.",
+    "noPermissionToManageHelpPosts": "Nemáte oprávnenie spravovať články pomoci.",
+    "backToAdminDashboard": "Späť na prehľad administrácie"
   },
   "permission": {
     "user": {
@@ -328,6 +350,9 @@
     },
     "defaultArticles": {
       "manage": "Spravovať globálne články"
+    },
+    "helpPosts": {
+      "manage": "Spravovať články pomoci"
     }
   },
   "logCategory": {
