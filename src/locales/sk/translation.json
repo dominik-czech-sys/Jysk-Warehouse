@@ -1,7 +1,7 @@
 {
   "common": {
     "welcomeUser": "Vitajte, {username}!",
-    "invalidCredentials": "Neplatné používateľské meno alebo heslo.",
+    "invalidCredentials": "Neplatné prihlasovacie údaje.",
     "loggedOut": "Boli ste odhlásení.",
     "userLoggedIn": "Používateľ sa prihlásil",
     "userLoggedOut": "Používateľ sa odhlásil",
@@ -53,6 +53,16 @@
     "email": "E-mail",
     "enterEmail": "Zadajte váš e-mail",
     "signUp": "Zaregistrovať sa",
+    "signUpTitle": "Vytvoriť nový účet",
+    "signUpDescription": "Vyplňte formulár pre vytvorenie nového účtu.",
+    "signingUp": "Registrácia...",
+    "alreadyHaveAccount": "Už máte účet?",
+    "noAccount": "Nemáte účet?",
+    "signUpSuccessTitle": "Registrácia úspešná!",
+    "signUpSuccessMessage": "Váš účet bol vytvorený. Teraz musí byť schválený administrátorom.",
+    "accountNotApproved": "Váš účet ešte nebol schválený administrátorom. Skúste to prosím neskôr.",
+    "firstName": "Meno",
+    "lastName": "Priezvisko",
     "viewExternalContent": "Zobraziť externý obsah",
     "scanBarcodeTitle": "Skenovať čiarový kód",
     "ensureBarcodeVisible": "Uistite sa, že je čiarový kód dobre viditeľný v rámčeku.",
@@ -476,6 +486,18 @@
     "shopFloorStock": "Zásoba na predajni",
     "replenishmentTrigger": "Limit pre doplnenie",
     "noArticlesToReplenish": "Žiadne artikle na doplnenie.",
-    "hasShopFloorStock": "Artikul má zásobu na predajni"
+    "hasShopFloorStock": "Artikul má zásobu na predajni",
+    "manageUsers": "Spravovať používateľov",
+    "userList": "Zoznam používateľov",
+    "userListDescription": "Tu môžete schvaľovať a spravovať používateľské účty.",
+    "name": "Meno",
+    "status": "Stav",
+    "loadingUsers": "Načítavanie používateľov...",
+    "approved": "Schválené",
+    "pendingApproval": "Čaká na schválenie",
+    "approve": "Schváliť",
+    "errorFetchingUsers": "Chyba pri načítavaní používateľov.",
+    "errorApprovingUser": "Chyba pri schvaľovaní používateľa.",
+    "userApprovedSuccess": "Používateľ bol úspešne schválený."
   }
 }

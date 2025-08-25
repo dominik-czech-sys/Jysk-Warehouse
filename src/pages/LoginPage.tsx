@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
@@ -29,6 +29,7 @@ const LoginPage: React.FC = () => {
             supabaseClient={supabase}
             appearance={{ theme: ThemeSupa }}
             providers={[]}
+            view="sign_in"
             localization={{
               variables: {
                 sign_in: {
@@ -38,19 +39,18 @@ const LoginPage: React.FC = () => {
                   email_input_placeholder: t("common.enterEmail"),
                   password_input_placeholder: t("common.enterPassword"),
                 },
-                sign_up: {
-                  email_label: t("common.email"),
-                  password_label: t("common.password"),
-                  button_label: "Registrovat se",
-                  email_input_placeholder: t("common.enterEmail"),
-                  password_input_placeholder: t("common.enterPassword"),
-                },
                 forgotten_password: {
                   link_text: "Zapomněli jste heslo?",
                 },
               },
             }}
           />
+          <div className="mt-4 text-center text-sm">
+            {t("common.noAccount")}{" "}
+            <Link to="/registrace" className="underline">
+              {t("common.signUp")}
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

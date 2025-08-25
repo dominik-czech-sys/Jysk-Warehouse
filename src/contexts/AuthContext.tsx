@@ -10,9 +10,11 @@ interface UserProfile {
   id: string;
   first_name: string;
   last_name: string;
+  username: string;
   role: "admin" | "vedouci_skladu" | "store_manager" | "deputy_store_manager" | "ar_assistant_of_sale" | "skladnik";
   store_id: string;
   first_login: boolean;
+  is_approved: boolean;
 }
 
 export type User = SupabaseUser & UserProfile;
@@ -56,7 +58,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (error) {
           console.error("Chyba při načítání profilu:", error);
         } else if (profile) {
-          setUser({ ...session.user, ...profile });
+          if (!profile.is_approved) {
+            toast.error(t("common.accountNotApproved"));
+            await supabase.auth.signOut();
+            setSession(null);
+          } else {
+            setUser({ ...session.user, ...profile });
+          }
         }
       }
       setLoading(false);
@@ -78,11 +86,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             console.error("Chyba při načítání profilu po změně stavu:", error);
             setUser(null);
           } else if (profile) {
-            const fullUser = { ...session.user, ...profile };
-            setUser(fullUser);
-            if (_event === 'SIGNED_IN') {
-              toast.success(t("common.welcomeUser", { username: fullUser.email }));
-              addLogEntry(t("common.userLoggedIn"), { username: fullUser.email, role: fullUser.role, storeId: fullUser.store_id }, fullUser.email);
+            if (!profile.is_approved) {
+              if (_event === 'SIGNED_IN') {
+                toast.error(t("common.accountNotApproved"));
+                await supabase.auth.signOut();
+              }
+              setUser(null);
+              setSession(null);
+            } else {
+              const fullUser = { ...session.user, ...profile };
+              setUser(fullUser);
+              if (_event === 'SIGNED_IN') {
+                toast.success(t("common.welcomeUser", { username: fullUser.email }));
+                addLogEntry(t("common.userLoggedIn"), { username: fullUser.email, role: fullUser.role, storeId: fullUser.store_id }, fullUser.email);
+              }
             }
           }
         } else {
@@ -137,14 +154,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         toast.error(error.message);
         return false;
       }
-      // Manually update user state to reflect the change immediately
       setUser(prevUser => prevUser ? { ...prevUser, first_login: false } : null);
       return true;
     }
     return false;
   };
 
-  const isAuthenticated = !!session?.user;
+  const isAuthenticated = !!session?.user && !!user;
   const isAdmin = user?.role === "admin";
   const userStoreId = user?.store_id;
 

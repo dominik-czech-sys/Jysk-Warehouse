@@ -1,7 +1,7 @@
 {
   "common": {
     "welcomeUser": "Vítejte, {username}!",
-    "invalidCredentials": "Neplatné uživatelské jméno nebo heslo.",
+    "invalidCredentials": "Neplatné přihlašovací údaje.",
     "loggedOut": "Byli jste odhlášeni.",
     "userLoggedIn": "Uživatel se přihlásil",
     "userLoggedOut": "Uživatel se odhlásil",
@@ -53,6 +53,16 @@
     "email": "E-mail",
     "enterEmail": "Zadejte váš e-mail",
     "signUp": "Zaregistrovat se",
+    "signUpTitle": "Vytvořit nový účet",
+    "signUpDescription": "Vyplňte formulář pro vytvoření nového účtu.",
+    "signingUp": "Registrace...",
+    "alreadyHaveAccount": "Už máte účet?",
+    "noAccount": "Nemáte účet?",
+    "signUpSuccessTitle": "Registrace úspěšná!",
+    "signUpSuccessMessage": "Váš účet byl vytvořen. Nyní musí být schválen administrátorem.",
+    "accountNotApproved": "Váš účet ještě nebyl schválen administrátorem. Zkuste to prosím později.",
+    "firstName": "Jméno",
+    "lastName": "Příjmení",
     "viewExternalContent": "Zobrazit externí obsah",
     "scanBarcodeTitle": "Skenovat čárový kód",
     "ensureBarcodeVisible": "Ujistěte se, že je čárový kód dobře viditelný v rámečku.",
@@ -476,6 +486,18 @@
     "shopFloorStock": "Zásoba na prodejně",
     "replenishmentTrigger": "Limit pro doplnění",
     "noArticlesToReplenish": "Žádné artikly k doplnění.",
-    "hasShopFloorStock": "Artikl má zásobu na prodejně"
+    "hasShopFloorStock": "Artikl má zásobu na prodejně",
+    "manageUsers": "Spravovat uživatele",
+    "userList": "Seznam uživatelů",
+    "userListDescription": "Zde můžete schvalovat a spravovat uživatelské účty.",
+    "name": "Jméno",
+    "status": "Status",
+    "loadingUsers": "Načítání uživatelů...",
+    "approved": "Schváleno",
+    "pendingApproval": "Čeká na schválení",
+    "approve": "Schválit",
+    "errorFetchingUsers": "Chyba při načítání uživatelů.",
+    "errorApprovingUser": "Chyba při schvalování uživatele.",
+    "userApprovedSuccess": "Uživatel byl úspěšně schválen."
   }
 }

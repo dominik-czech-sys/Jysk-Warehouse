@@ -1,7 +1,7 @@
 {
   "common": {
     "welcomeUser": "Welcome, {username}!",
-    "invalidCredentials": "Invalid username or password.",
+    "invalidCredentials": "Invalid login credentials.",
     "loggedOut": "You have been logged out.",
     "userLoggedIn": "User logged in",
     "userLoggedOut": "User logged out",
@@ -53,6 +53,16 @@
     "email": "Email",
     "enterEmail": "Enter your email",
     "signUp": "Sign Up",
+    "signUpTitle": "Create a New Account",
+    "signUpDescription": "Fill out the form to create a new account.",
+    "signingUp": "Signing up...",
+    "alreadyHaveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "signUpSuccessTitle": "Registration Successful!",
+    "signUpSuccessMessage": "Your account has been created. It now needs to be approved by an administrator.",
+    "accountNotApproved": "Your account has not been approved by an administrator yet. Please try again later.",
+    "firstName": "First Name",
+    "lastName": "Last Name",
     "viewExternalContent": "View External Content",
     "scanBarcodeTitle": "Scan Barcode",
     "ensureBarcodeVisible": "Ensure the barcode is clearly visible within the frame.",
@@ -476,6 +486,18 @@
     "shopFloorStock": "Shop Floor Stock",
     "replenishmentTrigger": "Replenishment Trigger",
     "noArticlesToReplenish": "No articles to replenish.",
-    "hasShopFloorStock": "Article has shop floor stock"
+    "hasShopFloorStock": "Article has shop floor stock",
+    "manageUsers": "Manage Users",
+    "userList": "User List",
+    "userListDescription": "Here you can approve and manage user accounts.",
+    "name": "Name",
+    "status": "Status",
+    "loadingUsers": "Loading users...",
+    "approved": "Approved",
+    "pendingApproval": "Pending Approval",
+    "approve": "Approve",
+    "errorFetchingUsers": "Error fetching users.",
+    "errorApprovingUser": "Error approving user.",
+    "userApprovedSuccess": "User approved successfully."
   }
 }
