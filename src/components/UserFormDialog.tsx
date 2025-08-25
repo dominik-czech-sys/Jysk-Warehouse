@@ -206,7 +206,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
                 onValueChange={handleStoreSelect}
                 value={formData.storeId || ""}
                 disabled={isStoreSelectDisabled}
-                key={availableStores.length} // Added key to force re-render
+                key={stores.length} // Changed from availableStores.length to stores.length
               >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder={t("common.selectStore")} />
