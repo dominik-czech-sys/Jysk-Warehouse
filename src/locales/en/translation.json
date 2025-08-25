@@ -443,6 +443,13 @@
     "clearAll": "Clear All",
     "noNewNotifications": "No new notifications.",
     "viewDetails": "View Details",
-    "lowStockNotification": "Low stock: Article {articleId} (quantity: {quantity}, min: {minQuantity}) in store {storeId} is running low."
+    "lowStockNotification": "Low stock: Article {articleId} (quantity: {quantity}, min: {minQuantity}) in store {storeId} is running low.",
+    "dashboardOverview": "Dashboard Overview",
+    "manageWidgets": "Manage Widgets",
+    "noWidgetsAdded": "No widgets have been added to the dashboard.",
+    "articleOverview": "Article Overview",
+    "totalStoreArticles": "Total Store Articles",
+    "totalGlobalArticles": "Total Global Articles",
+    "noLowStockAlerts": "No low stock alerts."
   }
 }

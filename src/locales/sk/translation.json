@@ -443,6 +443,13 @@
     "clearAll": "Vymazať všetko",
     "noNewNotifications": "Žiadne nové upozornenia.",
     "viewDetails": "Zobraziť detaily",
-    "lowStockNotification": "Nízky stav zásob: Artikulu {articleId} (množstvo: {quantity}, min: {minQuantity}) v obchode {storeId} dochádza zásoby."
+    "lowStockNotification": "Nízky stav zásob: Artikulu {articleId} (množstvo: {quantity}, min: {minQuantity}) v obchode {storeId} dochádza zásoby.",
+    "dashboardOverview": "Prehľad dashboardu",
+    "manageWidgets": "Spravovať widgety",
+    "noWidgetsAdded": "Žiadne widgety neboli pridané na dashboard.",
+    "articleOverview": "Prehľad artiklov",
+    "totalStoreArticles": "Celkom artiklov v obchodoch",
+    "totalGlobalArticles": "Celkom globálnych artiklov",
+    "noLowStockAlerts": "Žiadne upozornenia na nízky stav zásob."
   }
 }

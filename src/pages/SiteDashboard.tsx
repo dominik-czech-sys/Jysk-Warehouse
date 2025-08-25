@@ -9,11 +9,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Copy, Users as UsersIcon, Package, Warehouse as WarehouseIcon, Download, LifeBuoy, BookOpen } from "lucide-react"; // Added BookOpen icon
+import { ArrowLeft, PlusCircle, Edit, Trash2, ScrollText, Store as StoreIcon, Copy, Users as UsersIcon, Package, Warehouse as WarehouseIcon, Download, LifeBuoy, BookOpen, LayoutGrid, Plus } from "lucide-react"; // Added LayoutGrid, Plus icons
 import { UserFormDialog } from "@/components/UserFormDialog";
 import { StoreFormDialog } from "@/components/StoreFormDialog";
 import { ArticleCopyDialog } from "@/components/ArticleCopyDialog";
-import { AdminFAQDialog } from "@/components/AdminFAQDialog"; // Import AdminFAQDialog
+import { AdminFAQDialog } from "@/components/AdminFAQDialog";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -35,6 +35,22 @@ import { useShelfRacks } from "@/data/shelfRacks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "react-i18next";
+import { useDashboard } from "@/contexts/DashboardContext"; // Import useDashboard
+import { DashboardWidget } from "@/components/DashboardWidget"; // Import DashboardWidget
+import { ArticleOverviewWidget } from "@/components/widgets/ArticleOverviewWidget"; // Import ArticleOverviewWidget
+import { LowStockAlertsWidget } from "@/components/widgets/LowStockAlertsWidget"; // Import LowStockAlertsWidget
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"; // Import DropdownMenu components
+
+// Map widget component names to actual components
+const widgetComponents: { [key: string]: React.FC<{ id: string }> } = {
+  ArticleOverviewWidget: ArticleOverviewWidget,
+  LowStockAlertsWidget: LowStockAlertsWidget,
+};
 
 const SiteDashboard: React.FC = () => {
   const { allUsers, addUser, updateUser, deleteUser, isAdmin, hasPermission, userStoreId, user: currentUser } = useAuth();
@@ -42,6 +58,7 @@ const SiteDashboard: React.FC = () => {
   const { allArticles } = useArticles();
   const { allShelfRacks } = useShelfRacks();
   const { t } = useTranslation();
+  const { widgets, addWidget, removeWidget, availableWidgets } = useDashboard(); // Use dashboard context
 
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
   const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
@@ -57,7 +74,7 @@ const SiteDashboard: React.FC = () => {
 
   const [isLogViewerOpen, setIsLogViewerOpen] = useState(false);
   const [isArticleCopyDialogOpen, setIsArticleCopyDialogOpen] = useState(false);
-  const [isAdminFAQDialogOpen, setIsAdminFAQDialogOpen] = useState(false); // New state for Admin FAQ
+  const [isAdminFAQDialogOpen, setIsAdminFAQDialogOpen] = useState(false);
 
   // Statistics
   const totalUsers = allUsers.length;
@@ -104,7 +121,7 @@ const SiteDashboard: React.FC = () => {
       deleteStore(storeToDeleteId);
       setStoreToDeleteId(null);
     }
-    setIsDeleteUserDialogOpen(false); // Changed from setIsDeleteStoreDialogOpen to setIsDeleteUserDialogOpen
+    setIsDeleteUserDialogOpen(false);
   };
 
   // Filter users based on current user's role and storeId
@@ -154,44 +171,39 @@ const SiteDashboard: React.FC = () => {
           <div className="w-full sm:w-auto"></div> {/* Placeholder for alignment */}
         </div>
 
-        {/* Overview Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8 animate-slide-in-up">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t("common.totalStores")}</CardTitle>
-              <StoreIcon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalStores}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t("common.totalUsers")}</CardTitle>
-              <UsersIcon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalUsers}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t("common.totalArticles")}</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalArticles}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t("common.totalRacks")}</CardTitle>
-              <WarehouseIcon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalRacks}</div>
-            </CardContent>
-          </Card>
+        {/* Dashboard Widgets Section */}
+        <div className="mb-6 sm:mb-8 w-full animate-slide-in-up">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{t("common.dashboardOverview")}</h2>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center">
+                  <LayoutGrid className="h-4 w-4 mr-2" /> {t("common.manageWidgets")}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {availableWidgets.map((widget) => (
+                  <DropdownMenuItem key={widget.id} onClick={() => addWidget(widget.id)}>
+                    <Plus className="h-4 w-4 mr-2" /> {t(widget.name)}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {widgets.map((widgetConfig) => {
+              const WidgetComponent = widgetComponents[widgetConfig.component];
+              if (!WidgetComponent) return null;
+              return (
+                <div key={widgetConfig.id} className="h-full">
+                  <WidgetComponent id={widgetConfig.id} />
+                </div>
+              );
+            })}
+          </div>
+          {widgets.length === 0 && (
+            <p className="text-center text-muted-foreground mt-4">{t("common.noWidgetsAdded")}</p>
+          )}
         </div>
 
         <Separator className="my-6 sm:my-8" />

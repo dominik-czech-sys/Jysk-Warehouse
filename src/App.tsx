@@ -19,6 +19,7 @@ import ManageHelpPostsPage from "./pages/ManageHelpPostsPage"; // Import ManageH
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { NotificationProvider } from "./contexts/NotificationContext"; // Import NotificationProvider
+import { DashboardProvider } from "./contexts/DashboardContext"; // Import DashboardProvider
 import { useContext } from "react";
 import { Permission } from "./data/users"; // Import Permission type
 import { ThemeProvider } from "./contexts/ThemeContext"; // Import ThemeProvider
@@ -156,8 +157,10 @@ const App = () => (
           <AuthProvider>
             <ThemeProvider>
               <I18nextProvider i18n={i18n}>
-                <NotificationProvider> {/* Wrap AppContent with NotificationProvider */}
-                  <AppContent />
+                <NotificationProvider>
+                  <DashboardProvider> {/* Wrap AppContent with DashboardProvider */}
+                    <AppContent />
+                  </DashboardProvider>
                 </NotificationProvider>
               </I18nextProvider>
             </ThemeProvider>
