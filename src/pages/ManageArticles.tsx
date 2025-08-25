@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { PlusCircle, Edit, Trash2, Scan, Boxes, ArrowLeft, QrCode, Filter, ArrowUpDown, X } from "lucide-react"; // Import QrCode icon, Filter, ArrowUpDown, X
+import { PlusCircle, Edit, Trash2, Scan, Boxes, ArrowLeft, QrCode, Filter, ArrowUpDown, X } from "lucide-react";
 import { ArticleFormDialog } from "@/components/ArticleFormDialog";
 import { toast } from "sonner";
 import {
@@ -27,9 +27,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { useGlobalArticles, GlobalArticle } from "@/data/globalArticles";
 import { useArticles, Article } from "@/data/articles";
-import { Input } from "@/components/ui/input"; // Import Input
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Import Select components
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Import Card components
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArticleBarcodeGenerator } from "@/components/ArticleBarcodeGenerator"; // <-- Opravený import
 
 const ManageArticles = () => {
   const { articles, addArticle, updateArticle, deleteArticle } = useArticles();
