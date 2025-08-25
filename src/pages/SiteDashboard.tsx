@@ -104,7 +104,7 @@ const SiteDashboard: React.FC = () => {
       deleteStore(storeToDeleteId);
       setStoreToDeleteId(null);
     }
-    setIsDeleteStoreDialogOpen(false);
+    setIsDeleteUserDialogOpen(false); // Changed from setIsDeleteStoreDialogOpen to setIsDeleteUserDialogOpen
   };
 
   // Filter users based on current user's role and storeId

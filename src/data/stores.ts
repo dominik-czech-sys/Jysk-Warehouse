@@ -95,7 +95,7 @@ export const useStores = () => {
       return updatedStores;
     });
     toast.success(t("common.storeDeletedSuccess", { storeId: id }));
-    addLogEntry("Obchod smazán", { storeId: id }, user?.username);
+    addLogEntry(t("common.storeDeleted"), { storeId: id }, user?.username);
     // TODO: Also delete all articles and racks associated with this store
     return true;
   };

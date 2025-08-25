@@ -174,7 +174,7 @@ const FirstLoginTutorial: React.FC<FirstLoginTutorialProps> = ({ onComplete }) =
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
-                    {tutorialContent[currentStep - 1].content}
+                    {t(tutorialContent[currentStep - 1].content)}
                   </p>
                 </CardContent>
               </Card>

@@ -26,13 +26,13 @@ export const LanguageSwitcher: React.FC = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => changeLanguage("cs")}>
-          Čeština
+          {t("common.czech")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => changeLanguage("en")}>
-          English
+          {t("common.english")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => changeLanguage("sk")}>
-          Slovenčina
+          {t("common.slovak")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
