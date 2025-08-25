@@ -27,9 +27,9 @@ import { useTranslation } from "react-i18next";
 
 interface StoreManagementSectionProps {
   stores: Store[];
-  addStore: (newStore: Store, addDefaultArticles: boolean) => boolean;
-  updateStore: (updatedStore: Store) => boolean;
-  deleteStore: (id: string) => boolean;
+  addStore: (newStore: Store, addDefaultArticles: boolean) => Promise<void>;
+  updateStore: (updatedStore: Store) => Promise<any>;
+  deleteStore: (id: string) => Promise<any>;
   hasPermission: (permission: string) => boolean;
 }
 
@@ -50,12 +50,12 @@ export const StoreManagementSection: React.FC<StoreManagementSectionProps> = ({
   const [isArticleCopyDialogOpen, setIsArticleCopyDialogOpen] = useState(false);
   const [isArticleTransferDialogOpen, setIsArticleTransferDialogOpen] = useState(false);
 
-  const handleAddStore = (newStore: Store, addDefaultArticles: boolean) => {
-    return addStore(newStore, addDefaultArticles);
+  const handleAddStore = async (newStore: Store, addDefaultArticles: boolean) => {
+    await addStore(newStore, addDefaultArticles);
   };
 
-  const handleEditStore = (updatedStore: Store) => {
-    return updateStore(updatedStore);
+  const handleEditStore = async (updatedStore: Store) => {
+    await updateStore(updatedStore);
   };
 
   const handleDeleteStore = (id: string) => {
@@ -63,9 +63,9 @@ export const StoreManagementSection: React.FC<StoreManagementSectionProps> = ({
     setIsDeleteStoreDialogOpen(true);
   };
 
-  const confirmDeleteStore = () => {
+  const confirmDeleteStore = async () => {
     if (storeToDeleteId) {
-      deleteStore(storeToDeleteId);
+      await deleteStore(storeToDeleteId);
       setStoreToDeleteId(null);
     }
     setIsDeleteStoreDialogOpen(false);

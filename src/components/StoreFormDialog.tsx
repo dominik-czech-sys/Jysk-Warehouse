@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 interface StoreFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (store: Store, addDefaultArticles: boolean) => boolean;
+  onSubmit: (store: Store, addDefaultArticles: boolean) => Promise<any>;
   store?: Store | null;
 }
 
@@ -53,15 +53,14 @@ export const StoreFormDialog: React.FC<StoreFormDialogProps> = ({
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.id.trim() || !formData.name.trim()) {
       toast.error(t("common.fillStoreDetails"));
       return;
     }
-    if (onSubmit(formData, addDefaultArticles)) {
-      onClose();
-    }
+    await onSubmit(formData, addDefaultArticles);
+    onClose();
   };
 
   return (
