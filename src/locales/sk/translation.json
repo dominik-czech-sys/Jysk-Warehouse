@@ -50,6 +50,8 @@
     "password": "Heslo",
     "enterPassword": "Zadajte heslo",
     "login": "Prihlásiť sa",
+    "email": "E-mail",
+    "enterEmail": "Zadajte váš e-mail",
     "viewExternalContent": "Zobraziť externý obsah",
     "scanBarcodeTitle": "Skenovať čiarový kód",
     "ensureBarcodeVisible": "Uistite sa, že je čiarový kód dobre viditeľný v rámčeku.",
@@ -326,6 +328,8 @@
     "sortByQuantityDesc": "Množstvo (najviac)",
     "sortByStatusAsc": "Stav (vzostupne)",
     "sortByStatusDesc": "Stav (zostupne)",
+    "underConstructionTitle": "Funkcia vo Výstavbe",
+    "underConstructionMessage": "Správa používateľov sa práve prerába, aby bola bezpečne integrovaná so Supabase. Táto funkcia bude čoskoro opäť k dispozícii s vylepšeným zabezpečením.",
     "logCategory": {
       "fullLog": "Celý protokol",
       "login": "Prihlásenie",

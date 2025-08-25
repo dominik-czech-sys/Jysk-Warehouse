@@ -50,6 +50,8 @@
     "password": "Password",
     "enterPassword": "Enter password",
     "login": "Login",
+    "email": "Email",
+    "enterEmail": "Enter your email",
     "viewExternalContent": "View External Content",
     "scanBarcodeTitle": "Scan Barcode",
     "ensureBarcodeVisible": "Ensure the barcode is clearly visible within the frame.",
@@ -326,6 +328,8 @@
     "sortByQuantityDesc": "Quantity (Highest)",
     "sortByStatusAsc": "Status (Ascending)",
     "sortByStatusDesc": "Status (Descending)",
+    "underConstructionTitle": "Feature Under Construction",
+    "underConstructionMessage": "User management is being rebuilt to securely integrate with Supabase. This feature will be available again soon with enhanced security.",
     "logCategory": {
       "fullLog": "Full Log",
       "login": "Login",
