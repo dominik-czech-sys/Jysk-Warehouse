@@ -48,6 +48,13 @@ const AuditDetailPage: React.FC = () => {
     return null;
   };
 
+  const getScoreBadge = (score: number | null) => {
+    if (score === null) return null;
+    if (score >= 90) return <Badge className="bg-green-500 text-white hover:bg-green-600 text-lg">{score.toFixed(1)}%</Badge>;
+    if (score >= 70) return <Badge className="bg-yellow-500 text-white hover:bg-yellow-600 text-lg">{score.toFixed(1)}%</Badge>;
+    return <Badge variant="destructive" className="text-lg">{score.toFixed(1)}%</Badge>;
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -60,7 +67,10 @@ const AuditDetailPage: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>{audit.audit_templates?.name}</CardTitle>
+          <div className="flex items-center gap-4">
+            <CardTitle>{audit.audit_templates?.name}</CardTitle>
+            {getScoreBadge(audit.score)}
+          </div>
           <CardDescription>
             {t("common.audit.completedOn", { date: format(new Date(audit.completed_at), "d. M. yyyy 'v' HH:mm", { locale: cs }) })}
             <br />

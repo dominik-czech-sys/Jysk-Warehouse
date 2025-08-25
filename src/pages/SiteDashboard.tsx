@@ -19,6 +19,7 @@ import { StatisticsOverview } from "@/components/dashboard/StatisticsOverview";
 import { UserDistributionChart } from "@/components/dashboard/charts/UserDistributionChart";
 import { ScrapeDataSection } from "@/components/dashboard/ScrapeDataSection";
 import { AnnouncementManagementSection } from "@/components/dashboard/AnnouncementManagementSection";
+import { AuditScoresChart } from "@/components/dashboard/charts/AuditScoresChart";
 
 const SiteDashboard: React.FC = () => {
   const { isAdmin, hasPermission } = useAuth();
@@ -80,8 +81,9 @@ const SiteDashboard: React.FC = () => {
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-7">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-8">
             <TabsTrigger value="overview">{t("common.overview")}</TabsTrigger>
+            <TabsTrigger value="analytics">{t("common.analytics.title")}</TabsTrigger>
             <TabsTrigger value="stores">{t("common.storeManagement")}</TabsTrigger>
             <TabsTrigger value="users">{t("common.userManagement")}</TabsTrigger>
             <TabsTrigger value="communication">{t("common.announcement.communication")}</TabsTrigger>
@@ -103,6 +105,12 @@ const SiteDashboard: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="mt-4">
+            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
+                <AuditScoresChart />
+            </div>
           </TabsContent>
 
           <TabsContent value="stores" className="mt-4">

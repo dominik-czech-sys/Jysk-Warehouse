@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { PlusCircle, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { cs } from "date-fns/locale";
@@ -21,6 +22,13 @@ const AuditListPage: React.FC = () => {
   const { t } = useTranslation();
   const { audits, isLoading } = useCompletedAudits();
   const { hasPermission } = useAuth();
+
+  const getScoreBadge = (score: number | null) => {
+    if (score === null) return <Badge variant="secondary">N/A</Badge>;
+    if (score >= 90) return <Badge className="bg-green-500 text-white hover:bg-green-600">{score.toFixed(1)}%</Badge>;
+    if (score >= 70) return <Badge className="bg-yellow-500 text-white hover:bg-yellow-600">{score.toFixed(1)}%</Badge>;
+    return <Badge variant="destructive">{score.toFixed(1)}%</Badge>;
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -48,12 +56,13 @@ const AuditListPage: React.FC = () => {
                   <TableHead>{t("common.storeId")}</TableHead>
                   <TableHead>{t("common.audit.completedBy")}</TableHead>
                   <TableHead>{t("common.audit.completionDate")}</TableHead>
+                  <TableHead>{t("common.audit.score")}</TableHead>
                   <TableHead className="text-right">{t("common.action")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow><TableCell colSpan={5} className="text-center">{t("common.audit.loadingAudits")}</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={6} className="text-center">{t("common.audit.loadingAudits")}</TableCell></TableRow>
                 ) : (
                   audits.map((audit) => (
                     <TableRow key={audit.id}>
@@ -61,6 +70,7 @@ const AuditListPage: React.FC = () => {
                       <TableCell>{audit.store_id}</TableCell>
                       <TableCell>{audit.profiles?.username || t("common.unknown")}</TableCell>
                       <TableCell>{format(new Date(audit.completed_at), "d. M. yyyy HH:mm", { locale: cs })}</TableCell>
+                      <TableCell>{getScoreBadge(audit.score)}</TableCell>
                       <TableCell className="text-right">
                         <Link to={`/audity/${audit.id}`}>
                             <Button variant="ghost" size="sm">

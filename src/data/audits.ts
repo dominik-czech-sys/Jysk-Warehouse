@@ -24,6 +24,7 @@ export interface CompletedAudit {
   id: string;
   completed_at: string;
   store_id: string;
+  score: number | null;
   audit_templates: { name: string } | null;
   profiles: { username: string } | null;
 }
@@ -128,6 +129,7 @@ const fetchCompletedAudits = async (): Promise<CompletedAudit[]> => {
       id,
       completed_at,
       store_id,
+      score,
       audit_templates ( name ),
       profiles ( username )
     `)
@@ -138,9 +140,13 @@ const fetchCompletedAudits = async (): Promise<CompletedAudit[]> => {
 };
 
 const submitAuditToDb = async ({ template_id, store_id, user_id, results }: { template_id: string; store_id: string; user_id: string; results: AuditResult[] }) => {
+    const yesCount = results.filter(r => r.result.toLowerCase() === 'yes').length;
+    const totalQuestions = results.length;
+    const score = totalQuestions > 0 ? (yesCount / totalQuestions) * 100 : 100;
+
     const { data: auditData, error: auditError } = await supabase
         .from('audits')
-        .insert({ template_id, store_id, user_id })
+        .insert({ template_id, store_id, user_id, score })
         .select()
         .single();
 

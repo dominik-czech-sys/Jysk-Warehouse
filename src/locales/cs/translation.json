@@ -430,7 +430,11 @@
       "allQuestionsRequiredError": "Prosím, odpovězte na všechny otázky.",
       "auditDetail": "Detail auditu",
       "completedOn": "Dokončeno dne {{date}}",
-      "errorLoadingDetail": "Při načítání detailu auditu došlo k chybě."
+      "errorLoadingDetail": "Při načítání detailu auditu došlo k chybě.",
+      "score": "Skóre",
+      "averageScoresByStore": "Průměrné skóre auditů dle obchodu",
+      "averageScoresByStoreDescription": "Přehled výkonnosti jednotlivých obchodů v auditech.",
+      "averageScore": "Průměrné skóre"
     },
     "announcement": {
       "communication": "Komunikace",
@@ -456,6 +460,10 @@
       "confirmDeleteTitle": "Opravdu chcete smazat toto oznámení?",
       "confirmDeleteDescription": "Tato akce je nevratná. Oznámení s názvem '{{title}}' bude trvale odstraněno.",
       "publishedBy": "Publikoval {{author}} dne {{date}}"
-    }
+    },
+    "analytics": {
+      "title": "Analytika"
+    },
+    "loading": "Načítání"
   }
 }
