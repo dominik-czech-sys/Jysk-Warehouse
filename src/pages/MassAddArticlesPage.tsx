@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { useArticles, Article } from "@/data/articles";
 import { useAuth } from "@/hooks/useAuth";
 import { useLog } from "@/contexts/LogContext";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5QrcodeScanner, Html5Qrcode } from "html5-qrcode"; // Import Html5Qrcode
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -46,43 +46,68 @@ const MassAddArticlesPage: React.FC = () => {
   const [selectedShelfNumber, setSelectedShelfNumber] = useState<string>("");
 
   useEffect(() => {
-    if (isScannerActive && !scannerRef.current) {
-      scannerRef.current = new Html5QrcodeScanner(
-        "reader",
-        { 
-          fps: 10, 
-          qrbox: { width: 250, height: 250 },
-          // Prefer rear camera
-          facingMode: { exact: "environment" }
-        },
-        false
-      );
+    const scannerId = "reader-mass-add"; // Unique ID for this scanner
+    
+    const startScanner = async () => {
+      if (!isScannerActive || scannerRef.current) return; // Only start if active and not already running
 
-      const onScanSuccess = (decodedText: string) => {
-        toast.success(t("common.scannedBarcode", { decodedText }));
-        addLogEntry(t("common.barcodeScannedMassAdd"), { scannedCode: decodedText, shelfDetails, quantity: manualArticleQuantity }, user?.username);
-        addArticleToProcess(decodedText, manualArticleQuantity);
-      };
+      try {
+        const devices = await Html5Qrcode.getVideoDevices();
+        if (devices && devices.length) {
+          const rearCamera = devices.find(device => device.label.toLowerCase().includes("back") || device.label.toLowerCase().includes("rear"));
+          const cameraId = rearCamera ? rearCamera.id : devices[0].id; // Use rear camera if found, otherwise first available
 
-      const onScanError = (errorMessage: string) => {
-        // console.warn(`Chyba skenování: ${errorMessage}`);
-      };
+          scannerRef.current = new Html5QrcodeScanner(
+            scannerId,
+            { 
+              fps: 10, 
+              qrbox: { width: 250, height: 250 },
+              // Use cameraId directly in start() method
+            },
+            false
+          );
 
-      scannerRef.current.render(onScanSuccess, onScanError);
-    } else if (!isScannerActive && scannerRef.current) {
-      scannerRef.current.clear().catch((error) => {
-        console.error("Failed to clear html5QrcodeScanner", error);
-      });
-      scannerRef.current = null;
-    }
+          const onScanSuccess = (decodedText: string) => {
+            toast.success(t("common.scannedBarcode", { decodedText }));
+            addLogEntry(t("common.barcodeScannedMassAdd"), { scannedCode: decodedText, shelfDetails, quantity: manualArticleQuantity }, user?.username);
+            addArticleToProcess(decodedText, manualArticleQuantity);
+          };
 
-    return () => {
+          const onScanError = (errorMessage: string) => {
+            // console.warn(`Chyba skenování: ${errorMessage}`);
+          };
+          
+          // Render with specific camera
+          scannerRef.current.render(onScanSuccess, onScanError);
+
+        } else {
+          toast.error(t("common.noCameraFound"));
+          setIsScannerActive(false); // Turn off scanner toggle if no camera
+        }
+      } catch (err) {
+        console.error("Error accessing camera:", err);
+        toast.error(t("common.cameraAccessError"));
+        setIsScannerActive(false); // Turn off scanner toggle on error
+      }
+    };
+
+    const stopScanner = () => {
       if (scannerRef.current) {
         scannerRef.current.clear().catch((error) => {
-          console.error("Failed to clear html5QrcodeScanner on unmount", error);
+          console.error("Failed to clear html5QrcodeScanner", error);
         });
         scannerRef.current = null;
       }
+    };
+
+    if (isScannerActive) {
+      startScanner();
+    } else {
+      stopScanner();
+    }
+
+    return () => {
+      stopScanner();
     };
   }, [isScannerActive, shelfDetails, user?.username, manualArticleQuantity, t]);
 
@@ -275,7 +300,7 @@ const MassAddArticlesPage: React.FC = () => {
                     <Scan className="h-4 w-4 mr-2" /> {isScannerActive ? t("common.stopScanning") : t("common.startScanning")}
                   </Button>
                   {isScannerActive && (
-                    <div id="reader" className="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center text-muted-foreground mt-4">
+                    <div id="reader-mass-add" className="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center text-muted-foreground mt-4">
                       {/* QR Code Scanner will render here */}
                     </div>
                   )}

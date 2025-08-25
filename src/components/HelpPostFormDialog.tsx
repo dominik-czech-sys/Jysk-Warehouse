@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "@/components/ui/textarea"; // Correct import for Textarea
 import { HelpPost } from "@/data/helpPosts";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";

@@ -27,6 +27,7 @@ import { useHelpPosts } from "@/hooks/useHelpPosts";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { HelpPost } from "@/data/helpPosts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Import Card components
 
 const ManageHelpPostsPage: React.FC = () => {
   const { helpPosts, addHelpPost, updateHelpPost, deleteHelpPost } = useHelpPosts();

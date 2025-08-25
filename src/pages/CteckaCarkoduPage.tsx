@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { Html5QrcodeScanner, Html5Qrcode } from "html5-qrcode"; // Import Html5Qrcode
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
@@ -17,33 +17,55 @@ const CteckaCarkoduPage: React.FC = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    const html5QrcodeScanner = new Html5QrcodeScanner(
-      "reader",
-      { 
-        fps: 10, 
-        qrbox: { width: 250, height: 250 },
-        // Prefer rear camera
-        facingMode: { exact: "environment" }
-      },
-      false
-    );
+    const scannerId = "reader";
+    let html5QrcodeScanner: Html5QrcodeScanner | null = null;
 
-    const onScanSuccess = (decodedText: string) => {
-      html5QrcodeScanner.clear();
-      setScanResult(decodedText);
-      toast.success(t("common.scannedBarcode", { decodedText }));
-      addLogEntry(t("common.barcodeScanned"), { scannedCode: decodedText, storeId: userStoreId }, user?.username);
-      navigate(`/?articleId=${decodedText}`);
+    const startScanner = async () => {
+      try {
+        const devices = await Html5Qrcode.getVideoDevices();
+        if (devices && devices.length) {
+          const rearCamera = devices.find(device => device.label.toLowerCase().includes("back") || device.label.toLowerCase().includes("rear"));
+          const cameraId = rearCamera ? rearCamera.id : devices[0].id; // Use rear camera if found, otherwise first available
+
+          html5QrcodeScanner = new Html5QrcodeScanner(
+            scannerId,
+            { 
+              fps: 10, 
+              qrbox: { width: 250, height: 250 },
+              // Use cameraId directly in start() method
+            },
+            false
+          );
+
+          const onScanSuccess = (decodedText: string) => {
+            html5QrcodeScanner?.clear();
+            setScanResult(decodedText);
+            toast.success(t("common.scannedBarcode", { decodedText }));
+            addLogEntry(t("common.barcodeScanned"), { scannedCode: decodedText, storeId: userStoreId }, user?.username);
+            navigate(`/?articleId=${decodedText}`);
+          };
+
+          const onScanError = (errorMessage: string) => {
+            // console.warn(`Chyba skenování: ${errorMessage}`);
+          };
+          
+          // Render with specific camera
+          html5QrcodeScanner.render(onScanSuccess, onScanError);
+          // html5QrcodeScanner.start({ deviceId: { exact: cameraId } }, { fps: 10, qrbox: { width: 250, height: 250 } }, onScanSuccess, onScanError);
+
+        } else {
+          toast.error(t("common.noCameraFound"));
+        }
+      } catch (err) {
+        console.error("Error accessing camera:", err);
+        toast.error(t("common.cameraAccessError"));
+      }
     };
 
-    const onScanError = (errorMessage: string) => {
-      // console.warn(`Chyba skenování: ${errorMessage}`);
-    };
-
-    html5QrcodeScanner.render(onScanSuccess, onScanError);
+    startScanner();
 
     return () => {
-      html5QrcodeScanner.clear().catch((error) => {
+      html5QrcodeScanner?.clear().catch((error) => {
         console.error("Failed to clear html5QrcodeScanner", error);
       });
     };

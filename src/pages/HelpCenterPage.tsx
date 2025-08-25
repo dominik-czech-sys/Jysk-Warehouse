@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Search, BookOpen } from "lucide-react";
+import { ArrowLeft, Search, BookOpen, X } from "lucide-react"; // Import X
 import { helpPosts, HelpPost } from "@/data/helpPosts";
 import { useTranslation } from "react-i18next";
 import { Separator } from "@/components/ui/separator";

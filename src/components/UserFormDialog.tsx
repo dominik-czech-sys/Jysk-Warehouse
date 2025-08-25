@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-  Dialog,
+  Dialog, // Ensure Dialog is imported
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -206,7 +206,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
                 onValueChange={handleStoreSelect}
                 value={formData.storeId || ""}
                 disabled={isStoreSelectDisabled}
-                key={availableStores.length} {/* Added key to force re-render */}
+                key={availableStores.length} // Added key to force re-render
               >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder={t("common.selectStore")} />
