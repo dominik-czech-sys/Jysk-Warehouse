@@ -18,6 +18,7 @@ import { ExportDataSection } from "@/components/dashboard/ExportDataSection";
 import { StatisticsOverview } from "@/components/dashboard/StatisticsOverview";
 import { UserDistributionChart } from "@/components/dashboard/charts/UserDistributionChart";
 import { ScrapeDataSection } from "@/components/dashboard/ScrapeDataSection";
+import { AnnouncementManagementSection } from "@/components/dashboard/AnnouncementManagementSection";
 
 const SiteDashboard: React.FC = () => {
   const { isAdmin, hasPermission } = useAuth();
@@ -79,10 +80,11 @@ const SiteDashboard: React.FC = () => {
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-6">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-7">
             <TabsTrigger value="overview">{t("common.overview")}</TabsTrigger>
             <TabsTrigger value="stores">{t("common.storeManagement")}</TabsTrigger>
             <TabsTrigger value="users">{t("common.userManagement")}</TabsTrigger>
+            <TabsTrigger value="communication">{t("common.announcement.communication")}</TabsTrigger>
             <TabsTrigger value="audits">{t("common.audit.management")}</TabsTrigger>
             <TabsTrigger value="system">{t("common.system")}</TabsTrigger>
             <TabsTrigger value="todo">{t("common.todoList")}</TabsTrigger>
@@ -115,6 +117,10 @@ const SiteDashboard: React.FC = () => {
 
           <TabsContent value="users" className="mt-4">
             <UserManagementSection />
+          </TabsContent>
+
+          <TabsContent value="communication" className="mt-4">
+            <AnnouncementManagementSection />
           </TabsContent>
 
           <TabsContent value="audits" className="mt-4">

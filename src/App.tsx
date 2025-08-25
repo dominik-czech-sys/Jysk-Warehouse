@@ -20,7 +20,8 @@ import TaskManagementPage from "./pages/TaskManagementPage";
 import ManageAuditTemplatesPage from "./pages/ManageAuditTemplatesPage";
 import AuditListPage from "./pages/AuditListPage";
 import PerformAuditPage from "./pages/PerformAuditPage";
-import AuditDetailPage from "./pages/AuditDetailPage"; // Import
+import AuditDetailPage from "./pages/AuditDetailPage";
+import AnnouncementsPage from "./pages/AnnouncementsPage"; // Import
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
@@ -78,6 +79,7 @@ const AppContent = () => {
         <Route path="/audity" element={<PrivateRoute requiredPermission="audit:view_results"><AuditListPage /></PrivateRoute>} />
         <Route path="/audity/provadet" element={<PrivateRoute requiredPermission="audit:perform"><PerformAuditPage /></PrivateRoute>} />
         <Route path="/audity/:auditId" element={<PrivateRoute requiredPermission="audit:view_results"><AuditDetailPage /></PrivateRoute>} />
+        <Route path="/oznameni" element={<PrivateRoute><AnnouncementsPage /></PrivateRoute>} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

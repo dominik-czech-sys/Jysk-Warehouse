@@ -373,6 +373,9 @@
         "manage_templates": "Spravovat šablony auditů",
         "perform": "Provádět audity",
         "view_results": "Zobrazit výsledky auditů"
+      },
+      "announcement": {
+        "manage": "Spravovat oznámení"
       }
     },
     "audit": {
@@ -425,6 +428,31 @@
       "auditDetail": "Detail auditu",
       "completedOn": "Dokončeno dne {{date}}",
       "errorLoadingDetail": "Při načítání detailu auditu došlo k chybě."
+    },
+    "announcement": {
+      "communication": "Komunikace",
+      "pageTitle": "Oznámení",
+      "managementTitle": "Správa oznámení",
+      "add": "Nové oznámení",
+      "edit": "Upravit oznámení",
+      "addDescription": "Vytvořte nové oznámení pro zaměstnance.",
+      "editDescription": "Upravte existující oznámení.",
+      "title": "Nadpis",
+      "urgency": "Naléhavost",
+      "urgencyNormal": "Běžná",
+      "urgencyImportant": "Důležitá",
+      "urgencyCritical": "Kritická",
+      "publish": "Publikovat",
+      "titleContentRequired": "Nadpis a obsah jsou povinné.",
+      "addSuccess": "Oznámení bylo úspěšně publikováno.",
+      "updateSuccess": "Oznámení bylo úspěšně aktualizováno.",
+      "deleteSuccess": "Oznámení bylo úspěšně smazáno.",
+      "author": "Autor",
+      "date": "Datum",
+      "loading": "Načítání oznámení...",
+      "confirmDeleteTitle": "Opravdu chcete smazat toto oznámení?",
+      "confirmDeleteDescription": "Tato akce je nevratná. Oznámení s názvem '{{title}}' bude trvale odstraněno.",
+      "publishedBy": "Publikoval {{author}} dne {{date}}"
     }
   }
 }

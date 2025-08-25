@@ -16,6 +16,7 @@ import {
   Globe,
   ClipboardList,
   FileCheck,
+  Megaphone,
 } from "lucide-react";
 import { MobileSidebar } from "@/components/MobileSidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -56,6 +57,10 @@ const MainLayout: React.FC = () => {
       <NavLink to="/" end className={navLinkClasses}>
         <Home className="h-4 w-4" />
         {t("common.dashboard")}
+      </NavLink>
+      <NavLink to="/oznameni" className={navLinkClasses}>
+        <Megaphone className="h-4 w-4" />
+        {t("common.announcement.pageTitle")}
       </NavLink>
       
       <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.warehouse")}</h3>

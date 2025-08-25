@@ -28,7 +28,8 @@ export type Permission =
   | "task:delete"
   | "audit:manage_templates"
   | "audit:perform"
-  | "audit:view_results";
+  | "audit:view_results"
+  | "announcement:manage";
 
 export interface User {
   id?: string;
@@ -55,6 +56,7 @@ export const defaultPermissions: Record<User['role'], Permission[]> = {
     "help_posts:manage",
     "task:view", "task:create", "task:update", "task:delete",
     "audit:manage_templates", "audit:perform", "audit:view_results",
+    "announcement:manage",
   ],
   "vedouci_skladu": [
     "user:view", "user:create", "user:update", "user:delete",

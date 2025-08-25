@@ -19,6 +19,7 @@ import {
   Globe,
   ClipboardList,
   FileCheck,
+  Megaphone,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
@@ -64,6 +65,10 @@ export const MobileSidebar: React.FC = () => {
       <NavLink to="/" end className={navLinkClasses} onClick={closeSheet}>
         <Home className="h-5 w-5" />
         {t("common.dashboard")}
+      </NavLink>
+      <NavLink to="/oznameni" className={navLinkClasses} onClick={closeSheet}>
+        <Megaphone className="h-5 w-5" />
+        {t("common.announcement.pageTitle")}
       </NavLink>
 
       <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.warehouse")}</h3>
