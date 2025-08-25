@@ -32,16 +32,15 @@ interface UserProfile {
   username: string;
   first_name: string;
   last_name: string;
-  role: string;
+  role: "admin" | "vedouci_skladu" | "store_manager" | "deputy_store_manager" | "ar_assistant_of_sale" | "skladnik";
   store_id: string;
   is_approved: boolean;
-  // Include all fields from User to satisfy UserFormDialog
   email: string;
   permissions: any[];
   firstLogin: boolean;
 }
 
-export const UserManagementDashboardSection: React.FC = () => {
+export const UserManagementSection: React.FC = () => {
   const { t } = useTranslation();
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<UserProfile[]>([]);
@@ -58,7 +57,7 @@ export const UserManagementDashboardSection: React.FC = () => {
     if (error) {
       toast.error(t("common.errorFetchingUsers"));
     } else {
-      setUsers(data as any[]);
+      setUsers(data as UserProfile[]);
     }
     setLoading(false);
   };
@@ -86,12 +85,12 @@ export const UserManagementDashboardSection: React.FC = () => {
   };
 
   const handleEditUser = (user: UserProfile) => {
-    const userForForm = {
+    const userForForm: User = {
       ...user,
       storeId: user.store_id,
       firstLogin: user.firstLogin,
     };
-    setEditingUser(userForForm as any);
+    setEditingUser(userForForm);
     setIsFormOpen(true);
   };
 

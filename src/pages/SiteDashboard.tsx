@@ -10,7 +10,7 @@ import { useStores, Store } from "@/data/stores";
 import { useArticles, Article } from "@/data/articles";
 import { useGlobalArticles } from "@/data/globalArticles";
 import { StoreManagementSection } from "@/components/dashboard/StoreManagementSection";
-import { UserManagementDashboardSection } from "@/components/dashboard/UserManagementDashboardSection";
+import { UserManagementSection } from "@/components/dashboard/UserManagementSection";
 import { HelpPostManagementSection } from "@/components/dashboard/HelpPostManagementSection";
 import { AdminTutorialsSection } from "@/components/dashboard/AdminTutorialsSection";
 import { LogViewerSection } from "@/components/dashboard/LogViewerSection";
@@ -114,7 +114,7 @@ const SiteDashboard: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="users" className="mt-4">
-            <UserManagementDashboardSection />
+            <UserManagementSection />
           </TabsContent>
 
           <TabsContent value="system" className="mt-4 space-y-6">

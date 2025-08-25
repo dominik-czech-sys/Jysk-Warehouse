@@ -77,6 +77,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
     password: "",
     first_name: "",
     last_name: "",
+    email: "",
     role: "skladnik",
     storeId: currentUserStoreId || "",
     permissions: defaultPermissions["skladnik"],
@@ -92,6 +93,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
         password: "",
         first_name: "",
         last_name: "",
+        email: "",
         role: "skladnik",
         storeId: currentUserStoreId || "",
         permissions: defaultPermissions["skladnik"],
@@ -129,7 +131,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.username || !formData.role || !formData.first_name || !formData.last_name || (!formData.storeId && formData.role !== "admin")) {
+    if (!formData.username || !formData.role || !formData.first_name || !formData.last_name || (!formData.storeId && formData.role !== "admin") || !formData.email) {
       toast.error(t("common.fillAllRequiredFields"));
       return;
     }
@@ -166,6 +168,19 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
             <Input
               id="username"
               value={formData.username}
+              onChange={handleChange}
+              className="col-span-3"
+              readOnly={!!user}
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="email" className="sm:text-right">
+              {t("common.email")}
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
               onChange={handleChange}
               className="col-span-3"
               readOnly={!!user}
