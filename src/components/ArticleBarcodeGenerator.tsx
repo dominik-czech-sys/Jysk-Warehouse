@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useArticles } from "@/data/articles";
 import { useTranslation } from "react-i18next";
-import QRCode from "qrcode.react";
+import { QRCode } from "qrcode.react"; // Corrected import to named export
 import { Printer } from "lucide-react";
 import { toast } from "sonner";
 
