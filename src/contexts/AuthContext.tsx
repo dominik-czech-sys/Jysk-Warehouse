@@ -22,7 +22,7 @@ export type User = SupabaseUser & UserProfile;
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  logout: () => void;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
   isAdmin: boolean;
   userStoreId: string | undefined;
@@ -117,10 +117,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (user) {
       addLogEntry(t("common.userLoggedOut"), { username: user.email, storeId: user.store_id }, user.email);
     }
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-    toast.info(t("common.loggedOut"));
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error logging out:", error);
+      toast.error("Chyba při odhlašování.");
+    } else {
+      toast.info(t("common.loggedOut"));
+    }
+    // The onAuthStateChange listener will automatically handle setting user and session to null.
   };
 
   const hasPermission = (permission: Permission): boolean => {
