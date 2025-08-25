@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useArticles } from "@/data/articles";
 import { useTranslation } from "react-i18next";
-import { QRCode } from "qrcode.react"; // Corrected import to named export
+import * as QRCode from "qrcode.react"; // Wildcard import
 import { Printer } from "lucide-react";
 import { toast } from "sonner";
 
@@ -79,7 +79,7 @@ export const ArticleBarcodeGenerator: React.FC<ArticleBarcodeGeneratorProps> = (
             <div className="article-id">{article.id}</div>
             <div className="article-name">{article.name}</div>
             <div className="store-info">{t("common.storeId")}: {article.storeId}</div>
-            <QRCode value={qrCodeValue} size={256} level="H" includeMargin={true} />
+            <QRCode.QRCode value={qrCodeValue} size={256} level="H" includeMargin={true} /> {/* Used QRCode.QRCode */}
           </div>
         </div>
         <DialogFooter>
