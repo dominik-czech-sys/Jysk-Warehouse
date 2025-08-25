@@ -17,7 +17,6 @@ import { LogViewerSection } from "@/components/dashboard/LogViewerSection";
 import { ExportDataSection } from "@/components/dashboard/ExportDataSection";
 import { StatisticsOverview } from "@/components/dashboard/StatisticsOverview";
 import { UserDistributionChart } from "@/components/dashboard/charts/UserDistributionChart";
-import { ArticleStatusChart } from "@/components/dashboard/charts/ArticleStatusChart";
 import { ScrapeDataSection } from "@/components/dashboard/ScrapeDataSection";
 
 const SiteDashboard: React.FC = () => {
@@ -97,7 +96,6 @@ const SiteDashboard: React.FC = () => {
                 <StatisticsOverview />
                 <div className="grid gap-4 md:grid-cols-2">
                   <UserDistributionChart />
-                  <ArticleStatusChart />
                 </div>
               </CardContent>
             </Card>
