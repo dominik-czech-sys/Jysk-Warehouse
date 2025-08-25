@@ -17,9 +17,15 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "types": ["vite/client"]
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "supabase"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": [
+    "src",
+    "vite.config.ts",
+    "postcss.config.js",
+    "tailwind.config.ts",
+    "eslint.config.js"
+  ],
+  "exclude": ["node_modules", "supabase"]
 }
