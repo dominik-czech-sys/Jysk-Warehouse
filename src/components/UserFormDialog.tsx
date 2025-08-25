@@ -75,6 +75,8 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
   const [formData, setFormData] = useState<User>({
     username: "",
     password: "",
+    first_name: "",
+    last_name: "",
     role: "skladnik",
     storeId: currentUserStoreId || "",
     permissions: defaultPermissions["skladnik"],
@@ -88,6 +90,8 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
       setFormData({
         username: "",
         password: "",
+        first_name: "",
+        last_name: "",
         role: "skladnik",
         storeId: currentUserStoreId || "",
         permissions: defaultPermissions["skladnik"],
@@ -125,7 +129,7 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.username || !formData.role || (!formData.storeId && formData.role !== "admin")) {
+    if (!formData.username || !formData.role || !formData.first_name || !formData.last_name || (!formData.storeId && formData.role !== "admin")) {
       toast.error(t("common.fillAllRequiredFields"));
       return;
     }
@@ -168,13 +172,35 @@ export const UserFormDialog: React.FC<UserFormDialogProps> = ({
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="first_name" className="sm:text-right">
+              {t("common.firstName")}
+            </Label>
+            <Input
+              id="first_name"
+              value={formData.first_name}
+              onChange={handleChange}
+              className="col-span-3"
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <Label htmlFor="last_name" className="sm:text-right">
+              {t("common.lastName")}
+            </Label>
+            <Input
+              id="last_name"
+              value={formData.last_name}
+              onChange={handleChange}
+              className="col-span-3"
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="password" className="sm:text-right">
               {t("common.password")}
             </Label>
             <Input
               id="password"
               type="password"
-              value={formData.password}
+              value={formData.password || ""}
               onChange={handleChange}
               className="col-span-3"
               placeholder={user ? t("common.enterNewPasswordOptional") : t("common.enterPassword")}

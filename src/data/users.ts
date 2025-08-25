@@ -24,12 +24,16 @@ export type Permission =
   | "help_posts:manage";
 
 export interface User {
+  id?: string;
   username: string;
-  password: string;
+  password?: string;
+  first_name: string;
+  last_name: string;
   role: "admin" | "vedouci_skladu" | "store_manager" | "deputy_store_manager" | "ar_assistant_of_sale" | "skladnik";
   storeId?: string;
   permissions: Permission[];
   firstLogin: boolean;
+  email?: string;
 }
 
 export const defaultPermissions: Record<User['role'], Permission[]> = {

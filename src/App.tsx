@@ -16,7 +16,6 @@ import ExportDataPage from "./pages/ExportDataPage";
 import AccountSettingsPage from "./pages/AccountSettingsPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
 import ManageHelpPostsPage from "./pages/ManageHelpPostsPage";
-import ManageUsersPage from "./pages/ManageUsersPage"; // Import
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
@@ -62,7 +61,6 @@ const AppContent = () => {
         <Route path="/spravovat-artikly" element={<PrivateRoute requiredPermission="article:view"><ManageArticles /></PrivateRoute>} />
         <Route path="/admin/site-dashboard" element={<PrivateRoute requiredPermission="store:view"><SiteDashboard /></PrivateRoute>} />
         <Route path="/admin/regaly" element={<PrivateRoute requiredPermission="rack:view"><ManageShelfRacksPage /></PrivateRoute>} />
-        <Route path="/admin/sprava-uzivatelu" element={<PrivateRoute requiredPermission="user:view"><ManageUsersPage /></PrivateRoute>} />
         <Route path="/skenovat-carkod" element={<PrivateRoute requiredPermission="article:scan"><CteckaCarkoduPage /></PrivateRoute>} />
         <Route path="/mass-add-artikly" element={<PrivateRoute requiredPermission="article:mass_add"><MassAddArticlesPage /></PrivateRoute>} />
         <Route path="/export-dat" element={<PrivateRoute requiredPermission="log:view"><ExportDataPage /></PrivateRoute>} />
