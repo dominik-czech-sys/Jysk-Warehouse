@@ -14,6 +14,10 @@ export interface Article {
   status: string; // Nové pole pro status zboží
   quantity: number; // New field for article quantity
   minQuantity?: number; // Optional minimum quantity for low stock alerts
+  // New fields for replenishment system
+  hasShopFloorStock?: boolean; // Does this item have stock on the shop floor?
+  shopFloorStock?: number; // Current quantity on the shop floor
+  replenishmentTrigger?: number; // Threshold to trigger replenishment
 }
 
 export const useArticles = () => {

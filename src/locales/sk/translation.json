@@ -33,7 +33,7 @@
     "loggedInAs": "Prihlásený ako",
     "warehouseWorkerStore": "Skladník, Obchod: {storeId}",
     "admin": "Administrátor",
-    "searchArticleLocation": "Vyhľadajte artikul podľa jeho ID a zistite jeho umiestnenie v sklade.",
+    "searchArticleLocation": "Vyhľadať lokáciu artiklu",
     "enterArticleId": "Zadajte ID artiklu",
     "search": "Hľadať",
     "rackColon": "Regál:",
@@ -431,7 +431,7 @@
       "exportDataTitle": "Export dát: CSV a JSON",
       "exportDataContent": "Na stránke 'Export dát' môžete vybrať, ktoré typy dát (používatelia, obchody, artikle, regály) chcete exportovať. Môžete si vybrať medzi formátom CSV a JSON. Exportované dáta sa stiahnu do vášho zariadenia. Táto funkcia je užitočná pre zálohovanie alebo analýzu dát.",
       "copyArticlesTitle": "Kopírovanie artiklov medzi obchodmi",
-      "copyArticlesContent": "V sekcii 'Správa obchodov' nájdete tlačidlo 'Kopírovať artikle'. Táto funkcia vám umožní skopírovať všetky artikle z jedného 'zdrojového' obchodu do iného 'cíľového' obchodu. Môžete tiež zvoliť, či chcete prepísať existujúce artikle v cieľovom obchode. To je veľmi užitočné pre rýchle nastavenie zásob v nových obchodoch alebo pre synchronizáciu dát.",
+      "copyArticlesContent": "V sekcii 'Správa obchodov' nájdete tlačidlo 'Kopírovať artikle'. Táto funkcia vám umožní skopírovať všetky artikle z jedného 'zdrojového' obchodu do iného 'cílového' obchodu. Môžete tiež zvoliť, či chcete prepísať existujúce artikle v cieľovom obchode. To je veľmi užitočné pre rýchle nastavenie zásob v nových obchodoch alebo pre synchronizáciu dát.",
       "categoryAdminDashboard": "Prehľad administrácie",
       "categoryStoreManagement": "Správa obchodov",
       "categoryUserManagement": "Správa používateľov",
@@ -459,6 +459,18 @@
     "fillAllTransferFields": "Vyplňte prosím všetky polia pre prevod artiklov.",
     "articleNotFoundInSource": "Artikul {articleId} nebol nájdený v zdrojovom obchode {storeId}.",
     "insufficientQuantity": "Nedostatočné množstvo artiklu {articleId} v zdrojovom obchode. K dispozícii: {available}, požadované: {requested}.",
-    "articleTransferSuccess": "Úspešne prevedených {quantity} ks artiklu {articleId} z obchodu {sourceStore} do obchodu {targetStore}."
+    "articleTransferSuccess": "Úspešne prevedených {quantity} ks artiklu {articleId} z obchodu {sourceStore} do obchodu {targetStore}.",
+    "dashboard": "Dashboard",
+    "warehouse": "Sklad",
+    "replenishment": "Doplňovanie",
+    "welcomeMessage": "Vitajte späť, {username}! Tu je prehľad vášho skladu.",
+    "articleLocation": "Lokácia artiklu",
+    "replenishmentList": "Zoznam na doplnenie",
+    "replenishmentListDescription": "Nasledujúce artikle klesli pod limit pre doplnenie na predajni.",
+    "warehouseLocation": "Lokácia v sklade",
+    "shopFloorStock": "Zásoba na predajni",
+    "replenishmentTrigger": "Limit pre doplnenie",
+    "noArticlesToReplenish": "Žiadne artikle na doplnenie.",
+    "hasShopFloorStock": "Artikul má zásobu na predajni"
   }
 }

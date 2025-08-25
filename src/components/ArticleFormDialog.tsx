@@ -17,6 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useShelfRacks } from "@/data/shelfRacks";
 import { useTranslation } from "react-i18next";
 import { GlobalArticle } from "@/data/globalArticles";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 
 interface ArticleFormDialogProps {
   isOpen: boolean;
@@ -41,7 +43,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
     id: "",
     name: "",
     status: "",
-    ...(isGlobalAdminContext ? { minQuantity: 0 } : { rackId: "", shelfNumber: "", storeId: userStoreId || "", quantity: 1, minQuantity: 0 }),
+    ...(isGlobalAdminContext ? { minQuantity: 0 } : { rackId: "", shelfNumber: "", storeId: userStoreId || "", quantity: 1, minQuantity: 0, hasShopFloorStock: false, shopFloorStock: 0, replenishmentTrigger: 0 }),
   });
   const [selectedRackId, setSelectedRackId] = useState<string>("");
   const [selectedShelfNumber, setSelectedShelfNumber] = useState<string>("");
@@ -58,7 +60,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
         id: "",
         name: "",
         status: "",
-        ...(isGlobalAdminContext ? { minQuantity: 0 } : { rackId: "", shelfNumber: "", storeId: userStoreId || "", quantity: 1, minQuantity: 0 }),
+        ...(isGlobalAdminContext ? { minQuantity: 0 } : { rackId: "", shelfNumber: "", storeId: userStoreId || "", quantity: 1, minQuantity: 0, hasShopFloorStock: false, shopFloorStock: 0, replenishmentTrigger: 0 }),
       });
       setSelectedRackId("");
       setSelectedShelfNumber("");
@@ -91,6 +93,13 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
     setFormData((prev) => ({
       ...prev,
       [id]: type === "number" ? parseInt(value, 10) || 0 : value,
+    }));
+  };
+
+  const handleCheckboxChange = (checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      hasShopFloorStock: checked,
     }));
   };
 
@@ -131,6 +140,7 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+          {/* ... existing fields ... */}
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="id" className="sm:text-right">
               {t("common.articleId")}
@@ -244,6 +254,50 @@ export const ArticleFormDialog: React.FC<ArticleFormDialogProps> = ({
               min="0"
             />
           </div>
+
+          {!isGlobalAdminContext && (
+            <>
+              <Separator className="col-span-full my-2" />
+              <div className="col-span-full flex items-center space-x-2">
+                <Checkbox
+                  id="hasShopFloorStock"
+                  checked={(formData as Article).hasShopFloorStock}
+                  onCheckedChange={(checked) => handleCheckboxChange(!!checked)}
+                />
+                <Label htmlFor="hasShopFloorStock">{t("common.hasShopFloorStock")}</Label>
+              </div>
+              {(formData as Article).hasShopFloorStock && (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+                    <Label htmlFor="shopFloorStock" className="sm:text-right">
+                      {t("common.shopFloorStock")}
+                    </Label>
+                    <Input
+                      id="shopFloorStock"
+                      type="number"
+                      value={(formData as Article).shopFloorStock || 0}
+                      onChange={handleChange}
+                      className="col-span-3"
+                      min="0"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+                    <Label htmlFor="replenishmentTrigger" className="sm:text-right">
+                      {t("common.replenishmentTrigger")}
+                    </Label>
+                    <Input
+                      id="replenishmentTrigger"
+                      type="number"
+                      value={(formData as Article).replenishmentTrigger || 0}
+                      onChange={handleChange}
+                      className="col-span-3"
+                      min="0"
+                    />
+                  </div>
+                </>
+              )}
+            </>
+          )}
 
           <DialogFooter>
             <Button type="submit" className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">

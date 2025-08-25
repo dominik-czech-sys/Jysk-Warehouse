@@ -33,7 +33,7 @@
     "loggedInAs": "Logged in as",
     "warehouseWorkerStore": "Warehouse Worker, Store: {storeId}",
     "admin": "Administrator",
-    "searchArticleLocation": "Search for an article by its ID to find its location in the warehouse.",
+    "searchArticleLocation": "Search Article Location",
     "enterArticleId": "Enter Article ID",
     "search": "Search",
     "rackColon": "Rack:",
@@ -459,6 +459,18 @@
     "fillAllTransferFields": "Please fill in all fields for article transfer.",
     "articleNotFoundInSource": "Article {articleId} not found in source store {storeId}.",
     "insufficientQuantity": "Insufficient quantity of article {articleId} in source store. Available: {available}, Requested: {requested}.",
-    "articleTransferSuccess": "Successfully transferred {quantity} pcs of article {articleId} from store {sourceStore} to store {targetStore}."
+    "articleTransferSuccess": "Successfully transferred {quantity} pcs of article {articleId} from store {sourceStore} to store {targetStore}.",
+    "dashboard": "Dashboard",
+    "warehouse": "Warehouse",
+    "replenishment": "Replenishment",
+    "welcomeMessage": "Welcome back, {username}! Here's an overview of your warehouse.",
+    "articleLocation": "Article Location",
+    "replenishmentList": "Replenishment List",
+    "replenishmentListDescription": "The following articles have fallen below the replenishment trigger on the shop floor.",
+    "warehouseLocation": "Warehouse Location",
+    "shopFloorStock": "Shop Floor Stock",
+    "replenishmentTrigger": "Replenishment Trigger",
+    "noArticlesToReplenish": "No articles to replenish.",
+    "hasShopFloorStock": "Article has shop floor stock"
   }
 }
