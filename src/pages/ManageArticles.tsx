@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { PlusCircle, Edit, Trash2, Scan, Boxes, ArrowLeft, QrCode } from "lucide-react"; // Import QrCode icon
+import { PlusCircle, Edit, Trash2, Scan, Boxes, ArrowLeft, QrCode, Filter, ArrowUpDown, X } from "lucide-react"; // Import QrCode icon, Filter, ArrowUpDown, X
 import { ArticleFormDialog } from "@/components/ArticleFormDialog";
 import { toast } from "sonner";
 import {
@@ -27,7 +27,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { useGlobalArticles, GlobalArticle } from "@/data/globalArticles";
 import { useArticles, Article } from "@/data/articles";
-import { ArticleBarcodeGenerator } from "@/components/ArticleBarcodeGenerator"; // Import ArticleBarcodeGenerator
+import { Input } from "@/components/ui/input"; // Import Input
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Import Select components
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Import Card components
 
 const ManageArticles = () => {
   const { articles, addArticle, updateArticle, deleteArticle } = useArticles();
@@ -45,7 +47,68 @@ const ManageArticles = () => {
   const [isBarcodeGeneratorOpen, setIsBarcodeGeneratorOpen] = useState(false);
   const [articleToGenerateBarcode, setArticleToGenerateBarcode] = useState<{ id: string; storeId: string } | null>(null);
 
-  const currentArticles = isAdmin ? globalArticles : articles;
+  // Filter and Sort States
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [minQuantityFilter, setMinQuantityFilter] = useState<number | ''>('');
+  const [sortBy, setSortBy] = useState("id-asc"); // e.g., "id-asc", "name-desc", "quantity-asc"
+
+  const allArticlesForDisplay = isAdmin ? globalArticles : articles;
+
+  const filteredAndSortedArticles = useMemo(() => {
+    let currentFilteredArticles = allArticlesForDisplay;
+
+    // Apply search term filter
+    if (searchTerm) {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      currentFilteredArticles = currentFilteredArticles.filter(
+        (article) =>
+          article.id.toLowerCase().includes(lowerCaseSearchTerm) ||
+          article.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+          article.status.toLowerCase().includes(lowerCaseSearchTerm)
+      );
+    }
+
+    // Apply status filter
+    if (filterStatus !== "all") {
+      currentFilteredArticles = currentFilteredArticles.filter(
+        (article) => article.status === filterStatus
+      );
+    }
+
+    // Apply min quantity filter
+    if (minQuantityFilter !== '' && minQuantityFilter >= 0) {
+      currentFilteredArticles = currentFilteredArticles.filter(
+        (article) => (article.minQuantity || 0) >= minQuantityFilter
+      );
+    }
+
+    // Apply sorting
+    currentFilteredArticles.sort((a, b) => {
+      switch (sortBy) {
+        case "id-asc":
+          return a.id.localeCompare(b.id);
+        case "id-desc":
+          return b.id.localeCompare(a.id);
+        case "name-asc":
+          return a.name.localeCompare(b.name);
+        case "name-desc":
+          return b.name.localeCompare(a.name);
+        case "quantity-asc":
+          return (a as Article).quantity - (b as Article).quantity;
+        case "quantity-desc":
+          return (b as Article).quantity - (a as Article).quantity;
+        case "status-asc":
+          return a.status.localeCompare(b.status);
+        case "status-desc":
+          return b.status.localeCompare(a.status);
+        default:
+          return 0;
+      }
+    });
+
+    return currentFilteredArticles;
+  }, [allArticlesForDisplay, searchTerm, filterStatus, minQuantityFilter, sortBy]);
 
   const handleAddArticle = (newArticle: Article | GlobalArticle) => {
     if (isAdmin) {
@@ -53,7 +116,12 @@ const ManageArticles = () => {
         toast.error(t("common.noPermissionToAddArticles"));
         return;
       }
+      if (globalArticles.some(article => article.id === newArticle.id)) {
+        toast.error(t("common.globalArticleExists", { articleId: newArticle.id }));
+        return;
+      }
       addGlobalArticle(newArticle as GlobalArticle);
+      toast.success(t("common.globalArticleAddedSuccess", { articleId: newArticle.id }));
     } else {
       if (!hasPermission("article:create")) {
         toast.error(t("common.noPermissionToAddArticles"));
@@ -76,6 +144,7 @@ const ManageArticles = () => {
         return;
       }
       updateGlobalArticle(updatedArticle as GlobalArticle);
+      toast.success(t("common.globalArticleUpdatedSuccess", { articleId: updatedArticle.id }));
     } else {
       if (!hasPermission("article:update")) {
         toast.error(t("common.noPermissionToEditArticles"));
@@ -124,9 +193,23 @@ const ManageArticles = () => {
     setIsBarcodeGeneratorOpen(true);
   };
 
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setFilterStatus("all");
+    setMinQuantityFilter('');
+    setSortBy("id-asc");
+  };
+
+  // Get unique statuses for filter dropdown
+  const uniqueStatuses = useMemo(() => {
+    const statuses = new Set<string>();
+    allArticlesForDisplay.forEach(article => statuses.add(article.status));
+    return ["all", ...Array.from(statuses).sort()];
+  }, [allArticlesForDisplay]);
+
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 dark:bg-gray-900 p-2 sm:p-4">
-      <div className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 sm:p-6 mt-4 sm:mt-8">
+      <div className="w-full max-w-6xl bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 sm:p-6 mt-4 sm:mt-8">
         <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-4 sm:mb-6 space-y-2 sm:space-y-0">
           <Link to="/" className="w-full sm:w-auto">
             <Button variant="outline" className="flex items-center w-full">
@@ -159,6 +242,75 @@ const ManageArticles = () => {
           </div>
         </div>
 
+        {/* Filter and Sort Section */}
+        <Card className="mb-4 sm:mb-6">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light flex items-center">
+              <Filter className="h-5 w-5 mr-2" /> {t("common.articlesFilter")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="col-span-full md:col-span-2 lg:col-span-1">
+              <Input
+                placeholder={t("common.searchArticles")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Select onValueChange={setFilterStatus} value={filterStatus}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t("common.filterByStatus")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {uniqueStatuses.map(status => (
+                    <SelectItem key={status} value={status}>
+                      {status === "all" ? t("common.all") : status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Input
+                type="number"
+                placeholder={t("common.minQuantity")}
+                value={minQuantityFilter}
+                onChange={(e) => setMinQuantityFilter(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
+                className="w-full"
+                min="0"
+              />
+            </div>
+            <div>
+              <Select onValueChange={setSortBy} value={sortBy}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t("common.sortBy")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="id-asc">{t("common.sortByIdAsc")}</SelectItem>
+                  <SelectItem value="id-desc">{t("common.sortByIdDesc")}</SelectItem>
+                  <SelectItem value="name-asc">{t("common.sortByNameAsc")}</SelectItem>
+                  <SelectItem value="name-desc">{t("common.sortByNameDesc")}</SelectItem>
+                  {!isAdmin && (
+                    <>
+                      <SelectItem value="quantity-asc">{t("common.sortByQuantityAsc")}</SelectItem>
+                      <SelectItem value="quantity-desc">{t("common.sortByQuantityDesc")}</SelectItem>
+                    </>
+                  )}
+                  <SelectItem value="status-asc">{t("common.sortByStatusAsc")}</SelectItem>
+                  <SelectItem value="status-desc">{t("common.sortByStatusDesc")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="col-span-full flex justify-end">
+              <Button onClick={handleResetFilters} variant="outline" className="flex items-center">
+                <X className="h-4 w-4 mr-2" /> {t("common.resetFilters")}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -175,7 +327,7 @@ const ManageArticles = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {currentArticles.map((article) => (
+              {filteredAndSortedArticles.map((article) => (
                 <TableRow key={`${article.id}-${isAdmin ? "GLOBAL" : (article as Article).storeId}`}>
                   <TableCell className="font-medium">{article.id}</TableCell>
                   <TableCell>{article.name}</TableCell>
@@ -223,7 +375,7 @@ const ManageArticles = () => {
           </Table>
         </div>
 
-        {currentArticles.length === 0 && (
+        {filteredAndSortedArticles.length === 0 && (
           <p className="text-center text-muted-foreground mt-4">{isAdmin ? t("common.noGlobalArticles") : t("common.noArticlesFound")}</p>
         )}
       </div>

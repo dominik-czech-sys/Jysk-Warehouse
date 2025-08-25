@@ -164,7 +164,7 @@ const MassAddArticlesPage: React.FC = () => {
     const existingArticle = getArticleById(articleId.trim().toUpperCase(), userStoreId);
     const newArticleData: Article = {
       id: articleId.trim().toUpperCase(),
-      name: existingArticle?.name || `${t("common.unknown")} ${t("common.article")} ${articleId.trim().toUpperCase()}`,
+      name: existingArticle?.name || `${t("common.unknownArticle")} ${articleId.trim().toUpperCase()}`,
       status: existingArticle?.status || "21",
       quantity: quantity,
       ...shelfDetails,

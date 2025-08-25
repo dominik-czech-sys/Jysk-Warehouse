@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLog } from "@/contexts/LogContext"; // Import useLog
 import { useShelfRacks } from "./shelfRacks"; // Import useShelfRacks to get rack details
 import { useGlobalArticles } from "./globalArticles"; // Import useGlobalArticles
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 export interface Article {
   id: string; // Číslo artiklu (Article Number)
@@ -20,6 +21,7 @@ export const useArticles = () => {
   const { addLogEntry } = useLog();
   const { allShelfRacks } = useShelfRacks(); // Use allShelfRacks here
   const { globalArticles } = useGlobalArticles(); // Use global articles
+  const { t } = useTranslation(); // Initialize useTranslation
 
   const [articles, setArticles] = useState<Article[]>(() => {
     const storedArticles = localStorage.getItem("articles");
@@ -38,7 +40,7 @@ export const useArticles = () => {
         ...articles, // All store-specific articles
         ...globalArticles.map(ga => ({ // Global articles as "N/A" location
           id: ga.id,
-          name: ga.name,
+          name: ga.id, // Use ID as name for global articles in this context
           status: ga.status,
           rackId: "N/A",
           shelfNumber: "N/A",
@@ -66,19 +68,19 @@ export const useArticles = () => {
 
   const addArticle = (newArticle: Article) => {
     setArticles((prev) => [...prev, newArticle]);
-    addLogEntry("Artikl přidán", { articleId: newArticle.id, name: newArticle.name, rackId: newArticle.rackId, shelfNumber: newArticle.shelfNumber, storeId: newArticle.storeId, quantity: newArticle.quantity, minQuantity: newArticle.minQuantity }, user?.username);
+    addLogEntry(t("common.articleAdded"), { articleId: newArticle.id, name: newArticle.name, rackId: newArticle.rackId, shelfNumber: newArticle.shelfNumber, storeId: newArticle.storeId, quantity: newArticle.quantity, minQuantity: newArticle.minQuantity }, user?.username);
   };
 
   const updateArticle = (updatedArticle: Article) => {
     setArticles((prev) =>
       prev.map((article) => (article.id === updatedArticle.id && article.storeId === updatedArticle.storeId ? updatedArticle : article))
     );
-    addLogEntry("Artikl aktualizován", { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, storeId: updatedArticle.storeId, quantity: updatedArticle.quantity, minQuantity: updatedArticle.minQuantity }, user?.username);
+    addLogEntry(t("common.articleUpdated"), { articleId: updatedArticle.id, name: updatedArticle.name, rackId: updatedArticle.rackId, shelfNumber: updatedArticle.shelfNumber, storeId: updatedArticle.storeId, quantity: updatedArticle.quantity, minQuantity: updatedArticle.minQuantity }, user?.username);
   };
 
   const deleteArticle = (id: string, storeId: string) => {
     setArticles((prev) => prev.filter((article) => !(article.id === id && article.storeId === storeId)));
-    addLogEntry("Artikl smazán", { articleId: id, storeId }, user?.username);
+    addLogEntry(t("common.articleDeleted"), { articleId: id, storeId }, user?.username);
   };
 
   const getArticlesByStoreId = (storeId: string) => {
