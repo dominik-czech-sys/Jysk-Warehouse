@@ -52,6 +52,7 @@
     "login": "Login",
     "email": "Email",
     "enterEmail": "Enter your email",
+    "signUp": "Sign Up",
     "viewExternalContent": "View External Content",
     "scanBarcodeTitle": "Scan Barcode",
     "ensureBarcodeVisible": "Ensure the barcode is clearly visible within the frame.",
