@@ -49,6 +49,8 @@ const AccountSettingsPage: React.FC = () => {
             <CardDescription>{t("common.personalInformationDescription")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-gray-700 dark:text-gray-300">
+            <p><strong>{t("common.name")}:</strong> {user.first_name} {user.last_name}</p>
+            <p><strong>{t("common.username")}:</strong> {user.username}</p>
             <p><strong>{t("common.email")}:</strong> {user.email}</p>
             <p><strong>{t("common.role")}:</strong> {user.role}</p>
             {user.store_id && <p><strong>{t("common.storeId")}:</strong> {user.store_id}</p>}
