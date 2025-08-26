@@ -40,7 +40,7 @@ const MainLayout: React.FC = () => {
 
   const AdminNav = () => (
     <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-      <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.admin.systemManagement")}</h3>
+      <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("page.siteDashboard.system")}</h3>
       <NavLink to="/admin/site-dashboard" end className={navLinkClasses}>
         <Home className="h-4 w-4" />
         {t("common.siteDashboard")}
@@ -60,14 +60,14 @@ const MainLayout: React.FC = () => {
       </NavLink>
       <NavLink to="/oznameni" className={navLinkClasses}>
         <Megaphone className="h-4 w-4" />
-        {t("common.announcement.pageTitle")}
+        {t("announcement.pageTitle")}
       </NavLink>
       
       <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.warehouse")}</h3>
       {hasPermission("audit:view_results") && (
         <NavLink to="/audity" className={navLinkClasses}>
           <FileCheck className="h-4 w-4" />
-          {t("common.audit.audits")}
+          {t("audit.audits")}
         </NavLink>
       )}
       <NavLink to="/doplnovani" className={navLinkClasses}>
@@ -79,7 +79,7 @@ const MainLayout: React.FC = () => {
       {hasPermission("task:view") && (
         <NavLink to="/ukoly" className={navLinkClasses}>
           <ClipboardList className="h-4 w-4" />
-          {t("common.task.taskManagement")}
+          {t("task.taskManagement")}
         </NavLink>
       )}
       {hasPermission("article:view") && (

@@ -37,17 +37,17 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({ isOp
     e.preventDefault();
 
     if (!newPassword || !confirmNewPassword) {
-      toast.error(t("common.fillAllPasswordFields"));
+      toast.error(t("common.fillAllFields"));
       return;
     }
 
     if (newPassword !== confirmNewPassword) {
-      toast.error(t("common.passwordMismatch"));
+      toast.error(t("notification.error.passwordMismatch"));
       return;
     }
 
     if (newPassword.length < 6) {
-      toast.error(t("common.passwordTooShort"));
+      toast.error(t("notification.error.passwordTooShort"));
       return;
     }
 
@@ -62,15 +62,15 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({ isOp
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{t("common.changePassword")}</DialogTitle>
+          <DialogTitle>{t("page.accountSettings.changePassword")}</DialogTitle>
           <DialogDescription>
-            {t("common.changePasswordDescription")}
+            {t("page.accountSettings.changePasswordDescription")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="newPassword" className="sm:text-right">
-              {t("common.newPassword")}
+              {t("page.accountSettings.newPassword")}
             </Label>
             <Input
               id="newPassword"
@@ -83,7 +83,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({ isOp
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
             <Label htmlFor="confirmNewPassword" className="sm:text-right">
-              {t("common.confirmNewPassword")}
+              {t("page.accountSettings.confirmNewPassword")}
             </Label>
             <Input
               id="confirmNewPassword"
@@ -96,7 +96,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({ isOp
           </div>
           <DialogFooter className="col-span-full mt-4">
             <Button type="submit" className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">
-              {t("common.changePassword")}
+              {t("page.accountSettings.changePassword")}
             </Button>
           </DialogFooter>
         </form>

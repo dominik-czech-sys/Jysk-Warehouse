@@ -44,7 +44,7 @@ export const MobileSidebar: React.FC = () => {
         <Package className="h-6 w-6 text-jyskBlue-dark" />
         <span>JYSK WMS</span>
       </Link>
-      <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.admin.systemManagement")}</h3>
+      <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("page.siteDashboard.system")}</h3>
       <NavLink to="/admin/site-dashboard" end className={navLinkClasses} onClick={closeSheet}>
         <Home className="h-5 w-5" />
         {t("common.siteDashboard")}
@@ -68,14 +68,14 @@ export const MobileSidebar: React.FC = () => {
       </NavLink>
       <NavLink to="/oznameni" className={navLinkClasses} onClick={closeSheet}>
         <Megaphone className="h-5 w-5" />
-        {t("common.announcement.pageTitle")}
+        {t("announcement.pageTitle")}
       </NavLink>
 
       <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.warehouse")}</h3>
       {hasPermission("audit:view_results") && (
         <NavLink to="/audity" className={navLinkClasses} onClick={closeSheet}>
           <FileCheck className="h-5 w-5" />
-          {t("common.audit.audits")}
+          {t("audit.audits")}
         </NavLink>
       )}
       <NavLink to="/doplnovani" className={navLinkClasses} onClick={closeSheet}>
@@ -87,7 +87,7 @@ export const MobileSidebar: React.FC = () => {
       {hasPermission("task:view") && (
         <NavLink to="/ukoly" className={navLinkClasses} onClick={closeSheet}>
           <ClipboardList className="h-5 w-5" />
-          {t("common.task.taskManagement")}
+          {t("task.taskManagement")}
         </NavLink>
       )}
       {hasPermission("article:view") && (
