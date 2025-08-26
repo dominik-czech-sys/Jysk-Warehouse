@@ -586,5 +586,9 @@
   "admin": {
     "taskStatusDistribution": "Task Status Distribution",
     "taskStatusDistributionDescription": "An overview of tasks by their current status."
+  },
+  "featureFlags": {
+    "title": "Features",
+    "description": "Enable or disable system modules for all users."
   }
 }

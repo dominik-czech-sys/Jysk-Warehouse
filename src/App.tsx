@@ -26,6 +26,7 @@ import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { DashboardProvider } from "./contexts/DashboardContext";
+import { FeatureFlagProvider, useFeatureFlags } from "./contexts/FeatureFlagContext";
 import { useContext } from "react";
 import { Permission } from "./data/users";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -42,19 +43,28 @@ const ProtectedRoutes = () => {
   return <MainLayout />;
 };
 
-const PrivateRoute: React.FC<{ children: JSX.Element; requiredPermission?: Permission }> = ({
+const PrivateRoute: React.FC<{ children: JSX.Element; requiredPermission?: Permission, featureFlag?: string }> = ({
   children,
   requiredPermission,
+  featureFlag,
 }) => {
   const auth = useContext(AuthContext);
+  const { isFeatureEnabled, isLoading } = useFeatureFlags();
+
   if (!auth) return <Navigate to="/prihlaseni" replace />;
+  if (isLoading) return <div>Loading...</div>; // Or a proper spinner
   if (requiredPermission && !auth.hasPermission(requiredPermission)) {
+    return <Navigate to="/" replace />;
+  }
+  if (featureFlag && !isFeatureEnabled(featureFlag)) {
     return <Navigate to="/" replace />;
   }
   return children;
 };
 
 const AppContent = () => {
+  const { isFeatureEnabled } = useFeatureFlags();
+
   return (
     <Routes>
       <Route path="/prihlaseni" element={<LoginPage />} />
@@ -71,13 +81,14 @@ const AppContent = () => {
         <Route path="/account-settings" element={<PrivateRoute><AccountSettingsPage /></PrivateRoute>} />
         <Route path="/help-center" element={<PrivateRoute><HelpCenterPage /></PrivateRoute>} />
         <Route path="/admin/help-posts" element={<PrivateRoute requiredPermission="help_posts:manage"><ManageHelpPostsPage /></PrivateRoute>} />
-        <Route path="/doplnovani" element={<PrivateRoute><ReplenishmentPage /></PrivateRoute>} />
-        <Route path="/ukoly" element={<PrivateRoute requiredPermission="task:view"><TaskManagementPage /></PrivateRoute>} />
-        <Route path="/admin/audit-templates" element={<PrivateRoute requiredPermission="audit:manage_templates"><ManageAuditTemplatesPage /></PrivateRoute>} />
-        <Route path="/audity" element={<PrivateRoute requiredPermission="audit:view_results"><AuditListPage /></PrivateRoute>} />
-        <Route path="/audity/provadet" element={<PrivateRoute requiredPermission="audit:perform"><PerformAuditPage /></PrivateRoute>} />
-        <Route path="/audity/:auditId" element={<PrivateRoute requiredPermission="audit:view_results"><AuditDetailPage /></PrivateRoute>} />
-        <Route path="/oznameni" element={<PrivateRoute><AnnouncementsPage /></PrivateRoute>} />
+        
+        {isFeatureEnabled('replenishment') && <Route path="/doplnovani" element={<PrivateRoute featureFlag="replenishment"><ReplenishmentPage /></PrivateRoute>} />}
+        {isFeatureEnabled('tasks') && <Route path="/ukoly" element={<PrivateRoute requiredPermission="task:view" featureFlag="tasks"><TaskManagementPage /></PrivateRoute>} />}
+        {isFeatureEnabled('audits') && <Route path="/admin/audit-templates" element={<PrivateRoute requiredPermission="audit:manage_templates" featureFlag="audits"><ManageAuditTemplatesPage /></PrivateRoute>} />}
+        {isFeatureEnabled('audits') && <Route path="/audity" element={<PrivateRoute requiredPermission="audit:view_results" featureFlag="audits"><AuditListPage /></PrivateRoute>} />}
+        {isFeatureEnabled('audits') && <Route path="/audity/provadet" element={<PrivateRoute requiredPermission="audit:perform" featureFlag="audits"><PerformAuditPage /></PrivateRoute>} />}
+        {isFeatureEnabled('audits') && <Route path="/audity/:auditId" element={<PrivateRoute requiredPermission="audit:view_results" featureFlag="audits"><AuditDetailPage /></PrivateRoute>} />}
+        {isFeatureEnabled('announcements') && <Route path="/oznameni" element={<PrivateRoute featureFlag="announcements"><AnnouncementsPage /></PrivateRoute>} />}
       </Route>
 
       <Route path="*" element={<NotFound />} />
@@ -93,13 +104,15 @@ const App = () => (
       <BrowserRouter>
         <LogProvider>
           <AuthProvider>
-            <ThemeProvider>
-              <NotificationProvider>
-                <DashboardProvider>
-                  <AppContent />
-                </DashboardProvider>
-              </NotificationProvider>
-            </ThemeProvider>
+            <FeatureFlagProvider>
+              <ThemeProvider>
+                <NotificationProvider>
+                  <DashboardProvider>
+                    <AppContent />
+                  </DashboardProvider>
+                </NotificationProvider>
+              </ThemeProvider>
+            </FeatureFlagProvider>
           </AuthProvider>
         </LogProvider>
       </BrowserRouter>

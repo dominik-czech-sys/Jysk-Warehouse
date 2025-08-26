@@ -23,6 +23,7 @@ import { AnnouncementManagementSection } from "@/components/dashboard/Announceme
 import { AuditScoresChart } from "@/components/dashboard/charts/AuditScoresChart";
 import { ArticleStatusChart } from "@/components/dashboard/charts/ArticleStatusChart";
 import { TaskStatusChart } from "@/components/dashboard/charts/TaskStatusChart";
+import { FeatureManagementSection } from "@/components/dashboard/FeatureManagementSection";
 
 const SiteDashboard: React.FC = () => {
   const { isAdmin, hasPermission } = useAuth();
@@ -84,12 +85,13 @@ const SiteDashboard: React.FC = () => {
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-8">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-9">
             <TabsTrigger value="overview">{t("page.siteDashboard.overview")}</TabsTrigger>
             <TabsTrigger value="analytics">{t("page.siteDashboard.analytics")}</TabsTrigger>
             <TabsTrigger value="stores">{t("page.siteDashboard.stores")}</TabsTrigger>
             <TabsTrigger value="users">{t("page.siteDashboard.users")}</TabsTrigger>
             <TabsTrigger value="roles">{t("page.siteDashboard.roles")}</TabsTrigger>
+            <TabsTrigger value="features">{t("featureFlags.title")}</TabsTrigger>
             <TabsTrigger value="communication">{t("page.siteDashboard.communication")}</TabsTrigger>
             <TabsTrigger value="audits">{t("page.siteDashboard.audits")}</TabsTrigger>
             <TabsTrigger value="system">{t("page.siteDashboard.system")}</TabsTrigger>
@@ -134,6 +136,10 @@ const SiteDashboard: React.FC = () => {
 
           <TabsContent value="roles" className="mt-4">
             <RoleManagementSection />
+          </TabsContent>
+
+          <TabsContent value="features" className="mt-4">
+            <FeatureManagementSection />
           </TabsContent>
 
           <TabsContent value="communication" className="mt-4">

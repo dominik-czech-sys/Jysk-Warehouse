@@ -22,10 +22,12 @@ import { MobileSidebar } from "@/components/MobileSidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { NotificationList } from "@/components/NotificationList";
+import { useFeatureFlags } from "@/contexts/FeatureFlagContext";
 
 const MainLayout: React.FC = () => {
   const { user, isAdmin, hasPermission, logout } = useAuth();
   const { t } = useTranslation();
+  const { isFeatureEnabled } = useFeatureFlags();
 
   const handleLogout = () => {
     logout();
@@ -58,25 +60,29 @@ const MainLayout: React.FC = () => {
         <Home className="h-4 w-4" />
         {t("common.dashboard")}
       </NavLink>
-      <NavLink to="/oznameni" className={navLinkClasses}>
-        <Megaphone className="h-4 w-4" />
-        {t("announcement.pageTitle")}
-      </NavLink>
+      {isFeatureEnabled('announcements') && (
+        <NavLink to="/oznameni" className={navLinkClasses}>
+          <Megaphone className="h-4 w-4" />
+          {t("announcement.pageTitle")}
+        </NavLink>
+      )}
       
       <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.warehouse")}</h3>
-      {hasPermission("audit:view_results") && (
+      {isFeatureEnabled('audits') && hasPermission("audit:view_results") && (
         <NavLink to="/audity" className={navLinkClasses}>
           <FileCheck className="h-4 w-4" />
           {t("audit.audits")}
         </NavLink>
       )}
-      <NavLink to="/doplnovani" className={navLinkClasses}>
-        <RefreshCw className="h-4 w-4" />
-        {t("common.replenishment")}
-      </NavLink>
+      {isFeatureEnabled('replenishment') && (
+        <NavLink to="/doplnovani" className={navLinkClasses}>
+          <RefreshCw className="h-4 w-4" />
+          {t("common.replenishment")}
+        </NavLink>
+      )}
 
       <h3 className="my-2 px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("common.management")}</h3>
-      {hasPermission("task:view") && (
+      {isFeatureEnabled('tasks') && hasPermission("task:view") && (
         <NavLink to="/ukoly" className={navLinkClasses}>
           <ClipboardList className="h-4 w-4" />
           {t("task.taskManagement")}

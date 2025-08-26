@@ -586,5 +586,9 @@
   "admin": {
     "taskStatusDistribution": "Rozloženie stavov úloh",
     "taskStatusDistributionDescription": "Prehľad úloh podľa ich aktuálneho stavu."
+  },
+  "featureFlags": {
+    "title": "Funkcie",
+    "description": "Zapnite alebo vypnite jednotlivé moduly systému pre všetkých používateľov."
   }
 }
