@@ -8,6 +8,7 @@ export interface DashboardWidgetConfig {
 
 interface DashboardContextType {
   widgets: DashboardWidgetConfig[];
+  setWidgets: React.Dispatch<React.SetStateAction<DashboardWidgetConfig[]>>;
   addWidget: (componentName: string) => void;
   removeWidget: (id: string) => void;
   availableWidgets: { id: string; name: string; description: string }[];
@@ -51,12 +52,12 @@ export const DashboardProvider: React.FC<DashboardProviderProps> = ({ children }
   }, [widgets]);
 
   const availableWidgets = [
-    { id: "MyTasksWidget", name: "common.widgets.myTasks", description: "common.widgets.myTasksDescription" },
-    { id: "AnnouncementsWidget", name: "common.widgets.latestAnnouncements", description: "common.widgets.latestAnnouncementsDescription" },
-    { id: "LowStockAlertsWidget", name: "common.widgets.lowStockAlerts", description: "common.widgets.lowStockAlertsDescription" },
-    { id: "ArticleOverviewWidget", name: "common.widgets.articleOverview", description: "common.widgets.articleOverviewDescription" },
-    { id: "WarehouseSearchWidget", name: "common.widgets.searchArticleLocation", description: "common.widgets.searchArticleLocationDescription" },
-    { id: "WarehouseLocationDisplayWidget", name: "common.widgets.articleLocation", description: "common.widgets.articleLocationDescription" },
+    { id: "MyTasksWidget", name: "widget.myTasks", description: "widget.myTasksDescription" },
+    { id: "AnnouncementsWidget", name: "widget.latestAnnouncements", description: "widget.latestAnnouncementsDescription" },
+    { id: "LowStockAlertsWidget", name: "widget.lowStockAlerts", description: "widget.lowStockAlertsDescription" },
+    { id: "ArticleOverviewWidget", name: "widget.articleOverview", description: "widget.articleOverviewDescription" },
+    { id: "WarehouseSearchWidget", name: "widget.searchArticleLocation", description: "widget.searchArticleLocationDescription" },
+    { id: "WarehouseLocationDisplayWidget", name: "widget.articleLocation", description: "widget.articleLocationDescription" },
   ];
 
   const addWidget = (componentName: string) => {
@@ -75,6 +76,7 @@ export const DashboardProvider: React.FC<DashboardProviderProps> = ({ children }
     <DashboardContext.Provider
       value={{
         widgets,
+        setWidgets,
         addWidget,
         removeWidget,
         availableWidgets,

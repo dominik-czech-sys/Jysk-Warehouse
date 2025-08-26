@@ -32,8 +32,8 @@ export const AuditScoresChart: React.FC = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("common.audit.averageScoresByStore")}</CardTitle>
-        <CardDescription>{t("common.audit.averageScoresByStoreDescription")}</CardDescription>
+        <CardTitle>{t("audit.averageScoresByStore")}</CardTitle>
+        <CardDescription>{t("audit.averageScoresByStoreDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
@@ -46,7 +46,7 @@ export const AuditScoresChart: React.FC = () => {
               <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} unit="%" domain={[0, 100]} />
               <Tooltip formatter={(value) => `${(value as number).toFixed(1)}%`} />
               <Legend />
-              <Bar dataKey="averageScore" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name={t("common.audit.averageScore")} />
+              <Bar dataKey="averageScore" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name={t("audit.averageScore")} />
             </BarChart>
           )}
         </ResponsiveContainer>

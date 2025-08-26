@@ -21,7 +21,7 @@ import { UserDistributionChart } from "@/components/dashboard/charts/UserDistrib
 import { ScrapeDataSection } from "@/components/dashboard/ScrapeDataSection";
 import { AnnouncementManagementSection } from "@/components/dashboard/AnnouncementManagementSection";
 import { AuditScoresChart } from "@/components/dashboard/charts/AuditScoresChart";
-import { ArticleStatusChart } from "@/components/dashboard/ArticleStatusChart";
+import { ArticleStatusChart } from "@/components/dashboard/charts/ArticleStatusChart";
 import { TaskStatusChart } from "@/components/dashboard/charts/TaskStatusChart";
 
 const SiteDashboard: React.FC = () => {

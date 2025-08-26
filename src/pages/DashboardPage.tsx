@@ -12,6 +12,9 @@ import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { AddWidgetDialog } from "@/components/AddWidgetDialog";
+import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
+import { SortableWidget } from "@/components/SortableWidget";
 
 const widgetComponents: { [key: string]: React.FC<{ id: string }> } = {
   ArticleOverviewWidget,
@@ -25,12 +28,23 @@ const widgetComponents: { [key: string]: React.FC<{ id: string }> } = {
 const DashboardPage = () => {
   const { user, isAdmin } = useAuth();
   const { t } = useTranslation();
-  const { widgets } = useDashboard();
+  const { widgets, setWidgets } = useDashboard();
   const [isAddWidgetDialogOpen, setIsAddWidgetDialogOpen] = useState(false);
 
   if (isAdmin) {
     return <Navigate to="/admin/site-dashboard" replace />;
   }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setWidgets((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -47,13 +61,21 @@ const DashboardPage = () => {
         </Button>
       </div>
       
-      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
-        {widgets.map((widgetConfig) => {
-          const WidgetComponent = widgetComponents[widgetConfig.component];
-          if (!WidgetComponent) return null;
-          return <WidgetComponent key={widgetConfig.id} id={widgetConfig.id} />;
-        })}
-      </div>
+      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={widgets.map(w => w.id)} strategy={rectSortingStrategy}>
+          <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
+            {widgets.map((widgetConfig) => {
+              const WidgetComponent = widgetComponents[widgetConfig.component];
+              if (!WidgetComponent) return null;
+              return (
+                <SortableWidget key={widgetConfig.id} id={widgetConfig.id}>
+                  <WidgetComponent id={widgetConfig.id} />
+                </SortableWidget>
+              );
+            })}
+          </div>
+        </SortableContext>
+      </DndContext>
 
       <AddWidgetDialog isOpen={isAddWidgetDialogOpen} onClose={() => setIsAddWidgetDialogOpen(false)} />
     </div>

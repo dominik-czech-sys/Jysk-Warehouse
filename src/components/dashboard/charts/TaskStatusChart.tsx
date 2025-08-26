@@ -13,7 +13,7 @@ export const TaskStatusChart: React.FC = () => {
   const chartData = useMemo(() => {
     if (!tasks) return [];
     const statusCounts = tasks.reduce((acc, task) => {
-      const statusKey = `common.task.status${task.status.charAt(0).toUpperCase() + task.status.slice(1)}`;
+      const statusKey = `task.status${task.status.charAt(0).toUpperCase() + task.status.slice(1)}`;
       const statusName = t(statusKey);
       acc[statusName] = (acc[statusName] || 0) + 1;
       return acc;
@@ -25,8 +25,8 @@ export const TaskStatusChart: React.FC = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("common.admin.taskStatusDistribution")}</CardTitle>
-        <CardDescription>{t("common.admin.taskStatusDistributionDescription")}</CardDescription>
+        <CardTitle>{t("admin.taskStatusDistribution")}</CardTitle>
+        <CardDescription>{t("admin.taskStatusDistributionDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
