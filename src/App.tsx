@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage";
 import NotFound from "./pages/NotFound";
 import ManageArticles from "./pages/ManageArticles";
@@ -21,7 +21,7 @@ import ManageAuditTemplatesPage from "./pages/ManageAuditTemplatesPage";
 import AuditListPage from "./pages/AuditListPage";
 import PerformAuditPage from "./pages/PerformAuditPage";
 import AuditDetailPage from "./pages/AuditDetailPage";
-import AnnouncementsPage from "./pages/AnnouncementsPage"; // Import
+import AnnouncementsPage from "./pages/AnnouncementsPage";
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { LogProvider } from "./contexts/LogContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
@@ -29,8 +29,6 @@ import { DashboardProvider } from "./contexts/DashboardContext";
 import { useContext } from "react";
 import { Permission } from "./data/users";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { I18nextProvider } from "react-i18next";
-import i18n from "./i18n";
 import MainLayout from "./components/MainLayout";
 import ReplenishmentPage from "./pages/ReplenishmentPage";
 
@@ -96,13 +94,11 @@ const App = () => (
         <LogProvider>
           <AuthProvider>
             <ThemeProvider>
-              <I18nextProvider i18n={i18n}>
-                <NotificationProvider>
-                  <DashboardProvider>
-                    <AppContent />
-                  </DashboardProvider>
-                </NotificationProvider>
-              </I18nextProvider>
+              <NotificationProvider>
+                <DashboardProvider>
+                  <AppContent />
+                </DashboardProvider>
+              </NotificationProvider>
             </ThemeProvider>
           </AuthProvider>
         </LogProvider>

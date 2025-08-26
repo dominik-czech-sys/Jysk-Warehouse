@@ -1,14 +1,14 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
 const NotFound = () => {
   const location = useLocation();
-  const { t } = useTranslation(); // Initialize useTranslation
+  const { t } = useTranslation();
 
   useEffect(() => {
     console.error(
-      "404 Chyba: Uživatel se pokusil získat přístup k neexistující cestě:",
+      "404 Error: User tried to access a non-existent path:",
       location.pathname,
     );
   }, [location.pathname]);

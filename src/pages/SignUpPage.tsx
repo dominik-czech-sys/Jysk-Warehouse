@@ -30,8 +30,8 @@ const SignUpPage: React.FC = () => {
           username,
           first_name: firstName,
           last_name: lastName,
-          role: 'skladnik', // Default role for new signups
-          store_id: 'T508' // Default store, admin can change later
+          role: 'skladnik',
+          store_id: 'T508'
         },
       },
     });
@@ -39,10 +39,9 @@ const SignUpPage: React.FC = () => {
     if (error) {
       toast.error(error.message);
     } else if (data.user) {
-      toast.success(t("common.signUpSuccessTitle"));
-      toast.info(t("common.signUpSuccessMessage"));
+      toast.success(t("auth.signUpSuccessTitle"));
+      toast.info(t("auth.signUpSuccessMessage"));
       
-      // Notify admins
       const { data: admins, error: adminError } = await supabase.from("profiles").select("id").eq("role", "admin");
       if (adminError) {
         console.error("Error fetching admins for notification:", adminError);
@@ -51,7 +50,7 @@ const SignUpPage: React.FC = () => {
           user_id: admin.id,
           type: 'info',
           message: `Nový uživatel '${username}' čeká na schválení.`,
-          link: '/admin/site-dashboard' // Direct link to user management tab would be better
+          link: '/admin/site-dashboard'
         }));
         await supabase.from("notifications").insert(notifications);
       }
@@ -65,39 +64,39 @@ const SignUpPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("common.signUpTitle")}</CardTitle>
-          <CardDescription>{t("common.signUpDescription")}</CardDescription>
+          <CardTitle className="text-3xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("auth.signUpTitle")}</CardTitle>
+          <CardDescription>{t("auth.signUpDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignUp} className="space-y-4">
             <div>
-              <Label htmlFor="username">{t("common.username")}</Label>
+              <Label htmlFor="username">{t("auth.username")}</Label>
               <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} required />
             </div>
             <div>
-              <Label htmlFor="firstName">{t("common.firstName")}</Label>
+              <Label htmlFor="firstName">{t("auth.firstName")}</Label>
               <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
             </div>
             <div>
-              <Label htmlFor="lastName">{t("common.lastName")}</Label>
+              <Label htmlFor="lastName">{t("auth.lastName")}</Label>
               <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
             </div>
             <div>
-              <Label htmlFor="email">{t("common.email")}</Label>
+              <Label htmlFor="email">{t("auth.email")}</Label>
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div>
-              <Label htmlFor="password">{t("common.password")}</Label>
+              <Label htmlFor="password">{t("auth.password")}</Label>
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
             <Button type="submit" className="w-full bg-jyskBlue-dark hover:bg-jyskBlue-light" disabled={loading}>
-              {loading ? t("common.signingUp") : t("common.signUp")}
+              {loading ? t("auth.signingUp") : t("auth.signUp")}
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            {t("common.alreadyHaveAccount")}{" "}
+            {t("auth.alreadyHaveAccount")}{" "}
             <Link to="/prihlaseni" className="underline">
-              {t("common.login")}
+              {t("auth.login")}
             </Link>
           </div>
         </CardContent>

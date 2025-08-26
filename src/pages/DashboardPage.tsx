@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { AddWidgetDialog } from "@/components/AddWidgetDialog";
 
-// Map widget component names to actual components
 const widgetComponents: { [key: string]: React.FC<{ id: string }> } = {
   ArticleOverviewWidget,
   LowStockAlertsWidget,
@@ -29,7 +28,6 @@ const DashboardPage = () => {
   const { widgets } = useDashboard();
   const [isAddWidgetDialogOpen, setIsAddWidgetDialogOpen] = useState(false);
 
-  // Admins should see the site dashboard, not the user dashboard
   if (isAdmin) {
     return <Navigate to="/admin/site-dashboard" replace />;
   }
@@ -38,14 +36,14 @@ const DashboardPage = () => {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-            <h1 className="text-lg font-semibold md:text-2xl">{t("common.dashboard")}</h1>
+            <h1 className="text-lg font-semibold md:text-2xl">{t("page.dashboard.title")}</h1>
             <p className="text-sm text-muted-foreground">
-                {t("common.welcomeMessage", { username: user?.first_name || user?.email })}
+                {t("page.dashboard.welcomeMessage", { username: user?.first_name || user?.email })}
             </p>
         </div>
         <Button onClick={() => setIsAddWidgetDialogOpen(true)}>
             <PlusCircle className="h-4 w-4 mr-2" />
-            {t("common.widgets.addWidget")}
+            {t("page.dashboard.addWidget")}
         </Button>
       </div>
       

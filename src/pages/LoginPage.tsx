@@ -28,7 +28,7 @@ const LoginPage: React.FC = () => {
       </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("common.loginTitle")}</CardTitle>
+          <CardTitle className="text-3xl font-bold text-jyskBlue-dark dark:text-jyskBlue-light">{t("auth.loginTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Auth
@@ -36,26 +36,26 @@ const LoginPage: React.FC = () => {
             appearance={{ theme: ThemeSupa }}
             providers={[]}
             view="sign_in"
-            showLinks={false} // This will hide the "Don't have an account? Sign up" link
+            showLinks={false}
             localization={{
               variables: {
                 sign_in: {
-                  email_label: t("common.email"),
-                  password_label: t("common.password"),
-                  button_label: t("common.login"),
-                  email_input_placeholder: t("common.enterEmail"),
-                  password_input_placeholder: t("common.enterPassword"),
+                  email_label: t("auth.email"),
+                  password_label: t("auth.password"),
+                  button_label: t("auth.login"),
+                  email_input_placeholder: t("auth.enterEmail"),
+                  password_input_placeholder: t("auth.enterPassword"),
                 },
                 forgotten_password: {
-                  link_text: "Zapomněli jste heslo?",
+                  link_text: t("auth.forgotPassword"),
                 },
               },
             }}
           />
           <div className="mt-4 text-center text-sm">
-            {t("common.noAccount")}{" "}
+            {t("auth.noAccount")}{" "}
             <Link to="/registrace" className="underline">
-              {t("common.signUp")}
+              {t("auth.signUp")}
             </Link>
           </div>
         </CardContent>
