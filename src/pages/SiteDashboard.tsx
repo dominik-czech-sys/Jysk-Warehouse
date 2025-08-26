@@ -58,9 +58,9 @@ const SiteDashboard: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-2 sm:p-4">
         <Card className="p-4 sm:p-6 text-center">
-          <CardTitle className="text-xl sm:text-2xl font-bold text-red-600">{t("common.auth.accessDenied")}</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl font-bold text-red-600">{t("auth.accessDenied")}</CardTitle>
           <CardContent className="mt-4">
-            <p className="text-gray-700 dark:text-gray-300">{t("common.auth.noPermission")}</p>
+            <p className="text-gray-700 dark:text-gray-300">{t("auth.noPermission")}</p>
             <Link to="/" className="mt-4 inline-block">
               <Button className="bg-jyskBlue-dark hover:bg-jyskBlue-light text-jyskBlue-foreground">{t("common.backToMainPage")}</Button>
             </Link>
@@ -79,27 +79,27 @@ const SiteDashboard: React.FC = () => {
               <ArrowLeft className="h-4 w-4 mr-2" /> {t("common.backToMainPage")}
             </Button>
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("pageTitle.siteDashboard")}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">{t("page.siteDashboard.title")}</h1>
           <div className="w-full sm:w-auto"></div> {/* Placeholder for alignment */}
         </div>
 
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-8">
-            <TabsTrigger value="overview">{t("common.admin.overview")}</TabsTrigger>
-            <TabsTrigger value="analytics">{t("common.admin.analytics")}</TabsTrigger>
-            <TabsTrigger value="stores">{t("common.admin.stores")}</TabsTrigger>
-            <TabsTrigger value="users">{t("common.admin.users")}</TabsTrigger>
-            <TabsTrigger value="roles">{t("common.permission.roles")}</TabsTrigger>
-            <TabsTrigger value="communication">{t("common.admin.communication")}</TabsTrigger>
-            <TabsTrigger value="audits">{t("common.admin.audits")}</TabsTrigger>
-            <TabsTrigger value="system">{t("common.admin.system")}</TabsTrigger>
+            <TabsTrigger value="overview">{t("page.siteDashboard.overview")}</TabsTrigger>
+            <TabsTrigger value="analytics">{t("page.siteDashboard.analytics")}</TabsTrigger>
+            <TabsTrigger value="stores">{t("page.siteDashboard.stores")}</TabsTrigger>
+            <TabsTrigger value="users">{t("page.siteDashboard.users")}</TabsTrigger>
+            <TabsTrigger value="roles">{t("page.siteDashboard.roles")}</TabsTrigger>
+            <TabsTrigger value="communication">{t("page.siteDashboard.communication")}</TabsTrigger>
+            <TabsTrigger value="audits">{t("page.siteDashboard.audits")}</TabsTrigger>
+            <TabsTrigger value="system">{t("page.siteDashboard.system")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-4">
             <Card>
               <CardHeader>
-                <CardTitle>{t("common.admin.systemOverview")}</CardTitle>
-                <CardDescription>{t("common.admin.systemOverviewDescription")}</CardDescription>
+                <CardTitle>{t("page.siteDashboard.systemOverview")}</CardTitle>
+                <CardDescription>{t("page.siteDashboard.systemOverviewDescription")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <StatisticsOverview />
